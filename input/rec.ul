@@ -1,0 +1,24 @@
+| odd (VALUE n)
+  N 0 ==
+  IF
+  False
+  ELSE
+  n 1 -
+  n ASSIGN
+  even
+  THEN
+  1 RETURN |
+
+| even (VALUE n)
+  N 0 ==
+  IF
+  True
+  ELSE
+  n 1 -
+  n ASSIGN
+  even
+  THEN
+  1 RETURN |
+
+21 odd
+__PRINT__

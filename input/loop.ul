@@ -1,14 +1,14 @@
 | summy ( VALUE N )         # Start of function summy, taking N into local stack
-  VARIABLE result           # Create a new variable RESULT on the local stack
-  0 result ASSIGN                # Set RESULT to 0
+  VARIABLE result           # Create a new variable result on the local stack
+  0 result ASSIGN           # Set result to 0
   BEGIN                     # Begin while loop
   N 1 >=                    # Push bool(N >= 1) to the stack
   WHILE                     # Start of while body
-    result N +=             # Add N to RESULT
+    result N +=             # Add N to result
     N 1 -=                  # Subtract 1 from N
   REPEAT                    # End of while body
-  result @                  # Place RESULT on top of stack
-  1 -> |                    # Place n values from local stack onto stack (n is 1 in this case)
+  result RETRIEVE           # Place value of result on top of stack
+  1 RETURN |                # Place n values from local stack onto stack (n is 1 in this case)
 
 5 summy                     # Call summy function
 __PRINT__                   # Call print macro, printing the topmost value

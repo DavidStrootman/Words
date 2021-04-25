@@ -24,7 +24,7 @@ Should support:
 - [Stack Manipulation](#Stack Manipulation)  
   `DUP` -> `X Y -- X Y Y`
 - Functions/Subroutines  
-  `| NAME ( VALUE X, VALUE Y ) X Y == 1 ->|`  
+  `| NAME ( VALUE X, VALUE Y ) X Y == 1 RETURN|`  
 - Anonymous functions  
   `λ ( VALUE X, VALUE Y ) X Y == λ`  
   Takes the top element of the global stack for every argument and places it in the dictionary
@@ -83,7 +83,8 @@ The `ASSIGN` keyword assigns the topmost value from the stack to the variable st
 40
 count ASSIGN # Assigns the topmost value (40) to count (= in other languages)
 ```
-
+#### RETURN
+TODO
 ### Operators
 Operators take between 0 and 2 arguments, depending on how many should be taken from the stack.
 ```python
@@ -94,3 +95,6 @@ Operators take between 0 and 2 arguments, depending on how many should be taken 
 The arguments could be seen as extending the stack with new values before executing the opration. For 
 example the expression `20 /`, placing the complete operation between parentheses:  
 if the stack is [10, 20, 30] the operation would be `[10, 20, (30], 20 /)`, taking only 30 from the stack and dividing it by 20.
+
+### Macros
+TODO
