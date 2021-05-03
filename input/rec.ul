@@ -1,4 +1,4 @@
-| odd (VALUE n)
+| odd ( VALUE n )
   N 0 ==
   IF
   False
@@ -9,7 +9,7 @@
   THEN
   1 RETURN |
 
-| even (VALUE n)
+| even ( VALUE n )
   N 0 ==
   IF
   True
