@@ -1,39 +1,58 @@
-from typing import TypeVar
+from abc import ABC
 
-from blocks.helper.value_iterable_enum import ValueIterableEnum
-
-
-class MacroType(ValueIterableEnum):
-    PRINT = "__PRINT__"
+from blocks.helper.token_type_enum import TokenTypeEnum
 
 
-class TokenType(ValueIterableEnum):
-    BEGIN = "BEGIN"
-    WHILE = "WHILE"
-    REPEAT = "REPEAT"
-    IF = "IF"
-    ELSE = "ELSE"
-    THEN = "THEN"
-    VARIABLE = "VARIABLE"
-    ASSIGN = "ASSIGN"
-    FUNC = "|"
-    LAMB = "λ"
-    PAREN_OPEN = "("
-    PAREN_CLOSE = ")"
-    MINUS = "-"
-    PLUS = "+"
-    EQUALS = "="
-    GREATER = ">"
-    LESSER = "<"
-    COMMENT = "#"
-    NUMBER = "NUMBER"
-    LITERAL = "LITERAL"
+class Token(ABC):
+    class Types(TokenTypeEnum):
+        PLACEHOLDER = "PLACEHOLDER"
+
+    def __init__(self, token_type: str):
+        self.type = self.Types(token_type)
 
 
-TokenTyping = TypeVar("TokenTyping", MacroType, TokenType)
+class DelimToken(Token):
+    class Types(TokenTypeEnum):
+        PAREN_OPEN = "("
+        PAREN_CLOSE = ")"
 
 
-class Token:
-    """Base Token"""
-    def __init__(self, token_type):
-        self.type: TokenTyping = token_type
+class IdentToken(Token):
+    class Types(TokenTypeEnum):
+        IDENTIFIER = "IDENTIFIER"
+
+
+class KeywordToken(Token):
+    class Types(TokenTypeEnum):
+        BEGIN = "BEGIN"
+        WHILE = "WHILE"
+        REPEAT = "REPEAT"
+        IF = "IF"
+        ELSE = "ELSE"
+        THEN = "THEN"
+        VARIABLE = "VARIABLE"
+        VALUE = "VALUE"
+        ASSIGN = "ASSIGN"
+        RETURN = "RETURN"
+        FUNCTION = "|"
+        LAMBDA = "λ"
+
+
+class LiteralToken(Token):
+    class Types(TokenTypeEnum):
+        NUMBER = "NUMBER"
+        COMMENT = "#"
+
+
+class MacroToken(Token):
+    class Types(TokenTypeEnum):
+        PRINT = "__PRINT__"
+
+
+class OpToken(Token):
+    class Types(TokenTypeEnum):
+        MINUS = "-"
+        PLUS = "+"
+        EQUALS = "="
+        GREATER = ">"
+        LESSER = "<"
