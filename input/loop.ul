@@ -8,7 +8,7 @@
     N 1 -=                  # Subtract 1 from N
   REPEAT                    # End of while body
   result RETRIEVE           # Place value of result on top of stack
-  1 RETURN |                # Place n values from local stack onto stack (n is 1 in this case)
+  RETURN 1 |                # Place n values from local stack onto stack (n is 1 in this case)
 
 5 summy                     # Call summy function
 __PRINT__                   # Call print macro, printing the topmost value

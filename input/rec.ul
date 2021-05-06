@@ -7,7 +7,7 @@
   n ASSIGN
   even
   THEN
-  1 RETURN |
+  RETURN 1 |
 
 | even ( VALUE n )
   N 0 ==
@@ -18,7 +18,7 @@
   n ASSIGN
   even
   THEN
-  1 RETURN |
+  RETURN 1 |
 
 21 odd
 __PRINT__

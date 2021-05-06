@@ -1,7 +1,7 @@
 from pprint import pprint
 from typing import List, Iterator
 
-from blocks.token.token import Token, MacroToken, KeywordToken, LiteralToken, DelimToken, OpToken, IdentToken
+from blocks.token.token import LexerToken, MacroLexerToken, KeywordLexerToken, LiteralLexerToken, DelimLexerToken, OpLexerToken, IdentLexerToken
 
 
 class Lexer:
@@ -15,11 +15,11 @@ class Lexer:
         yield from (line.split() for line in lines)
 
     @staticmethod
-    def lex(words: Iterator[Iterator[str]]) -> Iterator[Token]:
+    def lex(words: Iterator[Iterator[str]]) -> Iterator[LexerToken]:
         return Lexer.exhaustive_lex(words)
 
     @staticmethod
-    def exhaustive_lex(text: Iterator[Iterator[str]]) -> Iterator[Token]:
+    def exhaustive_lex(text: Iterator[Iterator[str]]) -> Iterator[LexerToken]:
         try:
             yield from Lexer.lex_line(iter(next(text)))
             yield from Lexer.exhaustive_lex(text)
@@ -27,10 +27,10 @@ class Lexer:
             return
 
     @staticmethod
-    def lex_line(line: Iterator[str]) -> Iterator[Token]:
+    def lex_line(line: Iterator[str]) -> Iterator[LexerToken]:
         try:
             token = Lexer.lex_token(next(line))
-            if token.type == LiteralToken.Types.COMMENT:
+            if token.value == LiteralLexerToken.Types.COMMENT:
                 return
             yield token
             yield from Lexer.lex_line(line)
@@ -39,27 +39,26 @@ class Lexer:
             return
 
     @staticmethod
-    def lex_token(token: str) -> Token:
-        if token in DelimToken.Types.values():
-            return DelimToken(token)
-        if token in IdentToken.Types.values():
-            return IdentToken(token)
-        if token in KeywordToken.Types.values():
-            return KeywordToken(token)
-        if token in LiteralToken.Types.values():
-            return LiteralToken(token)
-        if token in MacroToken.Types.values():
-            return MacroToken(token)
-        if token in OpToken.Types.values():
-            return OpToken(token)
+    def lex_token(token: str) -> LexerToken:
+        if token in DelimLexerToken.Types.values():
+            return DelimLexerToken(token)
+        if token in KeywordLexerToken.Types.values():
+            return KeywordLexerToken(token)
+        if token in LiteralLexerToken.Types.values():
+            return LiteralLexerToken(LiteralLexerToken.Types(token), token)
+        if token in MacroLexerToken.Types.values():
+            return MacroLexerToken(token)
+        if token in OpLexerToken.Types.values():
+            return OpLexerToken(token)
         if token.isdigit():
-            return LiteralToken(LiteralToken.Types.NUMBER.value)
+            return LiteralLexerToken(LiteralLexerToken.Types.NUMBER.value, token)
 
-        return IdentToken(IdentToken.Types.IDENTIFIER.value)
+        return IdentLexerToken(token)
 
 
 # Debug main
 if __name__ == '__main__':
-    values = [token_ for token_ in list(Lexer.lex_file("../../input/loop.ul"))]
+    values = [token_.value for token_ in list(Lexer.lex_file("../../input/loop.ul"))]
     pprint(values)
-    assert len(values) == 31  # poor mans testcase
+    print(len(values))
+    assert len(values) == 31  # poor man's testcase

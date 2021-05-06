@@ -2,6 +2,9 @@
 
 Advanced Technical Programming Course
 
+Contains my own programming language "Blocks".  
+Includes a lexer/parser, an interpreter in python and a compiler for Cortex-M0
+
 ### BLOCKS
 
 - Inspired by (the syntax of) Forth
@@ -24,7 +27,7 @@ Should support:
 - [Stack Manipulation](#Stack Manipulation)  
   `DUP` -> `X Y -- X Y Y`
 - Functions/Subroutines  
-  `| NAME ( VALUE X, VALUE Y ) X Y == 1 RETURN|`  
+  `| NAME ( VALUE X, VALUE Y ) X Y == RETURN 1|`  
 - Anonymous functions  
   `λ ( VALUE X, VALUE Y ) X Y == λ`  
   Takes the top element of the global stack for every argument and places it in the dictionary
