@@ -21,14 +21,12 @@ class Parser:
     @staticmethod
     def parse_exhaustive(tokens: Iterator[LexerToken]):
         try:
-            yield next(tokens).parse(tokens)
-            yield from Parser.parse_exhaustive(tokens)
+            return [next(tokens).parse(tokens)] + Parser.parse_exhaustive(tokens)
         except StopIteration:
-            return
+            return []
 
 
 if __name__ == '__main__':
     lexed_tokens_ = Lexer.lex_file("../../input/loop.ul")
-    parsed_tokens_ = Parser.parse(lexed_tokens_)
-    teet = list(parsed_tokens_.tokens)
+    AST = Parser.parse(lexed_tokens_)
     x = 5

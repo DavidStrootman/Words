@@ -17,8 +17,8 @@ class LexerToken(ABC):
         pass
 
 
-class ParserToken:
-    pass
+class ParserToken(ABC):
+    """Base parser token."""
 
 
 class WhileParserToken(ParserToken):
@@ -146,9 +146,9 @@ def try_get_identifier_value(token):
 
 
 def try_get_return_value(token):
-    if int(token.value) not in range(3):
+    if int(token.content) not in range(3):
         raise RuntimeError(f"Got too many return values ({token.value}), expected 0, 1 or 2")
-    return int(token.value)
+    return int(token.content)
 
 
 class LiteralLexerToken(LexerToken):
@@ -158,11 +158,16 @@ class LiteralLexerToken(LexerToken):
 
     def __init__(self, token_type, value):
         super().__init__(token_type)
-        if self.value in [super().Types.UNDEFINED, self.Types.NUMBER]:
-            self.value = value
+        self.content = value
 
     def parse(self, tokens: Iterator["LexerToken"]):
-        pass
+        if self.value == self.Types.NUMBER:
+            return NumberParserToken(self.content)
+
+
+class NumberParserToken(ParserToken):
+    def __init__(self, value: int):
+        self.value = value
 
 
 class MacroLexerToken(LexerToken):
@@ -170,18 +175,45 @@ class MacroLexerToken(LexerToken):
         PRINT = "__PRINT__"
 
     def parse(self, tokens: Iterator["LexerToken"]):
-        pass
+        return MacroParserToken(self.value.value)
+
+
+class MacroParserToken(ParserToken):
+    def __init__(self, function_name: str):
+        self.function_name = function_name
 
 
 class OpLexerToken(LexerToken):
     class Types(TokenTypeEnum):
-        MINUS = "-"
-        PLUS = "+"
-        EQUALS = "="
+        SUBTRACTION = "-"
+        ADDITION = "+"
+        EQUALITY = "="
         GREATER = ">"
         LESSER = "<"
-        ASSIGN = "ASSIGN"
+        GREATER_EQ = ">="
+        LESER_EQ = ">="
+        ASSIGNMENT = "ASSIGN"
+        RETRIEVAL = "RETRIEVE"
 
     def parse(self, tokens: Iterator["LexerToken"]):
-        pass
+        if self.value.value in ["-", "+"]:
+            return ArithmeticOperatorParserToken(self.value.value)
+        if self.value.value in ["=", ">", "<", ">=", "<="]:
+            return BooleanOperatorParserToken(self.value.value)
+        if self.value.value in ["ASSIGN", "RETRIEVE"]:
+            return DictionaryOperatorParserToken(self.value.value)
 
+
+class ArithmeticOperatorParserToken(ParserToken):
+    def __init__(self, value: str):
+        self.value = value
+
+
+class BooleanOperatorParserToken(ParserToken):
+    def __init__(self, value: str):
+        self.value = value
+
+
+class DictionaryOperatorParserToken(ParserToken):
+    def __init__(self, value: str):
+        self.value = value
