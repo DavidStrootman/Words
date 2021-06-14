@@ -6,5 +6,9 @@ def summy(n: int) -> int:
 
     return result
 
+
+def run() -> int:
+    return summy(1400)
+
 if __name__ == "__main__":
-    print(summy(21))
+    print(summy(5))

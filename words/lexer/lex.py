@@ -1,7 +1,6 @@
-from pprint import pprint
 from typing import List, Iterator
 
-from blocks.token.token import LexerToken, MacroLexerToken, KeywordLexerToken, LiteralLexerToken, DelimLexerToken, OpLexerToken, IdentLexerToken
+from words.token.lexer_token import LexerToken, MacroLexerToken, KeywordLexerToken, LiteralLexerToken, DelimLexerToken, OpLexerToken, IdentLexerToken
 
 
 class Lexer:
@@ -59,6 +58,5 @@ class Lexer:
 # Debug main
 if __name__ == '__main__':
     values = [token_.value for token_ in list(Lexer.lex_file("../../input/loop.ul"))]
-    pprint(values)
     print(len(values))
     assert len(values) == 31  # poor man's testcase

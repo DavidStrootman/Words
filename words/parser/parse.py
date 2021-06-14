@@ -1,22 +1,16 @@
-from pprint import pprint
 from typing import Iterator
 
-
-from blocks.lexer.lex import Lexer
-from blocks.token.token import LexerToken
-
-
-class AST:
-    def __init__(self, tokens):
-        self.tokens = tokens
+from words.lexer.lex import Lexer
+from words.token.lexer_token import LexerToken
+from words.parser.parse_util import Program
 
 
 class Parser:
     @staticmethod
-    def parse(tokens: Iterator[LexerToken]):
+    def parse(tokens: Iterator[LexerToken]) -> Program:
         parsed_tokens = Parser.parse_exhaustive(tokens)
-        ast = AST(parsed_tokens)
-        return ast
+        program = Program(parsed_tokens)
+        return program
 
     @staticmethod
     def parse_exhaustive(tokens: Iterator[LexerToken]):
@@ -28,5 +22,5 @@ class Parser:
 
 if __name__ == '__main__':
     lexed_tokens_ = Lexer.lex_file("../../input/loop.ul")
-    AST = Parser.parse(lexed_tokens_)
-    x = 5
+    program_ = Parser.parse(lexed_tokens_)
+    yeet = 2

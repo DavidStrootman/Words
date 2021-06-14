@@ -2,10 +2,10 @@
 
 Advanced Technical Programming Course
 
-Contains my own programming language "Blocks".  
+Contains my own programming language "Words".  
 Includes a lexer/parser, an interpreter in python and a compiler for Cortex-M0
 
-### BLOCKS
+### Words
 
 - Inspired by (the syntax of) Forth
 - Stack based (stack, dictionary, local stack)
@@ -60,7 +60,7 @@ WHILE
 REPEAT
 ```
 #### Conditionals (IF ELSE THEN)  
-Conditionals in BLOCKS are built up of three keywords: IF, ELSE and THEN. Conditionals work the same way
+Conditionals in Words are built up of three keywords: IF, ELSE and THEN. Conditionals work the same way
 as they do in Forth. The IF is preceded by a boolean operator of some sort. If the result is true, the block of code following IF is called.
 If a ELSE block is given, the execution continues at THEN. If the result if false, the else block is called. [Forth documentation](https://www.forth.com/starting-forth/4-conditional-if-then-statements/)
 ```python
@@ -77,7 +77,7 @@ global and local variables are defined using the `VARIABLE` keyword:
 ```python
 VARIABLE count
 ```  
-BLOCKS uses one dictionary for all variables, both local and global. Shadowing is not allowed, and all variables in functions
+Words uses one dictionary for all variables, both local and global. Shadowing is not allowed, and all variables in functions
 that are not defined in the local scope must be passed as parameters. Using a global variable in a local scope will cause a 
 compile error.
 #### ASSIGN

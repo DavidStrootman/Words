@@ -4,7 +4,7 @@
   False
   ELSE
   n 1 -
-  n ASSIGN
+  ASSIGN n
   even
   THEN
   RETURN 1 |
@@ -15,7 +15,7 @@
   True
   ELSE
   n 1 -
-  n ASSIGN
+  ASSIGN n
   even
   THEN
   RETURN 1 |
