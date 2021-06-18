@@ -24,7 +24,18 @@ class NumberParserToken(ParserToken):
         self.value = value
 
     def execute(self, stack: list, dictionary: dict) -> Tuple[list, dict]:
-        return stack + list([self.value]), dictionary
+        return stack + [self.value], dictionary
+
+
+class BooleanParserToken(ParserToken):
+    def __init__(self, value: bool):
+        if value == "True":
+            self.value = True
+        if value == "False":
+            self.value = False
+
+    def execute(self, stack: list, dictionary: dict) -> Tuple[list, dict]:
+        return stack + [self.value], dictionary
 
 
 class MacroParserToken(ParserToken):
@@ -53,6 +64,14 @@ class IfParserToken(ParserToken):
     def __init__(self, if_body: List[ParserToken], else_body: Optional[List[ParserToken]] = None):
         self.if_body = if_body
         self.else_body = else_body
+
+    def execute(self, stack: list, dictionary: dict) -> Tuple[list, dict]:
+        predicate = stack[-1]
+        if predicate is True:
+            return exhaustive_interpret_tokens(self.if_body, stack[:-1], dictionary)
+        if self.else_body:
+            return exhaustive_interpret_tokens(self.else_body, stack[:-1], dictionary)
+        return stack[:-1], dictionary
 
 
 class VariableParserToken(ParserToken, DictionaryToken):
@@ -127,10 +146,6 @@ class FunctionParserToken(ParserToken, DictionaryToken):
 
         return rec_setup_parameters(stack, dictionary, self.parameters)
 
-    # def teardown_parameters(self, stack: list, dictionary: dict) -> Tuple[list, dict]:
-    #     return stack, {key: value for key, value in dictionary.items() if key not in
-    #                    [parameter.value for parameter in self.parameters]}  # Dictionary comprehension != for loop?
-
 
 class ArithmeticOperatorParserToken(ParserToken):
     def __init__(self, value: str):
@@ -148,13 +163,15 @@ class ArithmeticOperatorParserToken(ParserToken):
         raise NotImplementedError(f"Unimplemented ArithmeticOperator {self.value}")
 
 
-
-
 class BooleanOperatorParserToken(ParserToken):
     def __init__(self, value: str):
         self.value = value
 
     def execute(self, stack: list, dictionary: dict) -> Tuple[list, dict]:
+        if self.value == "==":
+            topmost_value = stack[-1]
+            second_value = stack[-2]
+            return stack[:-2] + [second_value == topmost_value], dictionary
         if self.value == ">=":
             topmost_value = stack[-1]
             second_value = stack[-2]

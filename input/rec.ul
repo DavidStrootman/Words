@@ -1,22 +1,18 @@
-| odd ( VALUE n )
+| odd ( VALUE N )
   N 0 ==
   IF
   False
   ELSE
-  n 1 -
-  ASSIGN n
-  even
+  N 1 - even
   THEN
   RETURN 1 |
 
-| even ( VALUE n )
+| even ( VALUE N )
   N 0 ==
   IF
   True
   ELSE
-  n 1 -
-  ASSIGN n
-  even
+  N 1 - odd
   THEN
   RETURN 1 |
 

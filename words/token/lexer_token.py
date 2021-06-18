@@ -4,7 +4,7 @@ from typing import Iterator, List, Optional, Type
 from words.helper.token_type_enum import TokenTypeEnum
 from words.parser.parse_util import eat_until, eat_until_discarding
 from words.token.parser_token import DictionaryOperatorParserToken, BooleanOperatorParserToken, \
-    ArithmeticOperatorParserToken, MacroParserToken, NumberParserToken, FunctionParserToken, ReturnParserToken, \
+    ArithmeticOperatorParserToken, BooleanParserToken, MacroParserToken, NumberParserToken, FunctionParserToken, ReturnParserToken, \
     ValueParserToken, VariableParserToken, IdentParserToken, IfParserToken, WhileParserToken
 
 
@@ -86,8 +86,8 @@ class KeywordLexerToken(LexerToken):
         if self.value == self.Types.REPEAT:
             raise NotImplementedError("Found unexpected REPEAT token.")
         if self.value == self.Types.IF:
-            if_body = eat_until(tokens, self.Types.ELSE)
-            else_body = eat_until(tokens, self.Types.THEN)
+            if_body = eat_until_discarding(tokens, self.Types.ELSE)
+            else_body = eat_until_discarding(tokens, self.Types.THEN)
             return IfParserToken(if_body, else_body)
         if self.value == self.Types.ELSE:
             raise NotImplementedError("Found unexpected ELSE token.")
@@ -117,6 +117,8 @@ class LiteralLexerToken(LexerToken):
     class Types(TokenTypeEnum):
         NUMBER = "NUMBER"
         COMMENT = "#"
+        TRUE = "True"
+        FALSE = "False"
 
     def __init__(self, token_type, value):
         super().__init__(token_type)
@@ -125,6 +127,8 @@ class LiteralLexerToken(LexerToken):
     def parse(self, tokens: Iterator["LexerToken"]):
         if self.value == self.Types.NUMBER:
             return NumberParserToken(int(self.content))
+        if self.value in [self.Types.TRUE, self.Types.FALSE]:
+            return BooleanParserToken(self.content)
 
 
 class MacroLexerToken(LexerToken):
@@ -139,7 +143,7 @@ class OpLexerToken(LexerToken):
     class Types(TokenTypeEnum):
         SUBTRACTION = "-"
         ADDITION = "+"
-        EQUALITY = "="
+        EQUALITY = "=="
         GREATER = ">"
         LESSER = "<"
         GREATER_EQ = ">="
@@ -150,7 +154,7 @@ class OpLexerToken(LexerToken):
     def parse(self, tokens: Iterator["LexerToken"]):
         if self.value.value in ["-", "+"]:
             return ArithmeticOperatorParserToken(self.value.value)
-        if self.value.value in ["=", ">", "<", ">=", "<="]:
+        if self.value.value in ["==", ">", "<", ">=", "<="]:
             return BooleanOperatorParserToken(self.value.value)
         if self.value.value in ["ASSIGN", "RETRIEVE"]:
             targeted_variable = next(tokens)
