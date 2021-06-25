@@ -10,7 +10,6 @@ def execute_program(program: "Program") -> any:
     return None
 
 
-
 def exhaustive_interpret_tokens(tokens_: List["ParserToken"], stack_: list, dictionary_: dict) -> Tuple[
     list, dict]:
     if tokens_:

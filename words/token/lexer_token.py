@@ -1,7 +1,8 @@
 from abc import ABC, abstractmethod
-from typing import Iterator, List, Optional, Type
+from typing import Iterator, Type
 
 from words.helper.token_type_enum import TokenTypeEnum
+from words.lexer.lex_util import Word
 from words.parser.parse_util import eat_until, eat_until_discarding
 from words.token.parser_token import DictionaryOperatorParserToken, BooleanOperatorParserToken, \
     ArithmeticOperatorParserToken, BooleanParserToken, MacroParserToken, NumberParserToken, FunctionParserToken, ReturnParserToken, \
@@ -12,8 +13,9 @@ class LexerToken(ABC):
     class Types(TokenTypeEnum):
         UNDEFINED = "UNDEFINED"
 
-    def __init__(self, token_type: str):
-        self.value = self.Types(token_type)
+    def __init__(self, word: Word):
+        self.debug_data = word.debug_data
+        self.value = self.Types(word.content)
 
     @abstractmethod
     def parse(self, tokens: Iterator["LexerToken"]):
@@ -53,9 +55,9 @@ class DelimLexerToken(LexerToken):
 
 
 class IdentLexerToken(LexerToken):
-    def __init__(self, value: str):
-        super().__init__("UNDEFINED")
-        self.value = value
+    def __init__(self, word: Word):
+        super().__init__(Word("UNDEFINED", word.debug_data))
+        self.value = word.content
 
     def parse(self, tokens: Iterator["LexerToken"]):
         return IdentParserToken(self.value)
@@ -120,9 +122,9 @@ class LiteralLexerToken(LexerToken):
         TRUE = "True"
         FALSE = "False"
 
-    def __init__(self, token_type, value):
-        super().__init__(token_type)
-        self.content = value
+    def __init__(self, token_type, word: Word):
+        super().__init__(Word(token_type, word.debug_data))
+        self.content = word.content
 
     def parse(self, tokens: Iterator["LexerToken"]):
         if self.value == self.Types.NUMBER:

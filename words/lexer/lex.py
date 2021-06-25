@@ -1,32 +1,36 @@
-from typing import List, Iterator
+from typing import List, Iterator, Tuple
 
-from words.token.lexer_token import LexerToken, MacroLexerToken, KeywordLexerToken, LiteralLexerToken, DelimLexerToken, OpLexerToken, IdentLexerToken
+from words.token.lexer_token import LexerToken, MacroLexerToken, KeywordLexerToken, LiteralLexerToken, DelimLexerToken, \
+    OpLexerToken, IdentLexerToken
+
+from words.lexer.lex_util import Word, DebugData
 
 
 class Lexer:
     @staticmethod
     def lex_file(filepath):
-        text: Iterator[Iterator[str]] = Lexer.split_lines_into_words(open(filepath, 'r').readlines())
-        return Lexer.lex(text)
+        words: Iterator[Iterator[Word]] = (Lexer.split_line_into_words(line_nr, line) for line_nr, line in
+                                           enumerate(open(filepath, 'r').readlines()))
+        return Lexer.lex(words)
 
     @staticmethod
-    def split_lines_into_words(lines: List[str]) -> Iterator[Iterator[str]]:
-        yield from (line.split() for line in lines)
+    def split_line_into_words(line_nr, line) -> Iterator[Word]:
+        yield from (Word(word, DebugData(line_nr)) for word in line.split())
 
     @staticmethod
-    def lex(words: Iterator[Iterator[str]]) -> Iterator[LexerToken]:
+    def lex(words: Iterator[Iterator[Word]]) -> Iterator[LexerToken]:
         return Lexer.exhaustive_lex(words)
 
     @staticmethod
-    def exhaustive_lex(text: Iterator[Iterator[str]]) -> Iterator[LexerToken]:
+    def exhaustive_lex(words: Iterator[Iterator[Word]]) -> Iterator[LexerToken]:
         try:
-            yield from Lexer.lex_line(iter(next(text)))
-            yield from Lexer.exhaustive_lex(text)
+            yield from Lexer.lex_line(iter(next(words)))
+            yield from Lexer.exhaustive_lex(words)
         except StopIteration:
             return
 
     @staticmethod
-    def lex_line(line: Iterator[str]) -> Iterator[LexerToken]:
+    def lex_line(line: Iterator[Word]) -> Iterator[LexerToken]:
         try:
             token = Lexer.lex_token(next(line))
             if token.value == LiteralLexerToken.Types.COMMENT:
@@ -38,18 +42,18 @@ class Lexer:
             return
 
     @staticmethod
-    def lex_token(token: str) -> LexerToken:
-        if token in DelimLexerToken.Types.values():
+    def lex_token(token: Word) -> LexerToken:
+        if token.content in DelimLexerToken.Types.values():
             return DelimLexerToken(token)
-        if token in KeywordLexerToken.Types.values():
+        if token.content in KeywordLexerToken.Types.values():
             return KeywordLexerToken(token)
-        if token in LiteralLexerToken.Types.values():
-            return LiteralLexerToken(LiteralLexerToken.Types(token), token)
-        if token in MacroLexerToken.Types.values():
+        if token.content in LiteralLexerToken.Types.values():
+            return LiteralLexerToken(LiteralLexerToken.Types(token.content), token)
+        if token.content in MacroLexerToken.Types.values():
             return MacroLexerToken(token)
-        if token in OpLexerToken.Types.values():
+        if token.content in OpLexerToken.Types.values():
             return OpLexerToken(token)
-        if token.isdigit():
+        if token.content.isdigit():
             return LiteralLexerToken(LiteralLexerToken.Types.NUMBER.value, token)
 
         return IdentLexerToken(token)
