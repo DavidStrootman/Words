@@ -1,0 +1,24 @@
+| FIBONACCI ( VALUE N )
+  N 0 <
+  IF
+  0 1 -
+  ELSE
+    N 0 ==
+    IF
+    0
+    ELSE
+      N 1 ==
+      IF
+      1
+      ELSE
+      N 1 - FIBONACCI
+      N 2 - FIBONACCI
+      +
+      THEN
+    THEN
+  THEN
+  RETURN 1 |
+
+12 FIBONACCI
+__PRINT__
+

@@ -79,17 +79,22 @@ class KeywordLexerToken(LexerToken):
 
     def parse(self, tokens: Iterator["LexerToken"]):
         if self.value == self.Types.BEGIN:
-            predicate = eat_until(tokens, self.Types.WHILE)
+            predicate = eat_until(tokens, [self.Types.WHILE])
             predicate_without_last_item = predicate[:-1]
-            statements = eat_until_discarding(tokens, self.Types.REPEAT)
+            statements = eat_until_discarding(tokens, [self.Types.REPEAT])
             return WhileParserToken(predicate_without_last_item, statements)
         if self.value == self.Types.WHILE:
             raise NotImplementedError("Found unexpected WHILE token.")
         if self.value == self.Types.REPEAT:
             raise NotImplementedError("Found unexpected REPEAT token.")
         if self.value == self.Types.IF:
-            if_body = eat_until_discarding(tokens, self.Types.ELSE)
-            else_body = eat_until_discarding(tokens, self.Types.THEN)
+            if_body = eat_until(tokens, [self.Types.ELSE, self.Types.THEN])
+            if if_body[-1].value == self.Types.ELSE:
+                if_body = if_body[:-1]  # Discard ELSE token
+                else_body = eat_until_discarding(tokens, [self.Types.THEN])
+            else:
+                if_body = if_body[:-1]  # Discard THEN token
+                else_body = None
             return IfParserToken(if_body, else_body)
         if self.value == self.Types.ELSE:
             raise NotImplementedError("Found unexpected ELSE token.")
@@ -108,8 +113,8 @@ class KeywordLexerToken(LexerToken):
             name = token.value
             paren_open = next(tokens)
             LexerToken.assert_type(paren_open, DelimLexerToken.Types.PAREN_OPEN)
-            parameters = eat_until_discarding(tokens, DelimLexerToken.Types.PAREN_CLOSE)
-            body = eat_until_discarding(tokens, KeywordLexerToken.Types.FUNCTION)
+            parameters = eat_until_discarding(tokens, [DelimLexerToken.Types.PAREN_CLOSE])
+            body = eat_until_discarding(tokens, [KeywordLexerToken.Types.FUNCTION])
             return FunctionParserToken(name, parameters, body)
         if self.value == self.Types.LAMBDA:
             raise NotImplementedError("Lambdas not implemented yet")

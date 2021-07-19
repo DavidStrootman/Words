@@ -5,12 +5,14 @@ from words.interpreter.interpret_util import exhaustive_interpret_tokens
 
 class ParserToken(ABC):
     """Base parser token."""
+
     def execute(self, stack: list, dictionary: dict) -> Tuple[list, dict]:
         raise RuntimeError(f"Tried to call unimplemented method \"execute\" on {self.__class__.__name__}.")
 
 
 class DictionaryToken(ABC):
     """A visitable token that is stored in the dictionary."""
+
     class RemovedDictionaryToken:
         pass
 
@@ -28,7 +30,7 @@ class NumberParserToken(ParserToken):
 
 
 class BooleanParserToken(ParserToken):
-    def __init__(self, value: bool):
+    def __init__(self, value: str):
         if value == "True":
             self.value = True
         if value == "False":
@@ -122,9 +124,12 @@ class ReturnParserToken(ParserToken):
 
 
 class FunctionParserToken(ParserToken, DictionaryToken):
-    def __init__(self, name, parameters: List[ValueParserToken], body: List[ParserToken]):
+    def __init__(self, name, parameters: List[ParserToken], body: List[ParserToken]):
         self.name = name
-        self.parameters: List[ValueParserToken] = parameters
+        if not all(isinstance(token, ValueParserToken) for token in parameters):
+            raise RuntimeError(
+                f"Got token that is not a ValueParserToken in Function Parameters in function {self.name}")
+        self.parameters: List[ParserToken] = parameters
         self.body = body
 
     def execute(self, stack: list, dictionary: dict):
@@ -134,7 +139,8 @@ class FunctionParserToken(ParserToken, DictionaryToken):
         return stack, dictionary
 
     def visit(self, stack: list, dictionary: dict) -> Tuple[list, dict]:
-        return stack + exhaustive_interpret_tokens(self.body, *self.setup_parameters(stack, dictionary.copy()))[0], dictionary
+        return stack[:-len(self.parameters)] + exhaustive_interpret_tokens(self.body, *self.setup_parameters(stack, dictionary.copy()))[
+            0], dictionary
 
     def setup_parameters(self, stack: list, dictionary: dict) -> Tuple[list, dict]:
         def rec_setup_parameters(stack_: list, dictionary_: dict, parameters: list):
@@ -176,6 +182,10 @@ class BooleanOperatorParserToken(ParserToken):
             topmost_value = stack[-1]
             second_value = stack[-2]
             return stack[:-2] + [second_value >= topmost_value], dictionary
+        if self.value == "<":
+            topmost_value = stack[-1]
+            second_value = stack[-2]
+            return stack[:-2] + [second_value < topmost_value], dictionary
         raise NotImplementedError(f"Unimplemented BooleanOperator {self.value}")
 
 
