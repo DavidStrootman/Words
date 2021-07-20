@@ -1,0 +1,16 @@
+| ACKERMANN ( VALUE M VALUE N )
+  M 0 ==
+  IF
+  N 1 +
+  ELSE
+    N 0 ==
+    IF
+      1 M 1 - ACKERMANN
+    ELSE
+      N 1 - M ACKERMANN M 1 - ACKERMANN
+    THEN
+  THEN
+  RETURN 1 |
+
+4 3 ACKERMANN
+__PRINT__

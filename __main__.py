@@ -9,7 +9,7 @@ from words.interpreter.interpret import Interpreter
 if __name__ == '__main__':
     sys.setrecursionlimit(4000)
 
-    lexed_tokens: Iterator[LexerToken] = Lexer.lex_file("input/fibonacci.ul")
+    lexed_tokens: Iterator[LexerToken] = Lexer.lex_file("input/ackermann.ul")
 
     program = Parser.parse(lexed_tokens)
 

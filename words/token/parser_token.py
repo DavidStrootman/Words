@@ -147,7 +147,7 @@ class FunctionParserToken(ParserToken, DictionaryToken):
             if not parameters:
                 return stack_, dictionary_
 
-            return rec_setup_parameters(stack_[:-1], {**dictionary, **{parameters[0].value: stack_[-1]}},
+            return rec_setup_parameters(stack_[:-1], {**dictionary_, **{parameters[0].value: stack_[-1]}},
                                         parameters[1:])
 
         return rec_setup_parameters(stack, dictionary, self.parameters)
