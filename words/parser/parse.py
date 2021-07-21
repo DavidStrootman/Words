@@ -21,6 +21,6 @@ class Parser:
 
 
 if __name__ == '__main__':
-    lexed_tokens_ = Lexer.lex_file("../../input/loop.ul")
+    lexed_tokens_ = Lexer.lex_file("../../input/loop.word")
     program_ = Parser.parse(lexed_tokens_)
     yeet = 2

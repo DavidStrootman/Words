@@ -61,6 +61,6 @@ class Lexer:
 
 # Debug main
 if __name__ == '__main__':
-    values = [token_.value for token_ in list(Lexer.lex_file("../../input/loop.ul"))]
+    values = [token_.value for token_ in list(Lexer.lex_file("../../input/loop.word"))]
     print(len(values))
     assert len(values) == 31  # poor man's testcase

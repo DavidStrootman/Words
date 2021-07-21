@@ -1,0 +1,23 @@
+/*! \mainpage Words
+ *
+ * Words is a simple stack based programming language implemented in Python.
+ *
+ * \section install_sec Installation
+ *
+ * Make sure you have Python 3.7 installed.
+ *
+ * Call words.py with an input file:
+ * ```sh
+ * python words.py input/fibonacci.word
+ * ```
+ *
+ * \page Language
+ * A page describing the syntax of Words
+ *
+ * \section stack_based Stack based
+ *  A section describing how values are placed on the stack and ordering.
+ *
+ * \page Syntax
+ *
+ * A page describing the all parts of the syntax of Words
+ */
