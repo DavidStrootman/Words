@@ -32,7 +32,7 @@ class LexerToken(ABC):
         pass
 
     @staticmethod
-    def assert_kind_of(token, kind: Type["LexerToken"]) -> None:
+    def assert_kind_of(token: "LexerToken", kind: Type["LexerToken"]) -> None:
         """
         Asserts that the provided token is of the provided kind. This method is used for recognizing syntax errors.
 
@@ -45,7 +45,7 @@ class LexerToken(ABC):
             raise RuntimeError(f"Expected {kind} token, got {type(token)}.")
 
     @staticmethod
-    def assert_type(token, type_: TokenTypeEnum):
+    def assert_type(token: "LexerToken", type_: TokenTypeEnum) -> None:
         """
         Asserts that the provided token is of the provided type. This method is used for recognizing syntax errors.
 
@@ -58,7 +58,7 @@ class LexerToken(ABC):
             raise RuntimeError(f"Expected {type_} token, got {token.value}.")
 
     @staticmethod
-    def try_get_identifier_value(token):
+    def try_get_identifier_value(token: "LexerToken") -> str:
         # TODO: Refactor this into assert_kind_of
         if not isinstance(token, IdentLexerToken):
             raise NotImplementedError(f"Expected IdentifierLexerToken, got {type(token)} with value \"{token.value}\".")

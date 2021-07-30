@@ -16,7 +16,7 @@ def execute_program(program: "Program") -> Optional[any]:
     return _return_value_or_none(result)
 
 
-def _return_value_or_none(result: Tuple[List, Dict]):
+def _return_value_or_none(result: Tuple[List, Dict]) -> Optional[any]:
     """
     Returns the value from result, or None if it has no return value
     :param result: the result of an Interpreted program.
