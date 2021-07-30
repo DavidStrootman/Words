@@ -1,6 +1,7 @@
 from enum import Enum, unique
 from typing import Iterable
 
+
 @unique
 class TokenTypeEnum(Enum):
     @classmethod

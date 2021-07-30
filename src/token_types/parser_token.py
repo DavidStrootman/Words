@@ -1,12 +1,20 @@
 from abc import ABC, abstractmethod
 from typing import List, Optional, Tuple
-from words.interpreter.interpret_util import exhaustive_interpret_tokens
+from src.interpreter.interpret_util import exhaustive_interpret_tokens
 
 
 class ParserToken(ABC):
-    """Base parser token."""
+    """
+    Base parser token.
+    """
 
     def execute(self, stack: list, dictionary: dict) -> Tuple[list, dict]:
+        """
+        Execute the token to get the result.
+        :param stack: The stack to use fo2r executing the token.
+        :param dictionary: The dictionary to use for executing the token.
+        :return: The stack and dictionary after executing the token.
+        """
         raise RuntimeError(f"Tried to call unimplemented method \"execute\" on {self.__class__.__name__}.")
 
 
@@ -14,22 +22,42 @@ class DictionaryToken(ABC):
     """A visitable token that is stored in the dictionary."""
 
     class RemovedDictionaryToken:
+        """Placeholder for tokens that are removed from the dictionary."""
         pass
 
     @abstractmethod
     def visit(self, stack: list, dictionary: dict) -> Tuple[list, dict]:
+        """
+        The visit method is used to place a token on the dictionary, without executing it.
+
+        :param stack: The stack used for visiting this token.
+        :param dictionary: The dictionary used for visiting this token.
+        :return: The stack and dictionary after this token has been visited..
+        """
         pass
 
 
 class NumberParserToken(ParserToken):
+    """
+    The number token represents an integer.
+    """
     def __init__(self, value: int):
         self.value = value
 
     def execute(self, stack: list, dictionary: dict) -> Tuple[list, dict]:
+        """
+        Execute the token to get the result.
+        :param stack: The stack to use for executing the token.
+        :param dictionary: The dictionary to use for executing the token.
+        :return: The stack and dictionary after executing the token.
+        """
         return stack + [self.value], dictionary
 
 
 class BooleanParserToken(ParserToken):
+    """
+    The boolean token represents a boolean.
+    """
     def __init__(self, value: str):
         if value == "True":
             self.value = True
@@ -37,25 +65,50 @@ class BooleanParserToken(ParserToken):
             self.value = False
 
     def execute(self, stack: list, dictionary: dict) -> Tuple[list, dict]:
+        """
+        Execute the token to get the result.
+        :param stack: The stack to use for executing the token.
+        :param dictionary: The dictionary to use for executing the token.
+        :return: The stack and dictionary after executing the token.
+        """
         return stack + [self.value], dictionary
 
 
 class MacroParserToken(ParserToken):
+    """
+    The macro token represents a macro, for example __PRINT___.
+    """
     def __init__(self, function_name: str):
         self.function_name = function_name
 
     def execute(self, stack: list, dictionary: dict) -> Tuple[list, dict]:
+        """
+        Execute the token to get the result.
+        :param stack: The stack to use for executing the token.
+        :param dictionary: The dictionary to use for executing the token.
+        :return: The stack and dictionary after executing the token.
+        """
         if self.function_name == "__PRINT__":
             print(stack[-1])
             return stack, dictionary
 
 
 class WhileParserToken(ParserToken):
+    """
+    The while token represents a while loop. It holds a predicate that is checked every loop and the statements that
+    should be executed as long as the predicate holds true.
+    """
     def __init__(self, predicate: List[ParserToken], statements: List[ParserToken]):
         self.predicate = predicate
         self.statements = statements
 
     def execute(self, stack: list, dictionary: dict) -> Tuple[list, dict]:
+        """
+        Execute the token to get the result.
+        :param stack: The stack to use for executing the token.
+        :param dictionary: The dictionary to use for executing the token.
+        :return: The stack and dictionary after executing the token.
+        """
         predicate_outcome: bool = exhaustive_interpret_tokens(self.predicate, stack, dictionary)[0][0]
         if predicate_outcome:
             return self.execute(*exhaustive_interpret_tokens(self.statements, stack, dictionary))
@@ -63,11 +116,20 @@ class WhileParserToken(ParserToken):
 
 
 class IfParserToken(ParserToken):
+    """
+    The if token represents an if statement, with an optional else statement.
+    """
     def __init__(self, if_body: List[ParserToken], else_body: Optional[List[ParserToken]] = None):
         self.if_body = if_body
         self.else_body = else_body
 
     def execute(self, stack: list, dictionary: dict) -> Tuple[list, dict]:
+        """
+        Execute the token to get the result.
+        :param stack: The stack to use for executing the token.
+        :param dictionary: The dictionary to use for executing the token.
+        :return: The stack and dictionary after executing the token.
+        """
         predicate = stack[-1]
         if predicate is True:
             return exhaustive_interpret_tokens(self.if_body, stack[:-1], dictionary)
@@ -77,6 +139,9 @@ class IfParserToken(ParserToken):
 
 
 class VariableParserToken(ParserToken, DictionaryToken):
+    """
+    The variable token represents a variable. The variable token gets placed in the dictionary.
+    """
     class VarUnassigned:
         pass
 
@@ -85,6 +150,12 @@ class VariableParserToken(ParserToken, DictionaryToken):
         self.assigned_value: any = self.VarUnassigned
 
     def execute(self, stack: list, dictionary: dict) -> Tuple[list, dict]:
+        """
+        Execute the token to get the result.
+        :param stack: The stack to use for executing the token.
+        :param dictionary: The dictionary to use for executing the token.
+        :return: The stack and dictionary after executing the token.
+        """
         if self.value in dictionary:
             raise KeyError(f"Variable {self.value} already exists in dictionary.")
         return stack, {**dictionary, **{self.value: self}}
@@ -94,18 +165,36 @@ class VariableParserToken(ParserToken, DictionaryToken):
 
 
 class ValueParserToken(ParserToken):
+    """
+    The value parser token represents a function parameter, which is called a value in Words.
+    """
     def __init__(self, value: str):
         self.value = value
 
     def execute(self, stack: list, dictionary: dict) -> Tuple[list, dict]:
+        """
+        Execute the token to get the result.
+        :param stack: The stack to use for executing the token.
+        :param dictionary: The dictionary to use for executing the token.
+        :return: The stack and dictionary after executing the token.
+        """
         return stack + list([self.value]), dictionary
 
 
 class IdentParserToken(ParserToken):
+    """
+    The identifier token represents an identifier.
+    """
     def __init__(self, value: str):
         self.value = value
 
     def execute(self, stack: list, dictionary: dict) -> Tuple[list, dict]:
+        """
+        Execute the token to get the result.
+        :param stack: The stack to use for executing the token.
+        :param dictionary: The dictionary to use for executing the token.
+        :return: The stack and dictionary after executing the token.
+        """
         if self.value in dictionary:
             # TODO: Create generic get function for dictionary
             if isinstance(dictionary[self.value], FunctionParserToken):
@@ -133,6 +222,12 @@ class FunctionParserToken(ParserToken, DictionaryToken):
         self.body = body
 
     def execute(self, stack: list, dictionary: dict):
+        """
+        Execute the token to get the result.
+        :param stack: The stack to use for executing the token.
+        :param dictionary: The dictionary to use for executing the token.
+        :return: The stack and dictionary after executing the token.
+        """
         if self.name in dictionary:
             raise KeyError(f"Function {self.name} already exists in dictionary.")
         dictionary[self.name] = self
@@ -158,6 +253,12 @@ class ArithmeticOperatorParserToken(ParserToken):
         self.value = value
 
     def execute(self, stack: list, dictionary: dict) -> Tuple[list, dict]:
+        """
+        Execute the token to get the result.
+        :param stack: The stack to use for executing the token.
+        :param dictionary: The dictionary to use for executing the token.
+        :return: The stack and dictionary after executing the token.
+        """
         topmost_value = stack[-1]
         second_value = stack[-2]
 
@@ -174,6 +275,12 @@ class BooleanOperatorParserToken(ParserToken):
         self.value = value
 
     def execute(self, stack: list, dictionary: dict) -> Tuple[list, dict]:
+        """
+        Execute the token to get the result.
+        :param stack: The stack to use for executing the token.
+        :param dictionary: The dictionary to use for executing the token.
+        :return: The stack and dictionary after executing the token.
+        """
         if self.value == "==":
             topmost_value = stack[-1]
             second_value = stack[-2]
@@ -195,6 +302,12 @@ class DictionaryOperatorParserToken(ParserToken):
         self.variable_name = variable_name
 
     def execute(self, stack: list, dictionary: dict) -> Tuple[list, dict]:
+        """
+        Execute the token to get the result.
+        :param stack: The stack to use for executing the token.
+        :param dictionary: The dictionary to use for executing the token.
+        :return: The stack and dictionary after executing the token.
+        """
         if self.value == "ASSIGN":
             topmost_value = stack[-1]
             return stack[:-1], {**dictionary, **{self.variable_name: topmost_value}}

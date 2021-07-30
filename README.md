@@ -13,8 +13,7 @@ Includes a lexer/parser, an interpreter in python and (hopefully soon) a compile
 Should support:
 
 - Functions/Subroutines
-- Anonymous functions  
-  
+- Anonymous functions
 
 - Goto:  
   `LABEL mylabel`  

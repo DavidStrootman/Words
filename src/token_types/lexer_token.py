@@ -1,16 +1,20 @@
 from abc import ABC, abstractmethod
-from typing import Iterator, Type
+from typing import Iterator, Type, Union
 
-from words.helper.token_type_enum import TokenTypeEnum
-from words.lexer.lex_util import Word
-from words.parser.parse_util import eat_until, eat_until_discarding
-from words.token.parser_token import DictionaryOperatorParserToken, BooleanOperatorParserToken, \
-    ArithmeticOperatorParserToken, BooleanParserToken, MacroParserToken, NumberParserToken, FunctionParserToken, ReturnParserToken, \
+from src.helper.token_type_enum import TokenTypeEnum
+from src.lexer.lex_util import Word
+from src.parser.parse_util import eat_until, eat_until_discarding
+from src.token_types.parser_token import ParserToken, DictionaryOperatorParserToken, BooleanOperatorParserToken, \
+    ArithmeticOperatorParserToken, BooleanParserToken, MacroParserToken, NumberParserToken, FunctionParserToken, \
+    ReturnParserToken, \
     ValueParserToken, VariableParserToken, IdentParserToken, IfParserToken, WhileParserToken
 
 
 class LexerToken(ABC):
+    """Abstract lexer token."""
+
     class Types(TokenTypeEnum):
+        """Fallback for undefined token types."""
         UNDEFINED = "UNDEFINED"
 
     def __init__(self, word: Word):
@@ -18,52 +22,106 @@ class LexerToken(ABC):
         self.value = self.Types(word.content)
 
     @abstractmethod
-    def parse(self, tokens: Iterator["LexerToken"]):
+    def parse(self, tokens: Iterator["LexerToken"]) -> ParserToken:
+        """
+        Parse the lexer token into a parser token.
+        :param tokens: The list of lexer tokens, which might be used during parsing of this token depending on it's
+        type.
+        :return: A parser token
+        """
         pass
 
     @staticmethod
-    def assert_instance_of(token, kind: Type["LexerToken"]):
+    def assert_kind_of(token, kind: Type["LexerToken"]) -> None:
+        """
+        Asserts that the provided token is of the provided kind. This method is used for recognizing syntax errors.
+
+        :param token: The token to run the assertion on.
+        :param kind: The asserted kind.
+        :return: None
+        """
+        # TODO: Use debug data to provide feedback on problems with syntax
         if not isinstance(token, kind):
             raise RuntimeError(f"Expected {kind} token, got {type(token)}.")
 
     @staticmethod
     def assert_type(token, type_: TokenTypeEnum):
+        """
+        Asserts that the provided token is of the provided type. This method is used for recognizing syntax errors.
+
+        :param token: The token to run the assertion on.
+        :param type_: The asserted type.
+        :return: None
+        """
+        # TODO: Use debug data to provide feedback on problems with syntax
         if token.value is not type_:
             raise RuntimeError(f"Expected {type_} token, got {token.value}.")
 
     @staticmethod
     def try_get_identifier_value(token):
+        # TODO: Refactor this into assert_kind_of
         if not isinstance(token, IdentLexerToken):
             raise NotImplementedError(f"Expected IdentifierLexerToken, got {type(token)} with value \"{token.value}\".")
         return token.value
 
     @staticmethod
-    def try_get_return_value(token):
-        LexerToken.assert_instance_of(token, LiteralLexerToken)
+    def try_get_return_value(token: "LiteralLexerToken") -> int:
+        """
+        Try to get a return value after a return statement.
+
+        :param token: The literal (number) token that should provide the amount of return values
+        :return: The amount of return values as an integer (1, 2 or 3).
+        """
+        LexerToken.assert_kind_of(token, LiteralLexerToken)
         if int(token.content) not in range(3):
             raise RuntimeError(f"Got too many return values ({token.value}), expected 0, 1 or 2")
         return int(token.content)
 
 
 class DelimLexerToken(LexerToken):
+    """
+    A delimiter token is used to start and end a series of values.
+    """
+
     class Types(TokenTypeEnum):
         PAREN_OPEN = "("
         PAREN_CLOSE = ")"
 
-    def parse(self, tokens: Iterator["LexerToken"]):
+    def parse(self, tokens: Iterator["LexerToken"]) -> None:
+        """
+        Parse the lexer token into a parser token.
+        :param tokens: The list of lexer tokens, which might be used during parsing of this token depending on it's
+        type.
+        :return: None
+        """
         raise NotImplementedError("Tried to parse a delimiter token, this should be handled by its parent.")
 
 
 class IdentLexerToken(LexerToken):
+    """
+    An identifier token holds the name of a variable or function.
+    """
+
     def __init__(self, word: Word):
         super().__init__(Word("UNDEFINED", word.debug_data))
         self.value = word.content
 
-    def parse(self, tokens: Iterator["LexerToken"]):
+    def parse(self, tokens: Iterator["LexerToken"]) -> IdentParserToken:
+        """
+        Parse the lexer token into a parser token.
+        :param tokens: The list of lexer tokens, which might be used during parsing of this token depending on it's
+        type.
+        :return: Identifier parser token.
+        """
         return IdentParserToken(self.value)
 
 
 class KeywordLexerToken(LexerToken):
+    """
+    A keyword token holds builtin words that mean something in the language. These keywords cannot be used as
+    variable names.
+    """
+
     class Types(TokenTypeEnum):
         BEGIN = "BEGIN"
         WHILE = "WHILE"
@@ -77,7 +135,14 @@ class KeywordLexerToken(LexerToken):
         FUNCTION = "|"
         LAMBDA = "λ"
 
-    def parse(self, tokens: Iterator["LexerToken"]):
+    def parse(self, tokens: Iterator["LexerToken"]) -> Union[
+        WhileParserToken, IfParserToken, VariableParserToken, ValueParserToken, ReturnParserToken, FunctionParserToken]:
+        """
+        Parse the lexer token into a parser token.
+        :param tokens: The list of lexer tokens, which might be used during parsing of this token depending on it's
+        type.
+        :return: A parser token
+        """
         if self.value == self.Types.BEGIN:
             predicate = eat_until(tokens, [self.Types.WHILE])
             predicate_without_last_item = predicate[:-1]
@@ -121,6 +186,10 @@ class KeywordLexerToken(LexerToken):
 
 
 class LiteralLexerToken(LexerToken):
+    """
+    A literal token holds a literal value that does not get changed during lexing or parsing.
+    """
+
     class Types(TokenTypeEnum):
         NUMBER = "NUMBER"
         COMMENT = "#"
@@ -131,7 +200,13 @@ class LiteralLexerToken(LexerToken):
         super().__init__(Word(token_type, word.debug_data))
         self.content = word.content
 
-    def parse(self, tokens: Iterator["LexerToken"]):
+    def parse(self, tokens: Iterator["LexerToken"]) -> Union[NumberParserToken, BooleanParserToken]:
+        """
+        Parse the lexer token into a parser token.
+        :param tokens: The list of lexer tokens, which might be used during parsing of this token depending on it's
+        type.
+        :return: Either a number parser token or a boolean parser token based on the type of lexer token.
+        """
         if self.value == self.Types.NUMBER:
             return NumberParserToken(int(self.content))
         if self.value in [self.Types.TRUE, self.Types.FALSE]:
@@ -143,10 +218,20 @@ class MacroLexerToken(LexerToken):
         PRINT = "__PRINT__"
 
     def parse(self, tokens: Iterator["LexerToken"]):
+        """
+        Parse the lexer token into a parser token.
+        :param tokens: The list of lexer tokens, which might be used during parsing of this token depending on it's
+        type.
+        :return: A Macro parser token.
+        """
         return MacroParserToken(self.value.value)
 
 
 class OpLexerToken(LexerToken):
+    """
+    An operator token holds a Keyword that is used as an operator on literals or identifiers
+    """
+
     class Types(TokenTypeEnum):
         SUBTRACTION = "-"
         ADDITION = "+"
@@ -158,12 +243,20 @@ class OpLexerToken(LexerToken):
         ASSIGNMENT = "ASSIGN"
         RETRIEVAL = "RETRIEVE"
 
-    def parse(self, tokens: Iterator["LexerToken"]):
+    def parse(self, tokens: Iterator["LexerToken"]) -> Union[
+        ArithmeticOperatorParserToken, BooleanOperatorParserToken, DictionaryOperatorParserToken]:
+        """
+        Parse the lexer token into a parser token.
+        :param tokens: The list of lexer tokens, which might be used during parsing of this token depending on it's
+        type.
+        :return: One of the three operator parser token types: ArithmeticOperatorParserToken, BooleanOperatorParserToken
+        or DictionaryOperatorParserToken, based on the type of lexer token.
+        """
         if self.value.value in ["-", "+"]:
             return ArithmeticOperatorParserToken(self.value.value)
         if self.value.value in ["==", ">", "<", ">=", "<="]:
             return BooleanOperatorParserToken(self.value.value)
         if self.value.value in ["ASSIGN", "RETRIEVE"]:
             targeted_variable = next(tokens)
-            LexerToken.assert_instance_of(targeted_variable, IdentLexerToken)
+            LexerToken.assert_kind_of(targeted_variable, IdentLexerToken)
             return DictionaryOperatorParserToken(self.value.value, targeted_variable.value)
