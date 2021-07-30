@@ -1,6 +1,6 @@
 Welcome to Words's documentation!
 =================================
-.. automodule:: words
+.. automodule:: src
     :members:
 
 .. toctree::

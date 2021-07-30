@@ -1,12 +1,12 @@
 Tokens
 =================================
-.. automodule:: words.token
+.. automodule:: src.token_types
     :members:
 
-.. automodule:: words.token.lexer_token
+.. automodule:: src.token_types.lexer_token
     :members:
 
-.. automodule:: words.token.parser_token
+.. automodule:: src.token_types.parser_token
     :members:
 
 

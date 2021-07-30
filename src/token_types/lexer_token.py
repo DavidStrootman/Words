@@ -11,7 +11,9 @@ from src.token_types.parser_token import ParserToken, DictionaryOperatorParserTo
 
 
 class LexerToken(ABC):
-    """Abstract lexer token."""
+    """
+    Abstract lexer token.
+    """
 
     class Types(TokenTypeEnum):
         """Fallback for undefined token types."""

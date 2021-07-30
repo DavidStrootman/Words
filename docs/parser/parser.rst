@@ -1,13 +1,13 @@
 Parser
 =================================
-.. automodule:: words.parser
+.. automodule:: src.parser
     :members:
 
-.. automodule:: words.parser.parse
+.. automodule:: src.parser.parse
     :members:
 
 
 Parse Utils
 =================================
-.. automodule:: words.parser.parse_util
+.. automodule:: src.parser.parse_util
     :members:
