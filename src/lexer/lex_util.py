@@ -7,6 +7,9 @@ class DebugData:
     line: int
     start_pos: int = None
 
+    def __str__(self):
+        return f"{self.line + 1}"
+
 
 @dataclass
 class Word:

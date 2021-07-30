@@ -12,5 +12,5 @@
   RETRIEVE result           # Place value of result on top of stack
   RETURN 1 |                # Place n values from local stack onto stack (n is 1 in this case)
 
-1400 summy                     # Call summy function
+1400 summy                  # Call summy function
 __PRINT__                   # Call print macro, printing the topmost value

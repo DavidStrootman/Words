@@ -10,7 +10,12 @@ from src.token_types.parser_token import ParserToken, DictionaryOperatorParserTo
     ValueParserToken, VariableParserToken, IdentParserToken, IfParserToken, WhileParserToken
 
 
-class LexerToken(ABC):
+class PrintableABC(type(ABC)):
+    def __str__(self):
+        return f"{self.__name__}"
+
+
+class LexerToken(metaclass=PrintableABC):
     """
     Abstract lexer token.
     """
@@ -22,6 +27,9 @@ class LexerToken(ABC):
     def __init__(self, word: Word):
         self.debug_data = word.debug_data
         self.value = self.Types(word.content)
+
+    def debug_str(self):
+        return f"\"{self.value}\" at line {self.debug_data}"
 
     @abstractmethod
     def parse(self, tokens: Iterator["LexerToken"]) -> ParserToken:
@@ -42,9 +50,8 @@ class LexerToken(ABC):
         :param kind: The asserted kind.
         :return: None
         """
-        # TODO: Use debug data to provide feedback on problems with syntax
         if not isinstance(token, kind):
-            raise RuntimeError(f"Expected {kind} token, got {type(token)}.")
+            raise SyntaxError(f"Expected {kind}, got {type(token)} with value {token.debug_str()}")
 
     @staticmethod
     def assert_type(token: "LexerToken", type_: TokenTypeEnum) -> None:
@@ -55,15 +62,14 @@ class LexerToken(ABC):
         :param type_: The asserted type.
         :return: None
         """
-        # TODO: Use debug data to provide feedback on problems with syntax
         if token.value is not type_:
-            raise RuntimeError(f"Expected {type_} token, got {token.value}.")
+            raise SyntaxError(f"Expected {type_}, got {type(token)} with value {token.debug_str()}.")
 
     @staticmethod
     def try_get_identifier_value(token: "LexerToken") -> str:
         # TODO: Refactor this into assert_kind_of
         if not isinstance(token, IdentLexerToken):
-            raise NotImplementedError(f"Expected IdentifierLexerToken, got {type(token)} with value \"{token.value}\".")
+            raise SyntaxError(f"Expected variable name, got {type(token)} with value {token.debug_str()}.")
         return token.value
 
     @staticmethod
@@ -76,7 +82,7 @@ class LexerToken(ABC):
         """
         LexerToken.assert_kind_of(token, LiteralLexerToken)
         if int(token.content) not in range(3):
-            raise RuntimeError(f"Got too many return values ({token.value}), expected 0, 1 or 2")
+            raise SyntaxError(f"Got too many return values ({token.value}), expected 0, 1 or 2")
         return int(token.content)
 
 
@@ -137,6 +143,9 @@ class KeywordLexerToken(LexerToken):
         FUNCTION = "|"
         LAMBDA = "λ"
 
+    def _unexpected_token_error(self) -> SyntaxError:
+        return SyntaxError(f"Found unexpected {self.debug_str()}.")
+
     def parse(self, tokens: Iterator["LexerToken"]) -> Union[
         WhileParserToken, IfParserToken, VariableParserToken, ValueParserToken, ReturnParserToken, FunctionParserToken]:
         """
@@ -151,9 +160,9 @@ class KeywordLexerToken(LexerToken):
             statements = eat_until_discarding(tokens, [self.Types.REPEAT])
             return WhileParserToken(predicate_without_last_item, statements)
         if self.value == self.Types.WHILE:
-            raise NotImplementedError("Found unexpected WHILE token.")
+            raise self._unexpected_token_error()
         if self.value == self.Types.REPEAT:
-            raise NotImplementedError("Found unexpected REPEAT token.")
+            raise self._unexpected_token_error()
         if self.value == self.Types.IF:
             if_body = eat_until(tokens, [self.Types.ELSE, self.Types.THEN])
             if if_body[-1].value == self.Types.ELSE:
@@ -164,9 +173,9 @@ class KeywordLexerToken(LexerToken):
                 else_body = None
             return IfParserToken(if_body, else_body)
         if self.value == self.Types.ELSE:
-            raise NotImplementedError("Found unexpected ELSE token.")
+            raise self._unexpected_token_error()
         if self.value == self.Types.THEN:
-            raise NotImplementedError("Tried to parse a THEN token, this should be handled by its IF token.")
+            raise self._unexpected_token_error()
         if self.value == self.Types.VARIABLE:
             return VariableParserToken(LexerToken.try_get_identifier_value(next(tokens)))
         if self.value == self.Types.VALUE:
@@ -176,7 +185,7 @@ class KeywordLexerToken(LexerToken):
         if self.value == self.Types.FUNCTION:
             token = next(tokens)
             if not isinstance(token, IdentLexerToken):
-                raise RuntimeError(f"Expected IdentLexerToken, got {type(token)}")
+                raise SyntaxError(f"Expected identifier, got {type(token)} with value {token.debug_str()}.")
             name = token.value
             paren_open = next(tokens)
             LexerToken.assert_type(paren_open, DelimLexerToken.Types.PAREN_OPEN)
