@@ -1,5 +1,6 @@
 # Words
 [![Build](https://github.com/DavidStrootman/Words/actions/workflows/build.yml/badge.svg)](https://github.com/DavidStrootman/Words/actions/workflows/build.yml)
+[![codecov](https://codecov.io/gh/DavidStrootman/Words/branch/main/graph/badge.svg?token=H9ZX3DWZQA)](https://codecov.io/gh/DavidStrootman/Words)
 
 Words programming language
 
