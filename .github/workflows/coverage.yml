@@ -8,13 +8,24 @@ on:
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
         python-version: [3.7, 3.8, 3.9]
     steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Install Words package
+      run: |
+        python -m pip install -e .
+    - name: coverage
+      run: |
+        python -m pip install coverage pytest
+        coverage run -m pytest
     - name: Codecov
       # You may pin to the exact commit or the version.
       # uses: codecov/codecov-action@51d810878be5422784e86451c0e7c14e5860ec47
