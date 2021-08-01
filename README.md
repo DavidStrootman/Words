@@ -1,4 +1,5 @@
 # Words
+[![Build](https://github.com/DavidStrootman/Words/actions/workflows/build.yml/badge.svg)](https://github.com/DavidStrootman/Words/actions/workflows/build.yml)
 
 Words programming language
 
