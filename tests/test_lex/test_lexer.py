@@ -1,10 +1,11 @@
 import pytest
-from typing import Iterator, Type
-from words.lexer.lex_util import DebugData, Word
-from words.lexer.lex import Lexer
-from words.token_types.lexer_token import *
 from pathlib import Path
 from os import remove as remove_file
+from typing import Iterator
+
+from words.lexer.lex_util import DebugData, Word
+from words.lexer.lex import Lexer
+from words.token_types.lexer_token import LexerToken, IdentLexerToken, LiteralLexerToken
 
 
 class TestLexer:
@@ -75,9 +76,6 @@ class TestLexer:
         # Test all subclasses of lexer tokens can be tokenized.
         lexer = Lexer()
 
-        def assert_lexer_token_type(lexer: Lexer, token_type: Type[LexerToken]):
+        for token_type in LexerToken.__subclasses__():
             word = Word(token_type.Types.values()[0], DebugData(0))
             assert isinstance(lexer.lex_word(word), token_type)
-
-        for token_type in LexerToken.__subclasses__():
-            assert_lexer_token_type(lexer, token_type)

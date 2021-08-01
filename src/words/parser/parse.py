@@ -24,7 +24,7 @@ class Parser:
         return program
 
     @staticmethod
-    def _parse_exhaustive(tokens: Iterator[LexerToken]) -> List["ParserToken"]:
+    def _parse_exhaustive(tokens: Iterator[LexerToken]) -> List["ParserToken"]:  # noqa: F821
         """
         parse parser tokens from iterator until it is empty.
 

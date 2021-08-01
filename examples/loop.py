@@ -10,5 +10,6 @@ def summy(n: int) -> int:
 def run() -> int:
     return summy(1400)
 
+
 if __name__ == "__main__":
     print(run())

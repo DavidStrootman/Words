@@ -11,10 +11,10 @@ class Program:
         self.tokens = tokens
 
 
-TOKEN = TypeVar('TOKEN', ParserToken, "LexerToken")
+TOKEN = TypeVar('TOKEN', ParserToken, "LexerToken")  # noqa: F821
 
 
-def eat_until(tokens: Iterator["LexerToken"], limit_types: List[TokenTypeEnum]) -> List[TOKEN]:
+def eat_until(tokens: Iterator["LexerToken"], limit_types: List[TokenTypeEnum]) -> List[TOKEN]:  # noqa: F821
     """
     Parse tokens until the next token matches the limit_type, leaving the last token unparsed.
 
@@ -29,7 +29,7 @@ def eat_until(tokens: Iterator["LexerToken"], limit_types: List[TokenTypeEnum]) 
     return [parsed_token] + eat_until(tokens, limit_types)
 
 
-def eat_until_discarding(tokens: Iterator["LexerToken"], limit_types: List[TokenTypeEnum]) -> List[ParserToken]:
+def eat_until_discarding(tokens: Iterator["LexerToken"], limit_types: List[TokenTypeEnum]) -> List[ParserToken]:  # noqa: F821, E501
     """
     Parse tokens until the next token matches the limit_type, discarding the last token.
 

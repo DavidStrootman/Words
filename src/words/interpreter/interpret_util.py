@@ -1,7 +1,7 @@
 from typing import Dict, List, Tuple, Optional
 
 
-def execute_program(program: "Program") -> Optional[any]:
+def execute_program(program: "Program") -> Optional[any]:  # noqa: F821
     """
     Execute a program.
 
@@ -27,7 +27,8 @@ def _return_value_or_none(result: Tuple[List, Dict]) -> Optional[any]:
     return None
 
 
-def exhaustive_interpret_tokens(tokens_: List["ParserToken"], stack_: list, dictionary_: dict) -> Tuple[list, dict]:
+def exhaustive_interpret_tokens(tokens_: List["ParserToken"], stack_: list, dictionary_: dict) -> Tuple[list, dict]:  # noqa: F821, E501
+
     """
     Interpret tokens from list until it is empty.
 

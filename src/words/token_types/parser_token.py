@@ -234,8 +234,9 @@ class FunctionParserToken(ParserToken, DictionaryToken):
         return stack, dictionary
 
     def visit(self, stack: list, dictionary: dict) -> Tuple[list, dict]:
-        return stack[:-len(self.parameters)] + exhaustive_interpret_tokens(self.body, *self.setup_parameters(stack, dictionary.copy()))[
-            0], dictionary
+        parameters = self.setup_parameters(stack, dictionary.copy())
+        new_stack = stack[:-len(self.parameters)] + exhaustive_interpret_tokens(self.body, *parameters)[0]
+        return new_stack, dictionary
 
     def setup_parameters(self, stack: list, dictionary: dict) -> Tuple[list, dict]:
         def rec_setup_parameters(stack_: list, dictionary_: dict, parameters: list):

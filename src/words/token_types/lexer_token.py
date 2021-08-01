@@ -101,7 +101,8 @@ class DelimLexerToken(LexerToken):
         type.
         :return: None
         """
-        raise NotImplementedError(f"Tried to parse a delimiter token: {self.debug_str()}, this should be handled by its parent.")
+        raise NotImplementedError(f"Tried to parse a delimiter token: {self.debug_str()}, "
+                                  f"this should be handled by its parent.")
 
 
 class IdentLexerToken(LexerToken):
@@ -146,7 +147,8 @@ class KeywordLexerToken(LexerToken):
         return SyntaxError(f"Found unexpected {self.debug_str()}.")
 
     def parse(self, tokens: Iterator["LexerToken"]) -> Union[
-        WhileParserToken, IfParserToken, VariableParserToken, ValueParserToken, ReturnParserToken, FunctionParserToken]:
+        WhileParserToken, IfParserToken, VariableParserToken,
+        ValueParserToken, ReturnParserToken, FunctionParserToken]:
         """
         Parse the lexer token into a parser token.
         :param tokens: The list of lexer tokens, which might be used during parsing of this token depending on it's
@@ -259,8 +261,9 @@ class OpLexerToken(LexerToken):
         Parse the lexer token into a parser token.
         :param tokens: The list of lexer tokens, which might be used during parsing of this token depending on it's
         type.
-        :return: One of the three operator parser token types: ArithmeticOperatorParserToken, BooleanOperatorParserToken
-        or DictionaryOperatorParserToken, based on the type of lexer token.
+        :return: One of the three operator parser token types:
+        ArithmeticOperatorParserToken, BooleanOperatorParserToken or DictionaryOperatorParserToken,
+        based on the type of lexer token.
         """
         if self.value.value in ["-", "+"]:
             return ArithmeticOperatorParserToken(self.value.value)
