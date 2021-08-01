@@ -1,6 +1,6 @@
 from typing import Iterator, List, TypeVar
-from src.helper.token_type_enum import TokenTypeEnum
-from src.token_types.parser_token import ParserToken
+from words.helper.token_type_enum import TokenTypeEnum
+from words.token_types.parser_token import ParserToken
 
 
 class Program:

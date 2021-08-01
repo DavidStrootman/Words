@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 from typing import List, Optional, Tuple
-from src.interpreter.interpret_util import exhaustive_interpret_tokens
+from words.interpreter.interpret_util import exhaustive_interpret_tokens
 
 
 class ParserToken(ABC):

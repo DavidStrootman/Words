@@ -5,10 +5,10 @@ from argparse import ArgumentParser
 from pathlib import Path
 import sys
 
-from src.lexer.lex import Lexer
-from src.parser.parse import Parser
-from src.token_types.lexer_token import LexerToken
-from src.interpreter.interpret import Interpreter
+from words.lexer.lex import Lexer
+from words.parser.parse import Parser
+from words.token_types.lexer_token import LexerToken
+from words.interpreter.interpret import Interpreter
 
 if __name__ == '__main__':
     argument_parser = ArgumentParser(description="Words programming language.")

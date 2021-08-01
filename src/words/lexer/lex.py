@@ -1,9 +1,9 @@
 from typing import Iterator
-from pathlib import Path
-from src.token_types.lexer_token import LexerToken, MacroLexerToken, KeywordLexerToken, LiteralLexerToken, DelimLexerToken, \
-    OpLexerToken, IdentLexerToken
+import pathlib
+from words.token_types.lexer_token import LexerToken, MacroLexerToken, KeywordLexerToken, LiteralLexerToken, \
+    DelimLexerToken, OpLexerToken, IdentLexerToken
 
-from src.lexer.lex_util import Word, DebugData
+from words.lexer.lex_util import Word, DebugData
 
 
 class Lexer:
@@ -12,7 +12,7 @@ class Lexer:
     Supplies functionality for reading text from a file and changing them into tokens the parser can accept.
     """
     @staticmethod
-    def lex_file(file: Path) -> Iterator[LexerToken]:
+    def lex_file(file: pathlib.Path) -> Iterator[LexerToken]:
         """
         Lex all tokens from a file.
 
@@ -42,27 +42,27 @@ class Lexer:
             return
 
     @staticmethod
-    def lex_word(token: Word) -> LexerToken:
+    def lex_word(word: Word) -> LexerToken:
         """
         Lex a single word.
 
-        :param token: The word to lex into a token.
+        :param word: The word to lex into a token.
         :return: A lexer token.
         """
-        if token.content in DelimLexerToken.Types.values():
-            return DelimLexerToken(token)
-        if token.content in KeywordLexerToken.Types.values():
-            return KeywordLexerToken(token)
-        if token.content in LiteralLexerToken.Types.values():
-            return LiteralLexerToken(LiteralLexerToken.Types(token.content), token)
-        if token.content in MacroLexerToken.Types.values():
-            return MacroLexerToken(token)
-        if token.content in OpLexerToken.Types.values():
-            return OpLexerToken(token)
-        if token.content.isdigit():
-            return LiteralLexerToken(LiteralLexerToken.Types.NUMBER.value, token)
+        if word.content in DelimLexerToken.Types.values():
+            return DelimLexerToken(word)
+        if word.content in KeywordLexerToken.Types.values():
+            return KeywordLexerToken(word)
+        if word.content in LiteralLexerToken.Types.values():
+            return LiteralLexerToken(LiteralLexerToken.Types(word.content), word)
+        if word.content in MacroLexerToken.Types.values():
+            return MacroLexerToken(word)
+        if word.content in OpLexerToken.Types.values():
+            return OpLexerToken(word)
+        if word.content.isdigit():
+            return LiteralLexerToken(LiteralLexerToken.Types.NUMBER.value, word)
 
-        return IdentLexerToken(token)
+        return IdentLexerToken(word)
 
     @staticmethod
     def _split_line_into_words(line_nr: int, line: str) -> Iterator[Word]:
@@ -92,6 +92,6 @@ class Lexer:
 
 # Debug main
 if __name__ == '__main__':
-    values = [token_.value for token_ in list(Lexer.lex_file(Path("../../examples/loop.word")))]
+    values = [token_.value for token_ in list(Lexer.lex_file(pathlib.Path("../../../examples/loop.word")))]
     print(len(values))
     assert len(values) == 31  # poor man's testcase

@@ -1,7 +1,7 @@
 from typing import Optional
 
-from src.parser.parse import Program
-from src.interpreter.interpret_util import execute_program
+from words.parser.parse import Program
+from words.interpreter.interpret_util import execute_program
 
 
 class Interpreter:

@@ -1,7 +1,7 @@
 from typing import Iterator, List
-from src.lexer.lex import Lexer
-from src.token_types.lexer_token import LexerToken
-from src.parser.parse_util import Program
+from words.lexer.lex import Lexer
+from words.token_types.lexer_token import LexerToken
+from words.parser.parse_util import Program
 
 
 class Parser:

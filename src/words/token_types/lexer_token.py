@@ -1,13 +1,12 @@
 from abc import ABC, abstractmethod
 from typing import Iterator, Type, Union
 
-from src.helper.token_type_enum import TokenTypeEnum
-from src.lexer.lex_util import Word
-from src.parser.parse_util import eat_until, eat_until_discarding
-from src.token_types.parser_token import ParserToken, DictionaryOperatorParserToken, BooleanOperatorParserToken, \
+from words.helper.token_type_enum import TokenTypeEnum
+from words.lexer.lex_util import Word
+from words.parser.parse_util import eat_until, eat_until_discarding
+from words.token_types.parser_token import ParserToken, DictionaryOperatorParserToken, BooleanOperatorParserToken, \
     ArithmeticOperatorParserToken, BooleanParserToken, MacroParserToken, NumberParserToken, FunctionParserToken, \
-    ReturnParserToken, \
-    ValueParserToken, VariableParserToken, IdentParserToken, IfParserToken, WhileParserToken
+    ReturnParserToken, ValueParserToken, VariableParserToken, IdentParserToken, IfParserToken, WhileParserToken
 
 
 class PrintableABC(type(ABC)):
@@ -73,7 +72,7 @@ class LexerToken(metaclass=PrintableABC):
         return token.value
 
     @staticmethod
-    def try_get_return_value(token: "LiteralLexerToken") -> int:
+    def try_get_return_value(token: "LexerToken") -> int:
         """
         Try to get a return value after a return statement.
 
@@ -82,7 +81,7 @@ class LexerToken(metaclass=PrintableABC):
         """
         LexerToken.assert_kind_of(token, LiteralLexerToken)
         if int(token.content) not in range(3):
-            raise SyntaxError(f"Got too many return values ({token.value}), expected 0, 1 or 2")
+            raise SyntaxError(f"Got too many return values: {token.debug_str()}, expected 0, 1 or 2")
         return int(token.content)
 
 
@@ -102,7 +101,7 @@ class DelimLexerToken(LexerToken):
         type.
         :return: None
         """
-        raise NotImplementedError("Tried to parse a delimiter token, this should be handled by its parent.")
+        raise NotImplementedError(f"Tried to parse a delimiter token: {self.debug_str()}, this should be handled by its parent.")
 
 
 class IdentLexerToken(LexerToken):
