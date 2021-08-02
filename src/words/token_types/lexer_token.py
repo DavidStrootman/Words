@@ -10,7 +10,7 @@ from words.token_types.parser_token import ParserToken, DictionaryOperatorParser
     ReturnParserToken, ValueParserToken, VariableParserToken, IdentParserToken, IfParserToken, WhileParserToken
 
 
-class LexerToken(metaclass=PrintableABC):
+class LexerToken(PrintableABC):
     """
     Abstract lexer token.
     """

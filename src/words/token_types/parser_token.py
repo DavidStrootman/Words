@@ -1,12 +1,14 @@
 from abc import abstractmethod
 from typing import List, Optional, Tuple
 
+from words.exceptions.parser_exceptions import StackSizeException
+from words.helper.Debuggable import Debuggable
 from words.helper.PrintableABC import PrintableABC
 from words.interpreter.interpret_util import exhaustive_interpret_tokens
 from words.lexer.lex_util import DebugData
 
 
-class ParserToken(metaclass=PrintableABC):
+class ParserToken(Debuggable, PrintableABC):
     """
     Base parser token.
     """
@@ -23,10 +25,10 @@ class ParserToken(metaclass=PrintableABC):
         raise RuntimeError(f"Tried to call unimplemented method \"execute\" on {self.__class__.__name__}.")
 
     def debug_str(self):
-        return f"\"{self.value}\" at line {self.debug_data}"
+        return f"\"{self}\" at line {self.debug_data}"
 
 
-class DictionaryToken(metaclass=PrintableABC):
+class DictionaryToken:
     """A visitable token that is stored in the dictionary."""
 
     class RemovedDictionaryToken:
@@ -94,6 +96,9 @@ class MacroParserToken(ParserToken):
 
         self.function_name = function_name
 
+    def debug_str(self):
+        return f"\"{self.function_name}\" at line {self.debug_data}"
+
     def execute(self, stack: list, dictionary: dict) -> Tuple[list, dict]:
         """
         Execute the token to get the result.
@@ -102,8 +107,8 @@ class MacroParserToken(ParserToken):
         :return: The stack and dictionary after executing the token.
         """
         if self.function_name == "__PRINT__":
-            # if not stack:
-            #     raise self
+            if not stack:
+                raise StackSizeException(token=self, expected_size=1, actual_size=0)
             print(stack[-1])
             return stack, dictionary
 
@@ -238,7 +243,14 @@ class ReturnParserToken(ParserToken):
         self.count = count
 
     def execute(self, stack: list, dictionary: dict) -> Tuple[list, dict]:
+        if len(stack) < self.count:
+            raise StackSizeException(token=self, expected_size=self.count, actual_size=len(stack))
+        if self.count == 0:
+            return [], dictionary
         return stack[-self.count:], dictionary
+
+    def debug_str(self):
+        return f"\"RETURN\" at line {self.debug_data}"
 
 
 class FunctionParserToken(ParserToken, DictionaryToken):
@@ -279,12 +291,16 @@ class FunctionParserToken(ParserToken, DictionaryToken):
         def rec_setup_parameters(stack_: list, dictionary_: dict, parameters: list):
             if not parameters:
                 return stack_, dictionary_
+            if len(stack) < len(self.parameters):
+                raise StackSizeException(token=self, expected_size=len(self.parameters), actual_size=len(stack))
 
             return rec_setup_parameters(stack_[:-1], {**dictionary_, **{parameters[0].value: stack_[-1]}},
                                         parameters[1:])
 
         return rec_setup_parameters(stack, dictionary, self.parameters)
 
+    def debug_str(self):
+        return f"function \"{self.name}\" at line {self.debug_data}"
 
 class ArithmeticOperatorParserToken(ParserToken):
     def __init__(self, debug_data: DebugData, value: str):
