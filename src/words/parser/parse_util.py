@@ -1,5 +1,5 @@
 from typing import Iterator, List, TypeVar
-from words.helper.token_type_enum import TokenTypeEnum
+from words.helper.TokenTypeEnum import TokenTypeEnum
 from words.token_types.parser_token import ParserToken
 
 
