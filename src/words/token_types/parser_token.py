@@ -302,6 +302,7 @@ class FunctionParserToken(ParserToken, DictionaryToken):
     def debug_str(self):
         return f"function \"{self.name}\" at line {self.debug_data}"
 
+
 class ArithmeticOperatorParserToken(ParserToken):
     def __init__(self, debug_data: DebugData, value: str):
         super().__init__(debug_data)
@@ -322,7 +323,6 @@ class ArithmeticOperatorParserToken(ParserToken):
             return stack[:-2] + [second_value + topmost_value], dictionary
         if self.value == "-":
             return stack[:-2] + [second_value - topmost_value], dictionary
-        # TODO: Create generic exception
         raise NotImplementedError(f"Unimplemented ArithmeticOperator {self.value}")
 
 

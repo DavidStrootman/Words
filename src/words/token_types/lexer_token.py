@@ -61,13 +61,6 @@ class LexerToken(PrintableABC):
             raise SyntaxError(f"Expected {type_}, got {type(token)} with value {token.debug_str()}.")
 
     @staticmethod
-    def try_get_identifier_value(token: "LexerToken") -> str:
-        # TODO: Refactor this into assert_kind_of
-        if not isinstance(token, IdentLexerToken):
-            raise SyntaxError(f"Expected variable name, got {type(token)} with value {token.debug_str()}.")
-        return token.value
-
-    @staticmethod
     def try_get_return_value(token: "LexerToken") -> int:
         """
         Try to get a return value after a return statement.
@@ -143,8 +136,8 @@ class KeywordLexerToken(LexerToken):
         return SyntaxError(f"Found unexpected {self.debug_str()}.")
 
     def parse(self, tokens: Iterator["LexerToken"]) -> Union[
-        WhileParserToken, IfParserToken, VariableParserToken,
-        ValueParserToken, ReturnParserToken, FunctionParserToken]:
+            WhileParserToken, IfParserToken, VariableParserToken,
+            ValueParserToken, ReturnParserToken, FunctionParserToken]:
         """
         Parse the lexer token into a parser token.
         :param tokens: The list of lexer tokens, which might be used during parsing of this token depending on it's
@@ -174,9 +167,13 @@ class KeywordLexerToken(LexerToken):
         if self.value == self.Types.THEN:
             raise self._unexpected_token_error()
         if self.value == self.Types.VARIABLE:
-            return VariableParserToken(self.debug_data, LexerToken.try_get_identifier_value(next(tokens)))
+            token = next(tokens)
+            LexerToken.assert_kind_of(token, IdentLexerToken)
+            return VariableParserToken(self.debug_data, token.value)
         if self.value == self.Types.VALUE:
-            return ValueParserToken(self.debug_data, LexerToken.try_get_identifier_value(next(tokens)))
+            token = next(tokens)
+            LexerToken.assert_kind_of(token, IdentLexerToken)
+            return ValueParserToken(self.debug_data, token.value)
         if self.value == self.Types.RETURN:
             return ReturnParserToken(self.debug_data, LexerToken.try_get_return_value(next(tokens)))
         if self.value == self.Types.FUNCTION:
@@ -252,7 +249,7 @@ class OpLexerToken(LexerToken):
         RETRIEVAL = "RETRIEVE"
 
     def parse(self, tokens: Iterator["LexerToken"]) -> Union[
-        ArithmeticOperatorParserToken, BooleanOperatorParserToken, DictionaryOperatorParserToken]:
+            ArithmeticOperatorParserToken, BooleanOperatorParserToken, DictionaryOperatorParserToken]:
         """
         Parse the lexer token into a parser token.
         :param tokens: The list of lexer tokens, which might be used during parsing of this token depending on it's
