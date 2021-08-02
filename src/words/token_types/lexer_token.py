@@ -1,17 +1,13 @@
-from abc import ABC, abstractmethod
+from abc import abstractmethod
 from typing import Iterator, Type, Union
 
+from words.helper.PrintableABC import PrintableABC
 from words.helper.token_type_enum import TokenTypeEnum
 from words.lexer.lex_util import Word
 from words.parser.parse_util import eat_until, eat_until_discarding
 from words.token_types.parser_token import ParserToken, DictionaryOperatorParserToken, BooleanOperatorParserToken, \
     ArithmeticOperatorParserToken, BooleanParserToken, MacroParserToken, NumberParserToken, FunctionParserToken, \
     ReturnParserToken, ValueParserToken, VariableParserToken, IdentParserToken, IfParserToken, WhileParserToken
-
-
-class PrintableABC(type(ABC)):
-    def __str__(self):
-        return f"{self.__name__}"
 
 
 class LexerToken(metaclass=PrintableABC):
@@ -121,7 +117,7 @@ class IdentLexerToken(LexerToken):
         type.
         :return: Identifier parser token.
         """
-        return IdentParserToken(self.value)
+        return IdentParserToken(self.debug_data, self.value)
 
 
 class KeywordLexerToken(LexerToken):
@@ -159,7 +155,7 @@ class KeywordLexerToken(LexerToken):
             predicate = eat_until(tokens, [self.Types.WHILE])
             predicate_without_last_item = predicate[:-1]
             statements = eat_until_discarding(tokens, [self.Types.REPEAT])
-            return WhileParserToken(predicate_without_last_item, statements)
+            return WhileParserToken(self.debug_data, predicate_without_last_item, statements)
         if self.value == self.Types.WHILE:
             raise self._unexpected_token_error()
         if self.value == self.Types.REPEAT:
@@ -172,17 +168,17 @@ class KeywordLexerToken(LexerToken):
             else:
                 if_body = if_body[:-1]  # Discard THEN token
                 else_body = None
-            return IfParserToken(if_body, else_body)
+            return IfParserToken(self.debug_data, if_body, else_body)
         if self.value == self.Types.ELSE:
             raise self._unexpected_token_error()
         if self.value == self.Types.THEN:
             raise self._unexpected_token_error()
         if self.value == self.Types.VARIABLE:
-            return VariableParserToken(LexerToken.try_get_identifier_value(next(tokens)))
+            return VariableParserToken(self.debug_data, LexerToken.try_get_identifier_value(next(tokens)))
         if self.value == self.Types.VALUE:
-            return ValueParserToken(LexerToken.try_get_identifier_value(next(tokens)))
+            return ValueParserToken(self.debug_data, LexerToken.try_get_identifier_value(next(tokens)))
         if self.value == self.Types.RETURN:
-            return ReturnParserToken(LexerToken.try_get_return_value(next(tokens)))
+            return ReturnParserToken(self.debug_data, LexerToken.try_get_return_value(next(tokens)))
         if self.value == self.Types.FUNCTION:
             token = next(tokens)
             if not isinstance(token, IdentLexerToken):
@@ -192,7 +188,7 @@ class KeywordLexerToken(LexerToken):
             LexerToken.assert_type(paren_open, DelimLexerToken.Types.PAREN_OPEN)
             parameters = eat_until_discarding(tokens, [DelimLexerToken.Types.PAREN_CLOSE])
             body = eat_until_discarding(tokens, [KeywordLexerToken.Types.FUNCTION])
-            return FunctionParserToken(name, parameters, body)
+            return FunctionParserToken(self.debug_data, name, parameters, body)
         if self.value == self.Types.LAMBDA:
             raise NotImplementedError("Lambdas not implemented yet")
 
@@ -220,9 +216,9 @@ class LiteralLexerToken(LexerToken):
         :return: Either a number parser token or a boolean parser token based on the type of lexer token.
         """
         if self.value == self.Types.NUMBER:
-            return NumberParserToken(int(self.content))
+            return NumberParserToken(self.debug_data, int(self.content))
         if self.value in [self.Types.TRUE, self.Types.FALSE]:
-            return BooleanParserToken(self.content)
+            return BooleanParserToken(self.debug_data, self.content)
 
 
 class MacroLexerToken(LexerToken):
@@ -236,7 +232,7 @@ class MacroLexerToken(LexerToken):
         type.
         :return: A Macro parser token.
         """
-        return MacroParserToken(self.value.value)
+        return MacroParserToken(self.debug_data, self.value.value)
 
 
 class OpLexerToken(LexerToken):
@@ -266,10 +262,10 @@ class OpLexerToken(LexerToken):
         based on the type of lexer token.
         """
         if self.value.value in ["-", "+"]:
-            return ArithmeticOperatorParserToken(self.value.value)
+            return ArithmeticOperatorParserToken(self.debug_data, self.value.value)
         if self.value.value in ["==", ">", "<", ">=", "<="]:
-            return BooleanOperatorParserToken(self.value.value)
+            return BooleanOperatorParserToken(self.debug_data, self.value.value)
         if self.value.value in ["ASSIGN", "RETRIEVE"]:
             targeted_variable = next(tokens)
             LexerToken.assert_kind_of(targeted_variable, IdentLexerToken)
-            return DictionaryOperatorParserToken(self.value.value, targeted_variable.value)
+            return DictionaryOperatorParserToken(self.debug_data, self.value.value, targeted_variable.value)

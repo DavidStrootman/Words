@@ -1,12 +1,17 @@
-from abc import ABC, abstractmethod
+from abc import abstractmethod
 from typing import List, Optional, Tuple
+
+from words.helper.PrintableABC import PrintableABC
 from words.interpreter.interpret_util import exhaustive_interpret_tokens
+from words.lexer.lex_util import DebugData
 
 
-class ParserToken(ABC):
+class ParserToken(metaclass=PrintableABC):
     """
     Base parser token.
     """
+    def __init__(self, debug_data: DebugData):
+        self.debug_data = debug_data
 
     def execute(self, stack: list, dictionary: dict) -> Tuple[list, dict]:
         """
@@ -17,8 +22,11 @@ class ParserToken(ABC):
         """
         raise RuntimeError(f"Tried to call unimplemented method \"execute\" on {self.__class__.__name__}.")
 
+    def debug_str(self):
+        return f"\"{self.value}\" at line {self.debug_data}"
 
-class DictionaryToken(ABC):
+
+class DictionaryToken(metaclass=PrintableABC):
     """A visitable token that is stored in the dictionary."""
 
     class RemovedDictionaryToken:
@@ -41,7 +49,8 @@ class NumberParserToken(ParserToken):
     """
     The number token represents an integer.
     """
-    def __init__(self, value: int):
+    def __init__(self, debug_data: DebugData, value: int):
+        super().__init__(debug_data)
         self.value = value
 
     def execute(self, stack: list, dictionary: dict) -> Tuple[list, dict]:
@@ -58,7 +67,9 @@ class BooleanParserToken(ParserToken):
     """
     The boolean token represents a boolean.
     """
-    def __init__(self, value: str):
+    def __init__(self, debug_data: DebugData, value: str):
+        super().__init__(debug_data)
+
         if value == "True":
             self.value = True
         if value == "False":
@@ -78,7 +89,9 @@ class MacroParserToken(ParserToken):
     """
     The macro token represents a macro, for example __PRINT___.
     """
-    def __init__(self, function_name: str):
+    def __init__(self, debug_data: DebugData, function_name: str):
+        super().__init__(debug_data)
+
         self.function_name = function_name
 
     def execute(self, stack: list, dictionary: dict) -> Tuple[list, dict]:
@@ -89,6 +102,8 @@ class MacroParserToken(ParserToken):
         :return: The stack and dictionary after executing the token.
         """
         if self.function_name == "__PRINT__":
+            # if not stack:
+            #     raise self
             print(stack[-1])
             return stack, dictionary
 
@@ -98,7 +113,9 @@ class WhileParserToken(ParserToken):
     The while token represents a while loop. It holds a predicate that is checked every loop and the statements that
     should be executed as long as the predicate holds true.
     """
-    def __init__(self, predicate: List[ParserToken], statements: List[ParserToken]):
+    def __init__(self, debug_data: DebugData, predicate: List[ParserToken], statements: List[ParserToken]):
+        super().__init__(debug_data)
+
         self.predicate = predicate
         self.statements = statements
 
@@ -119,7 +136,11 @@ class IfParserToken(ParserToken):
     """
     The if token represents an if statement, with an optional else statement.
     """
-    def __init__(self, if_body: List[ParserToken], else_body: Optional[List[ParserToken]] = None):
+    def __init__(self, debug_data: DebugData,
+                 if_body: List[ParserToken],
+                 else_body: Optional[List[ParserToken]] = None):
+        super().__init__(debug_data)
+
         self.if_body = if_body
         self.else_body = else_body
 
@@ -145,7 +166,9 @@ class VariableParserToken(ParserToken, DictionaryToken):
     class VarUnassigned:
         pass
 
-    def __init__(self, value: str):
+    def __init__(self, debug_data: DebugData, value: str):
+        super().__init__(debug_data)
+
         self.value: str = value
         self.assigned_value: any = self.VarUnassigned
 
@@ -168,7 +191,9 @@ class ValueParserToken(ParserToken):
     """
     The value parser token represents a function parameter, which is called a value in Words.
     """
-    def __init__(self, value: str):
+    def __init__(self, debug_data: DebugData, value: str):
+        super().__init__(debug_data)
+
         self.value = value
 
     def execute(self, stack: list, dictionary: dict) -> Tuple[list, dict]:
@@ -185,7 +210,9 @@ class IdentParserToken(ParserToken):
     """
     The identifier token represents an identifier.
     """
-    def __init__(self, value: str):
+    def __init__(self, debug_data: DebugData, value: str):
+        super().__init__(debug_data)
+
         self.value = value
 
     def execute(self, stack: list, dictionary: dict) -> Tuple[list, dict]:
@@ -205,15 +232,19 @@ class IdentParserToken(ParserToken):
 
 
 class ReturnParserToken(ParserToken):
-    def __init__(self, count: int):
+    def __init__(self, debug_data: DebugData, count: int):
+        super().__init__(debug_data)
+
         self.count = count
 
     def execute(self, stack: list, dictionary: dict) -> Tuple[list, dict]:
-        return [stack[-1]], dictionary
+        return stack[-self.count:], dictionary
 
 
 class FunctionParserToken(ParserToken, DictionaryToken):
-    def __init__(self, name, parameters: List[ParserToken], body: List[ParserToken]):
+    def __init__(self, debug_data: DebugData, name, parameters: List[ParserToken], body: List[ParserToken]):
+        super().__init__(debug_data)
+
         self.name = name
         if not all(isinstance(token, ValueParserToken) for token in parameters):
             raise RuntimeError(
@@ -223,7 +254,7 @@ class FunctionParserToken(ParserToken, DictionaryToken):
 
     def execute(self, stack: list, dictionary: dict):
         """
-        Execute the token to get the result.
+        Setup the function by placing it in the dictionary.
         :param stack: The stack to use for executing the token.
         :param dictionary: The dictionary to use for executing the token.
         :return: The stack and dictionary after executing the token.
@@ -234,6 +265,12 @@ class FunctionParserToken(ParserToken, DictionaryToken):
         return stack, dictionary
 
     def visit(self, stack: list, dictionary: dict) -> Tuple[list, dict]:
+        """
+        Execute the function body and get the result.
+        :param stack:
+        :param dictionary:
+        :return:
+        """
         parameters = self.setup_parameters(stack, dictionary.copy())
         new_stack = stack[:-len(self.parameters)] + exhaustive_interpret_tokens(self.body, *parameters)[0]
         return new_stack, dictionary
@@ -250,7 +287,9 @@ class FunctionParserToken(ParserToken, DictionaryToken):
 
 
 class ArithmeticOperatorParserToken(ParserToken):
-    def __init__(self, value: str):
+    def __init__(self, debug_data: DebugData, value: str):
+        super().__init__(debug_data)
+
         self.value = value
 
     def execute(self, stack: list, dictionary: dict) -> Tuple[list, dict]:
@@ -272,7 +311,9 @@ class ArithmeticOperatorParserToken(ParserToken):
 
 
 class BooleanOperatorParserToken(ParserToken):
-    def __init__(self, value: str):
+    def __init__(self, debug_data: DebugData, value: str):
+        super().__init__(debug_data)
+
         self.value = value
 
     def execute(self, stack: list, dictionary: dict) -> Tuple[list, dict]:
@@ -298,7 +339,9 @@ class BooleanOperatorParserToken(ParserToken):
 
 
 class DictionaryOperatorParserToken(ParserToken):
-    def __init__(self, value: str, variable_name: str):
+    def __init__(self, debug_data: DebugData, value: str, variable_name: str):
+        super().__init__(debug_data)
+
         self.value = value
         self.variable_name = variable_name
 
