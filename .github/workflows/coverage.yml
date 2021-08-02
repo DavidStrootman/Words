@@ -32,7 +32,7 @@ jobs:
       uses: codecov/codecov-action@v2.0.2
       with:
         # Comma-separated list of files to upload
-#         files:
+        files: .coverage
         # Directory to search for coverage reports.
 #         directory:
         # Flag upload to group coverage metrics (e.g. unittests | integration | ui,chrome)
