@@ -1,7 +1,8 @@
 from abc import abstractmethod
 from typing import Iterator, Type, Union
 
-from words.exceptions.lexer_exceptions import UnexpectedTokenError, UnexpectedTokenTypeError, IncorrectReturnCountError, InvalidTokenError
+from words.exceptions.lexer_exceptions import UnexpectedTokenError, UnexpectedTokenTypeError,\
+    IncorrectReturnCountError, InvalidTokenError
 from words.helper.Debuggable import Debuggable
 from words.helper.PrintableABC import PrintableABC
 from words.helper.TokenTypeEnum import TokenTypeEnum

@@ -56,10 +56,6 @@ jobs:
         #         flags:
         # Specify whether or not CI build should fail if Codecov runs into an error during upload
         fail_ci_if_error: True
-        # Threshold for failure
-        threshold: 0%
-        # Error if ci fails
-        if_ci_failed: error
         # Comma-separated list, see the README for options and their usage
         #         functionalities:
         # User defined upload name. Visible in Codecov UI
