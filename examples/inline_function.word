@@ -1,0 +1,1 @@
+1 | inline ( VALUE x ) x 2 + RETURN 1 | inline __PRINT__
