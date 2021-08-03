@@ -200,7 +200,7 @@ class LiteralLexerToken(LexerToken):
         TRUE = "True"
         FALSE = "False"
 
-    def __init__(self, token_type, word: Word):
+    def __init__(self, token_type: str, word: Word):
         super().__init__(Word(token_type, word.debug_data))
         self.content = word.content
 
