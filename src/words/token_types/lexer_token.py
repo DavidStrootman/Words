@@ -241,6 +241,9 @@ class LiteralLexerToken(LexerToken):
         TRUE = "True"
         FALSE = "False"
 
+    def debug_str(self) -> str:
+        return f"\"COMMENT\" at line {self.debug_data}"
+
     def __init__(self, token_type: str, word: Word):
         super().__init__(Word(token_type, word.debug_data))
         self.content = word.content
@@ -252,6 +255,8 @@ class LiteralLexerToken(LexerToken):
         type.
         :return: Either a number parser token or a boolean parser token based on the type of lexer token.
         """
+        if self.value == self.Types.COMMENT:
+            raise InvalidTokenError(self)
         if self.value == self.Types.NUMBER:
             return NumberParserToken(self.debug_data, int(self.content))
         if self.value in [self.Types.TRUE, self.Types.FALSE]:

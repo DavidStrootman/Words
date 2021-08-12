@@ -6,13 +6,15 @@ from words.exceptions.lexer_exceptions import InvalidTokenError, MissingTokenErr
 from words.token_types.lexer_token import LexerToken, DelimLexerToken, IdentLexerToken, LiteralLexerToken, \
     KeywordLexerToken
 from words.token_types.parser_token import ParserToken, IdentParserToken, WhileParserToken, IfParserToken, \
-    VariableParserToken, ValueParserToken, ReturnParserToken, FunctionParserToken, LambdaParserToken
+    VariableParserToken, ValueParserToken, ReturnParserToken, FunctionParserToken, LambdaParserToken, NumberParserToken, \
+    BooleanParserToken
 
 
 class TestLexerToken:
     def test_undefined_type(self):
         class ConcreteLexerToken(LexerToken):
             """Concrete implementation of abstract lexer token."""
+
             def parse(self, tokens: Iterator[LexerToken]):
                 """Concrete implementation of parse method."""
 
@@ -277,3 +279,27 @@ class TestKeywordLexerToken:
         ])
         _assert_token_parse_returns(KeywordLexerToken(Word("λ", DebugData(0))), lambda_token_positive,
                                     LambdaParserToken)
+
+
+class TestLiteralLexerToken:
+    def test_parse_number_token_positive(self):
+        """Parse a number literal."""
+        _assert_token_parse_returns(LiteralLexerToken(LiteralLexerToken.Types.NUMBER.value, Word("10", DebugData(0))),
+                                    iter([]), NumberParserToken)
+
+    def test_parse_number_token_incorrect_type(self):
+        """Parse a number with a character as value."""
+        _assert_token_parse_raises(LiteralLexerToken(LiteralLexerToken.Types.NUMBER.value, Word("a", DebugData(0))),
+                                   iter([]), ValueError)
+
+    def test_parse_boolean_token_positive(self):
+        """Parse a boolean literal."""
+        _assert_token_parse_returns(LiteralLexerToken(LiteralLexerToken.Types.TRUE.value, Word("True", DebugData(0))),
+                                    iter([]), BooleanParserToken)
+        _assert_token_parse_returns(LiteralLexerToken(LiteralLexerToken.Types.FALSE.value, Word("True", DebugData(0))),
+                                    iter([]), BooleanParserToken)
+
+    def test_parsing_comment_token(self):
+        """Comments cannot be parsed, since they are removed during lexing."""
+        _assert_token_parse_raises(LiteralLexerToken(LiteralLexerToken.Types.COMMENT.value, Word("#", DebugData(0))),
+                                   iter([]), InvalidTokenError)
