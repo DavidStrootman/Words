@@ -197,21 +197,37 @@ class KeywordLexerToken(LexerToken):
             return ValueParserToken(self.debug_data, token.value)
 
         if self.value == self.Types.RETURN:
-            return ReturnParserToken(self.debug_data, LexerToken.try_get_return_value(next(tokens)))
+            try:
+                return_value = LexerToken.try_get_return_value(next(tokens))
+            except StopIteration:
+                raise MissingTokenError(self, LiteralLexerToken.Types.NUMBER)
+            return ReturnParserToken(self.debug_data, return_value)
 
         if self.value == self.Types.FUNCTION:
             token = next(tokens)
+
             if not isinstance(token, IdentLexerToken):
                 raise UnexpectedTokenError(token, IdentLexerToken)
-            name = token.value
+
+            function_name = token.value
+
             paren_open = next(tokens)
             LexerToken.assert_type(paren_open, DelimLexerToken.Types.PAREN_OPEN)
-            parameters = eat_until_discarding(tokens, [DelimLexerToken.Types.PAREN_CLOSE])
-            body = eat_until_discarding(tokens, [KeywordLexerToken.Types.FUNCTION])
-            return FunctionParserToken(self.debug_data, name, parameters, body)
+
+            try:
+                parameters = eat_until_discarding(tokens, [DelimLexerToken.Types.PAREN_CLOSE])
+            except StopIteration:
+                raise MissingTokenError(self, DelimLexerToken.Types.PAREN_CLOSE)
+
+            try:
+                body = eat_until_discarding(tokens, [KeywordLexerToken.Types.FUNCTION])
+            except StopIteration:
+                raise MissingTokenError(self, KeywordLexerToken.Types.FUNCTION)
+
+            return FunctionParserToken(self.debug_data, function_name, parameters, body)
 
         if self.value == self.Types.LAMBDA:
-            raise NotImplementedError("Lambdas not implemented yet")
+            raise NotImplementedError("Lambdas not implemented yet.")
 
 
 class LiteralLexerToken(LexerToken):

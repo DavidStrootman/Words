@@ -302,6 +302,13 @@ class FunctionParserToken(ParserToken, DictionaryToken):
         return f"function \"{self.name}\" at line {self.debug_data}"
 
 
+class LambdaParserToken(ParserToken):
+    """TODO: Lambdas."""
+
+    def execute(self, stack: list, dictionary: dict) -> Tuple[list, dict]:
+        raise NotImplementedError("Lambdas not implemented yet.")
+
+
 class ArithmeticOperatorParserToken(ParserToken):
     def __init__(self, debug_data: DebugData, value: str):
         super().__init__(debug_data)
