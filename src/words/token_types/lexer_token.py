@@ -148,10 +148,13 @@ class KeywordLexerToken(LexerToken):
             predicate_without_last_item = predicate[:-1]
             statements = eat_until_discarding(tokens, [self.Types.REPEAT])
             return WhileParserToken(self.debug_data, predicate_without_last_item, statements)
+
         if self.value == self.Types.WHILE:
             raise InvalidTokenError(self)
+
         if self.value == self.Types.REPEAT:
             raise InvalidTokenError(self)
+
         if self.value == self.Types.IF:
             try:
                 if_body = eat_until(tokens, [self.Types.ELSE, self.Types.THEN])
@@ -167,23 +170,35 @@ class KeywordLexerToken(LexerToken):
                 if_body = if_body[:-1]  # Discard THEN token
                 else_body = None
             return IfParserToken(self.debug_data, if_body, else_body)
+
         if self.value == self.Types.ELSE:
             raise InvalidTokenError(self)
+
         if self.value == self.Types.THEN:
             raise InvalidTokenError(self)
+
         if self.value == self.Types.VARIABLE:
             try:
                 token = next(tokens)
             except StopIteration:
                 raise MissingTokenError(self, IdentLexerToken)
+
             LexerToken.assert_kind_of(token, IdentLexerToken)
             return VariableParserToken(self.debug_data, token.value)
+
         if self.value == self.Types.VALUE:
-            token = next(tokens)
+            try:
+                token = next(tokens)
+            except StopIteration:
+                raise MissingTokenError(self, IdentLexerToken)
+
             LexerToken.assert_kind_of(token, IdentLexerToken)
+
             return ValueParserToken(self.debug_data, token.value)
+
         if self.value == self.Types.RETURN:
             return ReturnParserToken(self.debug_data, LexerToken.try_get_return_value(next(tokens)))
+
         if self.value == self.Types.FUNCTION:
             token = next(tokens)
             if not isinstance(token, IdentLexerToken):
@@ -194,6 +209,7 @@ class KeywordLexerToken(LexerToken):
             parameters = eat_until_discarding(tokens, [DelimLexerToken.Types.PAREN_CLOSE])
             body = eat_until_discarding(tokens, [KeywordLexerToken.Types.FUNCTION])
             return FunctionParserToken(self.debug_data, name, parameters, body)
+
         if self.value == self.Types.LAMBDA:
             raise NotImplementedError("Lambdas not implemented yet")
 

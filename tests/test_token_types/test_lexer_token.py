@@ -5,7 +5,7 @@ from words.exceptions.lexer_exceptions import InvalidTokenError, MissingTokenErr
 from words.token_types.lexer_token import LexerToken, DelimLexerToken, IdentLexerToken, LiteralLexerToken, \
     KeywordLexerToken
 from words.token_types.parser_token import ParserToken, IdentParserToken, WhileParserToken, IfParserToken, \
-    VariableParserToken
+    VariableParserToken, ValueParserToken
 
 
 class TestLexerToken:
@@ -132,7 +132,7 @@ class TestKeywordLexerToken:
                                     VariableParserToken)
 
     def test_parse_variable_token_no_identifier(self):
-        """Parse a variable token without following it with an identifier to use as the variable name."""
+        """Parse a VARIABLE token without following it with an identifier to use as the variable name."""
         variable_token_no_identifier = iter([
             LiteralLexerToken(LiteralLexerToken.Types.NUMBER.value, Word("0", DebugData(0)))
         ])
@@ -140,5 +140,25 @@ class TestKeywordLexerToken:
                                    UnexpectedTokenError)
 
     def test_parse_variable_token_no_more_tokens(self):
+        """A VARIABLE token cannot be the last token in a file."""
         _assert_token_parse_raises(KeywordLexerToken(Word("VARIABLE", DebugData(0))), iter([]), MissingTokenError)
 
+    def test_parse_value_token_positive(self):
+        """Parse a VALUE token with a value name."""
+        value_token_positive = iter([
+            IdentLexerToken(Word("VALUE_NAME", DebugData(0)))
+        ])
+        _assert_token_parse_returns(KeywordLexerToken(Word("VALUE", DebugData(0))), value_token_positive,
+                                    ValueParserToken)
+
+    def test_parse_value_token_no_identifier(self):
+        """Parse a VALUE token without following it with an identifier to use as the value name."""
+        value_token_no_identifier = iter([
+            LiteralLexerToken(LiteralLexerToken.Types.NUMBER.value, Word("0", DebugData(0)))
+        ])
+        _assert_token_parse_raises(KeywordLexerToken(Word("VALUE", DebugData(0))), value_token_no_identifier,
+                                   UnexpectedTokenError)
+
+    def test_parse_value_token_no_more_tokens(self):
+        """A VALUE token cannot be the last token in a file."""
+        _assert_token_parse_raises(KeywordLexerToken(Word("VALUE", DebugData(0))), iter([]), MissingTokenError)
