@@ -1,7 +1,7 @@
 from abc import abstractmethod
 from typing import Iterator, Type, Union
 
-from words.exceptions.lexer_exceptions import UnexpectedTokenError, UnexpectedTokenTypeError,\
+from words.exceptions.lexer_exceptions import UnexpectedTokenError, UnexpectedTokenTypeError, \
     IncorrectReturnCountError, InvalidTokenError
 from words.helper.Debuggable import Debuggable
 from words.helper.PrintableABC import PrintableABC
@@ -87,7 +87,8 @@ class DelimLexerToken(LexerToken):
 
     def parse(self, tokens: Iterator["LexerToken"]) -> None:
         """
-        Parse the lexer token into a parser token.
+        Delimiter lexer tokens cannot be parsed by themselves. They are parsed by the preceding function token.
+
         :param tokens: The list of lexer tokens, which might be used during parsing of this token depending on it's
         type.
         :return: None
@@ -134,8 +135,8 @@ class KeywordLexerToken(LexerToken):
         LAMBDA = "λ"
 
     def parse(self, tokens: Iterator["LexerToken"]) -> Union[
-            WhileParserToken, IfParserToken, VariableParserToken,
-            ValueParserToken, ReturnParserToken, FunctionParserToken]:
+        WhileParserToken, IfParserToken, VariableParserToken,
+        ValueParserToken, ReturnParserToken, FunctionParserToken]:
         """
         Parse the lexer token into a parser token.
         :param tokens: The list of lexer tokens, which might be used during parsing of this token depending on it's
@@ -247,7 +248,7 @@ class OpLexerToken(LexerToken):
         RETRIEVAL = "RETRIEVE"
 
     def parse(self, tokens: Iterator["LexerToken"]) -> Union[
-            ArithmeticOperatorParserToken, BooleanOperatorParserToken, DictionaryOperatorParserToken]:
+        ArithmeticOperatorParserToken, BooleanOperatorParserToken, DictionaryOperatorParserToken]:
         """
         Parse the lexer token into a parser token.
         :param tokens: The list of lexer tokens, which might be used during parsing of this token depending on it's

@@ -15,6 +15,7 @@ class ParserToken(Debuggable, PrintableABC):
     def __init__(self, debug_data: DebugData):
         self.debug_data = debug_data
 
+    @abstractmethod
     def execute(self, stack: list, dictionary: dict) -> Tuple[list, dict]:
         """
         Execute the token to get the result.
@@ -22,7 +23,6 @@ class ParserToken(Debuggable, PrintableABC):
         :param dictionary: The dictionary to use for executing the token.
         :return: The stack and dictionary after executing the token.
         """
-        raise RuntimeError(f"Tried to call unimplemented method \"execute\" on {self.__class__.__name__}.")
 
     def debug_str(self):
         return f"\"{self}\" at line {self.debug_data}"
@@ -44,7 +44,6 @@ class DictionaryToken:
         :param dictionary: The dictionary used for visiting this token.
         :return: The stack and dictionary after this token has been visited..
         """
-        pass
 
 
 class NumberParserToken(ParserToken):
