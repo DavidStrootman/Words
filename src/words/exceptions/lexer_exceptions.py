@@ -33,5 +33,5 @@ class InvalidTokenError(SyntaxError):
 
 class IncorrectReturnCountError(SyntaxError):
     def __init__(self, token: Debuggable):
-        message = f"Got too many return values: {token.debug_str()}, expected 0, 1 or 2"
+        message = f"Got an incorrect return count: {token.debug_str()}; Expected 0, 1 or 2"
         super().__init__(message)

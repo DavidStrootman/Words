@@ -2,25 +2,13 @@ from typing import Iterator, Type
 import pytest
 from words.lexer.lex_util import Word, DebugData
 from words.exceptions.lexer_exceptions import InvalidTokenError, MissingTokenError, UnexpectedTokenError, \
-    UnexpectedTokenTypeError
+    UnexpectedTokenTypeError, IncorrectReturnCountError
 from words.token_types.lexer_token import LexerToken, DelimLexerToken, IdentLexerToken, LiteralLexerToken, \
-    KeywordLexerToken
+    KeywordLexerToken, MacroLexerToken, OpLexerToken
 from words.token_types.parser_token import ParserToken, IdentParserToken, WhileParserToken, IfParserToken, \
     VariableParserToken, ValueParserToken, ReturnParserToken, FunctionParserToken, LambdaParserToken, NumberParserToken, \
-    BooleanParserToken
-
-
-class TestLexerToken:
-    def test_undefined_type(self):
-        class ConcreteLexerToken(LexerToken):
-            """Concrete implementation of abstract lexer token."""
-
-            def parse(self, tokens: Iterator[LexerToken]):
-                """Concrete implementation of parse method."""
-
-        with pytest.raises(ValueError):
-            ConcreteLexerToken(Word("test", DebugData(0)))
-        ConcreteLexerToken(Word("UNDEFINED", DebugData(1)))
+    BooleanParserToken, MacroParserToken, ArithmeticOperatorParserToken, BooleanOperatorParserToken, \
+    DictionaryOperatorParserToken
 
 
 def _assert_token_parse_returns(token: LexerToken,
@@ -35,6 +23,56 @@ def _assert_token_parse_raises(token: LexerToken,
                                raises: Type[Exception]):
     with pytest.raises(raises):
         token.parse(tokens)
+
+
+class TestLexerToken:
+    def test_undefined_type(self):
+        class ConcreteLexerToken(LexerToken):
+            """Concrete implementation of abstract lexer token."""
+
+            def parse(self, tokens: Iterator[LexerToken]):
+                """Concrete implementation of parse method."""
+
+        with pytest.raises(ValueError):
+            ConcreteLexerToken(Word("test", DebugData(0)))
+        ConcreteLexerToken(Word("UNDEFINED", DebugData(1)))
+
+    def test_assert_kind_of_positive(self):
+        LexerToken.assert_kind_of(LiteralLexerToken(LiteralLexerToken.Types.NUMBER.value, Word("0", DebugData(0))),
+                                  LiteralLexerToken)
+
+    def test_assert_kind_of_negative(self):
+        with pytest.raises(UnexpectedTokenError):
+            LexerToken.assert_kind_of(LiteralLexerToken(LiteralLexerToken.Types.NUMBER.value, Word("0", DebugData(0))),
+                                      IdentLexerToken)
+
+    def test_assert_type_positive(self):
+        LexerToken.assert_type(LiteralLexerToken(LiteralLexerToken.Types.NUMBER.value, Word("0", DebugData(0))),
+                               LiteralLexerToken.Types.NUMBER)
+
+    def test_assert_type_negative(self):
+        with pytest.raises(UnexpectedTokenTypeError):
+            LexerToken.assert_type(LiteralLexerToken(LiteralLexerToken.Types.NUMBER.value, Word("0", DebugData(0))),
+                                   LiteralLexerToken.Types.TRUE)
+
+    def test_try_get_return_value_positive(self):
+        token = LiteralLexerToken(LiteralLexerToken.Types.NUMBER.value, Word("1", DebugData(0)))
+        assert isinstance(LexerToken.try_get_return_value(token), int)
+
+    def test_try_get_return_value_invalid_type(self):
+        token = LiteralLexerToken(LiteralLexerToken.Types.TRUE.value, Word("True", DebugData(0)))
+        with pytest.raises(UnexpectedTokenTypeError):
+            LexerToken.try_get_return_value(token)
+
+    def test_try_get_return_value_invalid_return_count_high(self):
+        token = LiteralLexerToken(LiteralLexerToken.Types.NUMBER.value, Word("4", DebugData(0)))
+        with pytest.raises(IncorrectReturnCountError):
+            LexerToken.try_get_return_value(token)
+
+    def test_try_get_return_value_invalid_return_count_low(self):
+        token = LiteralLexerToken(LiteralLexerToken.Types.NUMBER.value, Word("-1", DebugData(0)))
+        with pytest.raises(IncorrectReturnCountError):
+            LexerToken.try_get_return_value(token)
 
 
 class TestDelimLexerToken:
@@ -181,7 +219,7 @@ class TestKeywordLexerToken:
             IdentLexerToken(Word("INCORRECT_IDENT", DebugData(0)))
         ])
         _assert_token_parse_raises(KeywordLexerToken(Word("RETURN", DebugData(0))), return_statement_no_value,
-                                   UnexpectedTokenError)
+                                   UnexpectedTokenTypeError)
 
     def test_parse_return_token_no_more_tokens(self):
         """A RETURN token cannot be the last token in a file."""
@@ -202,6 +240,18 @@ class TestKeywordLexerToken:
         ])
         _assert_token_parse_returns(KeywordLexerToken(Word("|", DebugData(0))), function_token_positive,
                                     FunctionParserToken)
+
+    def test_parse_function_token_no_name(self):
+        """A FUNCTION token must be followed by an identifier token as its name."""
+        function_token_no_name = iter([
+            DelimLexerToken(Word("(", DebugData(0))),
+            KeywordLexerToken(Word("VALUE", DebugData(0))),
+            IdentLexerToken(Word("VALUE_NAME", DebugData(0))),
+            DelimLexerToken(Word(")", DebugData(0))),
+            LiteralLexerToken(LiteralLexerToken.Types.NUMBER.value, Word("9", DebugData(0))),
+        ])
+        _assert_token_parse_raises(KeywordLexerToken(Word("|", DebugData(0))), function_token_no_name,
+                                   UnexpectedTokenError)
 
     def test_parse_function_token_no_closing_token(self):
         """A FUNCTION token must be closed with another function token"""
@@ -303,3 +353,45 @@ class TestLiteralLexerToken:
         """Comments cannot be parsed, since they are removed during lexing."""
         _assert_token_parse_raises(LiteralLexerToken(LiteralLexerToken.Types.COMMENT.value, Word("#", DebugData(0))),
                                    iter([]), InvalidTokenError)
+
+
+class TestMacroLexerToken:
+    def test_parse_macro_token(self):
+        """Macros are not enriched during parsing and simply return the parser version of the same token."""
+        _assert_token_parse_returns(MacroLexerToken(Word("__PRINT__", DebugData(0))), iter([]), MacroParserToken)
+
+
+class TestOpLexerToken:
+    def test_parse_subtraction_op_token(self):
+        _assert_token_parse_returns(OpLexerToken(Word("-", DebugData(0))), iter([]), ArithmeticOperatorParserToken)
+
+    def test_parse_addition_op_token(self):
+        _assert_token_parse_returns(OpLexerToken(Word("+", DebugData(0))), iter([]), ArithmeticOperatorParserToken)
+
+    def test_parse_equality_op_token(self):
+        _assert_token_parse_returns(OpLexerToken(Word("==", DebugData(0))), iter([]), BooleanOperatorParserToken)
+
+    def test_parse_greater_op_token(self):
+        _assert_token_parse_returns(OpLexerToken(Word(">", DebugData(0))), iter([]), BooleanOperatorParserToken)
+
+    def test_parse_lesser_op_token(self):
+        _assert_token_parse_returns(OpLexerToken(Word("<", DebugData(0))), iter([]), BooleanOperatorParserToken)
+
+    def test_parse_greater_eq_op_token(self):
+        _assert_token_parse_returns(OpLexerToken(Word(">=", DebugData(0))), iter([]), BooleanOperatorParserToken)
+
+    def test_parse_lesser_eq_op_token(self):
+        _assert_token_parse_returns(OpLexerToken(Word("<=", DebugData(0))), iter([]), BooleanOperatorParserToken)
+
+    def test_parse_assignment_op_token_positive(self):
+        ident = IdentLexerToken(Word("SOME_VARIABLE", DebugData(0)))
+        _assert_token_parse_returns(OpLexerToken(Word("ASSIGN", DebugData(0))), iter([ident]), DictionaryOperatorParserToken)
+
+    def test_parse_retrieval_op_token_positive(self):
+        ident = IdentLexerToken(Word("SOME_VARIABLE", DebugData(0)))
+        _assert_token_parse_returns(OpLexerToken(Word("RETRIEVE", DebugData(0))), iter([ident]), DictionaryOperatorParserToken)
+
+    def test_parse_dictionary_operator_token_no_more_tokens(self):
+        """Dictionary operator tokens are always followed by an identifier as their name or value."""
+        _assert_token_parse_raises(OpLexerToken(Word("ASSIGN", DebugData(0))), iter([]), MissingTokenError)
+        _assert_token_parse_raises(OpLexerToken(Word("RETRIEVE", DebugData(0))), iter([]), MissingTokenError)

@@ -70,9 +70,9 @@ class LexerToken(Debuggable, PrintableABC):
         :param token: The literal (number) token that should provide the amount of return values
         :return: The amount of return values as an integer (1, 2 or 3).
         """
-        LexerToken.assert_kind_of(token, LiteralLexerToken)
+        LexerToken.assert_type(token, LiteralLexerToken.Types.NUMBER)
         if int(token.content) not in range(3):
-            raise IncorrectReturnCountError
+            raise IncorrectReturnCountError(token)
         return int(token.content)
 
 
@@ -241,12 +241,16 @@ class LiteralLexerToken(LexerToken):
         TRUE = "True"
         FALSE = "False"
 
-    def debug_str(self) -> str:
-        return f"\"COMMENT\" at line {self.debug_data}"
-
     def __init__(self, token_type: str, word: Word):
         super().__init__(Word(token_type, word.debug_data))
         self.content = word.content
+
+    def debug_str(self) -> str:
+        if self.value is self.Types.COMMENT:
+            return f"\"COMMENT\" at line {self.debug_data}"
+        if self.value is self.Types.NUMBER:
+            return f"{self.content}"
+        return super().debug_str()
 
     def parse(self, tokens: Iterator["LexerToken"]) -> Union[NumberParserToken, BooleanParserToken]:
         """
@@ -289,7 +293,7 @@ class OpLexerToken(LexerToken):
         GREATER = ">"
         LESSER = "<"
         GREATER_EQ = ">="
-        LESSER_EQ = ">="
+        LESSER_EQ = "<="
         ASSIGNMENT = "ASSIGN"
         RETRIEVAL = "RETRIEVE"
 
@@ -308,6 +312,10 @@ class OpLexerToken(LexerToken):
         if self.value.value in ["==", ">", "<", ">=", "<="]:
             return BooleanOperatorParserToken(self.debug_data, self.value.value)
         if self.value.value in ["ASSIGN", "RETRIEVE"]:
-            targeted_variable = next(tokens)
+            try:
+                targeted_variable = next(tokens)
+            except StopIteration:
+                raise MissingTokenError(self, IdentLexerToken)
+
             LexerToken.assert_kind_of(targeted_variable, IdentLexerToken)
             return DictionaryOperatorParserToken(self.debug_data, self.value.value, targeted_variable.value)
