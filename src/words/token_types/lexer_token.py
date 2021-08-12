@@ -2,7 +2,7 @@ from abc import abstractmethod
 from typing import Iterator, Type, Union
 
 from words.exceptions.lexer_exceptions import UnexpectedTokenError, UnexpectedTokenTypeError, \
-    IncorrectReturnCountError, InvalidTokenError
+    IncorrectReturnCountError, InvalidTokenError, MissingTokenError
 from words.helper.Debuggable import Debuggable
 from words.helper.PrintableABC import PrintableABC
 from words.helper.TokenTypeEnum import TokenTypeEnum
@@ -153,10 +153,16 @@ class KeywordLexerToken(LexerToken):
         if self.value == self.Types.REPEAT:
             raise InvalidTokenError(self)
         if self.value == self.Types.IF:
-            if_body = eat_until(tokens, [self.Types.ELSE, self.Types.THEN])
+            try:
+                if_body = eat_until(tokens, [self.Types.ELSE, self.Types.THEN])
+            except StopIteration:
+                raise MissingTokenError(self, self.Types.THEN)
             if if_body[-1].value == self.Types.ELSE:
                 if_body = if_body[:-1]  # Discard ELSE token
-                else_body = eat_until_discarding(tokens, [self.Types.THEN])
+                try:
+                    else_body = eat_until_discarding(tokens, [self.Types.THEN])
+                except StopIteration:
+                    raise MissingTokenError(self, self.Types.THEN)
             else:
                 if_body = if_body[:-1]  # Discard THEN token
                 else_body = None

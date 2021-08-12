@@ -4,16 +4,23 @@ from typing import Type
 
 
 class UnexpectedTokenError(SyntaxError):
-    """An unexpected token error is raised whenever a specific token is expected, but not found."""
+    """An unexpected token error is raised whenever a specific token is expected, but another is found."""
     def __init__(self, actual_token: Debuggable, expected_token: Type[Debuggable]):
         message = f"Expected {expected_token}, got {actual_token.debug_str()}"
+        super().__init__(message)
+
+
+class MissingTokenError(SyntaxError):
+    """A missing token error is raised whenever a token is expected, but never found. For example a closing brace."""
+    def __init__(self, opening_token: Debuggable, expected_token: TokenTypeEnum):
+        message = f"Expected {expected_token} was never found for token {opening_token.debug_str()}."
         super().__init__(message)
 
 
 class UnexpectedTokenTypeError(SyntaxError):
     """An unexpected token type error is raised whenever a specific token type is expected, but not found."""
     def __init__(self, actual_token: Debuggable, expected_type: TokenTypeEnum):
-        message = f"Expected a token of type {expected_type}, got {actual_token.debug_str()}"
+        message = f"Expected a token of type {expected_type}, got {actual_token.debug_str()}."
         super().__init__(message)
 
 
