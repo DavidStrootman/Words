@@ -172,7 +172,10 @@ class KeywordLexerToken(LexerToken):
         if self.value == self.Types.THEN:
             raise InvalidTokenError(self)
         if self.value == self.Types.VARIABLE:
-            token = next(tokens)
+            try:
+                token = next(tokens)
+            except StopIteration:
+                raise MissingTokenError(self, IdentLexerToken)
             LexerToken.assert_kind_of(token, IdentLexerToken)
             return VariableParserToken(self.debug_data, token.value)
         if self.value == self.Types.VALUE:

@@ -1,10 +1,11 @@
 from typing import Iterator, Type
 import pytest
 from words.lexer.lex_util import Word, DebugData
-from words.exceptions.lexer_exceptions import InvalidTokenError, MissingTokenError
+from words.exceptions.lexer_exceptions import InvalidTokenError, MissingTokenError, UnexpectedTokenError
 from words.token_types.lexer_token import LexerToken, DelimLexerToken, IdentLexerToken, LiteralLexerToken, \
     KeywordLexerToken
-from words.token_types.parser_token import ParserToken, IdentParserToken, WhileParserToken, IfParserToken
+from words.token_types.parser_token import ParserToken, IdentParserToken, WhileParserToken, IfParserToken, \
+    VariableParserToken
 
 
 class TestLexerToken:
@@ -100,7 +101,7 @@ class TestKeywordLexerToken:
         _assert_token_parse_raises(KeywordLexerToken(Word("IF", DebugData(0))), if_statement_with_else_negative,
                                    MissingTokenError)
 
-    def test_parse_if_statement_without_body(self):
+    def test_parse_if_statement_no_body(self):
         """Parsing an IF statement without a body, which is valid."""
         if_statement_without_body = iter([
             KeywordLexerToken(Word(KeywordLexerToken.Types.ELSE.value, DebugData(0))),
@@ -110,6 +111,10 @@ class TestKeywordLexerToken:
         _assert_token_parse_returns(KeywordLexerToken(Word("IF", DebugData(0))), if_statement_without_body,
                                     IfParserToken)
 
+    def test_parse_if_statement_no_more_tokens(self):
+        """An IF statement cannot be the last token in a file."""
+        _assert_token_parse_raises(KeywordLexerToken(Word("IF", DebugData(0))), iter([]), MissingTokenError)
+
     def test_parse_out_of_place_if_statement_tokens(self):
         """Parts of an if statement cannot be parsed on their own, and must be parsed by preceding tokens."""
         # Parsing an out of place ELSE token
@@ -117,3 +122,23 @@ class TestKeywordLexerToken:
 
         # Parsing an out of place THEN token
         _assert_token_parse_raises(KeywordLexerToken(Word("THEN", DebugData(0))), iter([]), InvalidTokenError)
+
+    def test_parse_variable_token_positive(self):
+        """Parse a variable token with a variable name."""
+        variable_token_positive = iter([
+            IdentLexerToken(Word("VARIABLE_NAME", DebugData(0)))
+        ])
+        _assert_token_parse_returns(KeywordLexerToken(Word("VARIABLE", DebugData(0))), variable_token_positive,
+                                    VariableParserToken)
+
+    def test_parse_variable_token_no_identifier(self):
+        """Parse a variable token without following it with an identifier to use as the variable name."""
+        variable_token_no_identifier = iter([
+            LiteralLexerToken(LiteralLexerToken.Types.NUMBER.value, Word("0", DebugData(0)))
+        ])
+        _assert_token_parse_raises(KeywordLexerToken(Word("VARIABLE", DebugData(0))), variable_token_no_identifier,
+                                   UnexpectedTokenError)
+
+    def test_parse_variable_token_no_more_tokens(self):
+        _assert_token_parse_raises(KeywordLexerToken(Word("VARIABLE", DebugData(0))), iter([]), MissingTokenError)
+
