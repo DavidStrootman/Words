@@ -37,7 +37,6 @@ class LexerToken(Debuggable, PrintableABC):
         type.
         :return: A parser token
         """
-        pass
 
     @staticmethod
     def assert_kind_of(token: "LexerToken", kind: Type["LexerToken"]) -> None:

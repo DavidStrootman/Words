@@ -2,7 +2,7 @@ from abc import ABC
 
 
 class PrintableABC(ABC):
-    """Printable ABC Metaclass"""
+    """Printable ABC."""
     def __str__(self) -> str:
         return f"{self.__class__.__name__}"
 
