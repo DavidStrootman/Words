@@ -1,6 +1,10 @@
-from words.token_types.lexer_token import *
-from words.token_types.parser_token import *
+from typing import Iterator, Type
 import pytest
+from words.lexer.lex_util import Word, DebugData
+from words.exceptions.lexer_exceptions import InvalidTokenError
+from words.token_types.lexer_token import LexerToken, DelimLexerToken, IdentLexerToken, LiteralLexerToken, \
+    KeywordLexerToken
+from words.token_types.parser_token import ParserToken, IdentParserToken, WhileParserToken
 
 
 class TestLexerToken:

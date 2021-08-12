@@ -134,12 +134,12 @@ class KeywordLexerToken(LexerToken):
         FUNCTION = "|"
         LAMBDA = "λ"
 
-    def parse(self, tokens: Iterator["LexerToken"]) -> Union[
+    def parse(self, tokens: Iterator["LexerToken"]) -> Union[  # noqa: C901
         WhileParserToken, IfParserToken, VariableParserToken,
         ValueParserToken, ReturnParserToken, FunctionParserToken]:
         """
         Parse the lexer token into a parser token.
-        :param tokens: The list of lexer tokens, which might be used during parsing of this token depending on it's
+        :param tokens: The list of lexer tokens, which might be used during parsing of this token depending on its
         type.
         :return: A parser token
         """

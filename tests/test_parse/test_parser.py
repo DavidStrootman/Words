@@ -1,5 +1,5 @@
 from words.parser.parse import Parser
-from words.token_types.lexer_token import LexerToken, IdentLexerToken
+from words.token_types.lexer_token import IdentLexerToken
 from words.token_types.parser_token import IdentParserToken
 from words.lexer.lex_util import DebugData, Word
 

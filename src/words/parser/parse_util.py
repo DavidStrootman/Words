@@ -11,7 +11,7 @@ class Program:
         self.tokens = tokens
 
 
-def eat_until(tokens: Iterator["LexerToken"], limit_types: List[TokenTypeEnum]) -> List[Union["LexerToken", ParserToken]]:  # noqa: F821
+def eat_until(tokens: Iterator["LexerToken"], limit_types: List[TokenTypeEnum]) -> List[Union["LexerToken", ParserToken]]:  # noqa: F821, E501
     """
     Parse tokens until the next token matches the limit_type, leaving the last token unparsed.
 
