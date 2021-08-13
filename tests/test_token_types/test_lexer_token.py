@@ -385,11 +385,13 @@ class TestOpLexerToken:
 
     def test_parse_assignment_op_token_positive(self):
         ident = IdentLexerToken(Word("SOME_VARIABLE", DebugData(0)))
-        _assert_token_parse_returns(OpLexerToken(Word("ASSIGN", DebugData(0))), iter([ident]), DictionaryOperatorParserToken)
+        _assert_token_parse_returns(OpLexerToken(Word("ASSIGN", DebugData(0))), iter([ident]),
+                                    DictionaryOperatorParserToken)
 
     def test_parse_retrieval_op_token_positive(self):
         ident = IdentLexerToken(Word("SOME_VARIABLE", DebugData(0)))
-        _assert_token_parse_returns(OpLexerToken(Word("RETRIEVE", DebugData(0))), iter([ident]), DictionaryOperatorParserToken)
+        _assert_token_parse_returns(OpLexerToken(Word("RETRIEVE", DebugData(0))), iter([ident]),
+                                    DictionaryOperatorParserToken)
 
     def test_parse_dictionary_operator_token_no_more_tokens(self):
         """Dictionary operator tokens are always followed by an identifier as their name or value."""
