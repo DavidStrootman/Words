@@ -262,7 +262,12 @@ class LiteralLexerToken(LexerToken):
         if self.value == self.Types.COMMENT:
             raise InvalidTokenError(self)
         if self.value == self.Types.NUMBER:
-            return NumberParserToken(self.debug_data, int(self.content))
+            number = int(self.content)
+            if number > 0xFFFFFFFF:
+                raise ValueError(f"Number is too big, must be at most a 32 bit unsigned integer(4,294,967,295). "
+                                 f"{self.debug_str()}.")
+
+            return NumberParserToken(self.debug_data, number)
         if self.value in [self.Types.TRUE, self.Types.FALSE]:
             return BooleanParserToken(self.debug_data, self.content)
 

@@ -33,7 +33,6 @@ class DictionaryToken:
 
     class RemovedDictionaryToken:
         """Placeholder for tokens that are removed from the dictionary."""
-        pass
 
     @abstractmethod
     def visit(self, stack: list, dictionary: dict) -> Tuple[list, dict]:

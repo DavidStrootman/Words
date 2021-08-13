@@ -6,9 +6,9 @@ from words.exceptions.lexer_exceptions import InvalidTokenError, MissingTokenErr
 from words.token_types.lexer_token import LexerToken, DelimLexerToken, IdentLexerToken, LiteralLexerToken, \
     KeywordLexerToken, MacroLexerToken, OpLexerToken
 from words.token_types.parser_token import ParserToken, IdentParserToken, WhileParserToken, IfParserToken, \
-    VariableParserToken, ValueParserToken, ReturnParserToken, FunctionParserToken, LambdaParserToken, NumberParserToken, \
-    BooleanParserToken, MacroParserToken, ArithmeticOperatorParserToken, BooleanOperatorParserToken, \
-    DictionaryOperatorParserToken
+    VariableParserToken, ValueParserToken, ReturnParserToken, FunctionParserToken, LambdaParserToken, \
+    NumberParserToken, BooleanParserToken, MacroParserToken, ArithmeticOperatorParserToken, \
+    BooleanOperatorParserToken, DictionaryOperatorParserToken
 
 
 def _assert_token_parse_returns(token: LexerToken,
@@ -341,6 +341,12 @@ class TestLiteralLexerToken:
         """Parse a number with a character as value."""
         _assert_token_parse_raises(LiteralLexerToken(LiteralLexerToken.Types.NUMBER.value, Word("a", DebugData(0))),
                                    iter([]), ValueError)
+
+    def test_assert_number_token_too_large(self):
+        """Numbers must fit into a 32 bit register for correct compilation."""
+        _assert_token_parse_raises(
+            LiteralLexerToken(LiteralLexerToken.Types.NUMBER.value, Word(str(0xFFFFFFFFF + 1), DebugData(0))),
+            iter([]), ValueError)
 
     def test_parse_boolean_token_positive(self):
         """Parse a boolean literal."""
