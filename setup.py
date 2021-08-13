@@ -1,10 +1,10 @@
-from setuptools import setup
+from setuptools import setup, find_packages
 
 setup(
     name='Words',
     version='0.1.0',
+    packages=find_packages('src'),
     package_dir={'': 'src'},
-    packages=['words'],
     install_requires=[
         'sphinx',
         'pytest',
