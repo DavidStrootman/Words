@@ -119,8 +119,8 @@ class WhileParserToken(ParserToken):
     def __init__(self, debug_data: DebugData, predicate: List[ParserToken], statements: List[ParserToken]):
         super().__init__(debug_data)
 
-        self.predicate = predicate
-        self.statements = statements
+        self.predicate: List[ParserToken] = predicate
+        self.statements: List[ParserToken] = statements
 
     def execute(self, stack: list, dictionary: dict) -> Tuple[list, dict]:
         """
@@ -144,8 +144,8 @@ class IfParserToken(ParserToken):
                  else_body: Optional[List[ParserToken]] = None):
         super().__init__(debug_data)
 
-        self.if_body = if_body
-        self.else_body = else_body
+        self.if_body: List[ParserToken] = if_body
+        self.else_body: Optional[List[ParserToken]] = else_body
 
     def execute(self, stack: list, dictionary: dict) -> Tuple[list, dict]:
         """

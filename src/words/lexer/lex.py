@@ -19,8 +19,13 @@ class Lexer:
         :param file: Path to the file to lex.
         :return: An iterator over lexer tokens.
         """
-        words: Iterator[Iterator[Word]] = (Lexer._split_line_into_words(line_nr, line) for line_nr, line in
-                                           enumerate(open(file, 'r').readlines()))
+        file_contents = enumerate(open(file, 'r').readlines())
+
+        return Lexer.lex_file_contents(file_contents)
+
+    @staticmethod
+    def lex_file_contents(contents: Iterator[str]):
+        words: Iterator[Iterator[Word]] = (Lexer._split_line_into_words(line_nr, line) for line_nr, line in contents)
         return Lexer._exhaustive_lex(words)
 
     @staticmethod
