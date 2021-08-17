@@ -24,7 +24,7 @@ class ParserToken(Debuggable, PrintableABC):
         :return: The stack and dictionary after executing the token.
         """
 
-    def debug_str(self):
+    def debug_str(self) -> str:
         return f"\"{self}\" at line {self.debug_data}"
 
 

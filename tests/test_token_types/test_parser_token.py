@@ -26,7 +26,12 @@ def _execute_from_string(words: str) -> Tuple[List[ParserToken], Dict[str, Parse
 
 
 class TestParserToken:
-    """No functionality in base class to test."""
+    """Test base class functionality with a concrete implementation."""
+    def test_debug_str(self):
+        class ConcreteParserToken(ParserToken):
+            def execute(self, stack: list, dictionary: dict) -> Tuple[list, dict]:
+                """Abstract method does not need to be tested"""
+        assert isinstance(ConcreteParserToken(DebugData(0)).debug_str(), str)
 
 
 class TestDictionaryToken:
@@ -140,27 +145,37 @@ class TestWhileParserToken:
 
 
 class TestIfParserToken:
-    def test_execute_positive(self):
+    def test_execute_true_condition(self):
         """Test a correct if statement with a body and an else body."""
         # Fixture
-        initial_state = _execute_from_string(
+        condition = _execute_from_string(
             "True"
         )
         if_body = _parse_from_string(
             "3"
         )
-        else_body = _parse_from_string(
-            "20"
-        )
+        # Assert stack equals the value in if body
+        token = IfParserToken(DebugData(0), if_body)
+        assert token.execute(*condition)[0][0] == 3
 
-        # Test
-        token = IfParserToken(DebugData(0), if_body, else_body)
-        assert token.execute(*initial_state)[0][0] == 3
-
-    def test_execute_else(self):
+    def test_execute_false_condition(self):
         """If the condition is false, the if token should execute the else body."""
         # Fixture
-        initial_state = _execute_from_string(
+        condition = _execute_from_string(
+            "False"
+        )
+        if_body = _parse_from_string(
+            "7"
+        )
+
+        # Assert stack is empty, so if body is not executed
+        token = IfParserToken(DebugData(0), if_body)
+        assert not token.execute(*condition)[0]
+
+    def test_execute_false_condition_else(self):
+        """If the condition is false, the if token should execute the else body."""
+        # Fixture
+        condition = _execute_from_string(
             "False"
         )
         if_body = _parse_from_string(
@@ -170,14 +185,14 @@ class TestIfParserToken:
             "13"
         )
 
-        # Test
+        # Assert stack equals the value in else body
         token = IfParserToken(DebugData(0), if_body, else_body)
-        assert token.execute(*initial_state)[0][0] == 13
+        assert token.execute(*condition)[0][0] == 13
 
     def test_execute_non_bool_predicate(self):
         """The if statement requires a boolean condition value before executing."""
         # Fixture
-        initial_state = _execute_from_string(
+        condition = _execute_from_string(
             "0"
         )
         if_body = _parse_from_string(
@@ -187,7 +202,7 @@ class TestIfParserToken:
             "2"
         )
 
-        # Test
+        # Assert an invalid predicate exception is raised if the condition is not a boolean value
         token = IfParserToken(DebugData(0), if_body, else_body)
         with pytest.raises(InvalidPredicateException):
-            token.execute(*initial_state)
+            token.execute(*condition)
