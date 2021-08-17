@@ -10,5 +10,5 @@ class StackSizeException(RuntimeError):
 class InvalidPredicateException(RuntimeError):
     """An invalid predicate exception is raised whenever the result of a predicate is not of type boolean."""
     def __init__(self, token: Debuggable):
-        message = f"Got a non-boolean value for predicate of {token.debug_str()}."
+        message = f"Got a non-boolean value as a predicate of {token.debug_str()}."
         super().__init__(message)

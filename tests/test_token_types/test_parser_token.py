@@ -9,7 +9,7 @@ from words.lexer.lex_util import DebugData
 from words.parser.parse import Parser
 from words.token_types.lexer_token import LexerToken
 from words.token_types.parser_token import NumberParserToken, BooleanParserToken, MacroParserToken, ParserToken, \
-    WhileParserToken
+    WhileParserToken, IfParserToken
 from words.interpreter.interpret_util import exhaustive_interpret_tokens
 
 
@@ -118,7 +118,7 @@ class TestWhileParserToken:
         result = token.execute(*initial_state)
         assert result[1]['SOME_VAR'] == 10
 
-    def test_execute_invalid_predicate(self):
+    def test_execute_non_bool_predicate(self):
         """A while loop requires a valid (boolean) predicate."""
         # Fixture
         predicate: List[ParserToken] = _parse_from_string(
@@ -137,3 +137,57 @@ class TestWhileParserToken:
         """The while body should not run if the predicate is never true."""
         token = WhileParserToken(DebugData(0), _parse_from_string("False"), _parse_from_string("0"))
         assert not token.execute([], {})[0]
+
+
+class TestIfParserToken:
+    def test_execute_positive(self):
+        """Test a correct if statement with a body and an else body."""
+        # Fixture
+        initial_state = _execute_from_string(
+            "True"
+        )
+        if_body = _parse_from_string(
+            "3"
+        )
+        else_body = _parse_from_string(
+            "20"
+        )
+
+        # Test
+        token = IfParserToken(DebugData(0), if_body, else_body)
+        assert token.execute(*initial_state)[0][0] == 3
+
+    def test_execute_else(self):
+        """If the condition is false, the if token should execute the else body."""
+        # Fixture
+        initial_state = _execute_from_string(
+            "False"
+        )
+        if_body = _parse_from_string(
+            "7"
+        )
+        else_body = _parse_from_string(
+            "13"
+        )
+
+        # Test
+        token = IfParserToken(DebugData(0), if_body, else_body)
+        assert token.execute(*initial_state)[0][0] == 13
+
+    def test_execute_non_bool_predicate(self):
+        """The if statement requires a boolean condition value before executing."""
+        # Fixture
+        initial_state = _execute_from_string(
+            "0"
+        )
+        if_body = _parse_from_string(
+            "9"
+        )
+        else_body = _parse_from_string(
+            "2"
+        )
+
+        # Test
+        token = IfParserToken(DebugData(0), if_body, else_body)
+        with pytest.raises(InvalidPredicateException):
+            token.execute(*initial_state)

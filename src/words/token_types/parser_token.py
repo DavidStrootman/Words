@@ -152,6 +152,9 @@ class IfParserToken(ParserToken):
         self.if_body: List[ParserToken] = if_body
         self.else_body: Optional[List[ParserToken]] = else_body
 
+    def debug_str(self):
+        return f"\"IF\" token at line {self.debug_data.line + 1}"
+
     def execute(self, stack: list, dictionary: dict) -> Tuple[list, dict]:
         """
         Execute the token to get the result.
@@ -160,6 +163,8 @@ class IfParserToken(ParserToken):
         :return: The stack and dictionary after executing the token.
         """
         predicate = stack[-1]
+        if not isinstance(predicate, bool):
+            raise InvalidPredicateException(self)
         if predicate is True:
             return exhaustive_interpret_tokens(self.if_body, stack[:-1], dictionary)
         if self.else_body:
