@@ -1,7 +1,7 @@
 from abc import abstractmethod
 from typing import List, Optional, Tuple
 
-from words.exceptions.parser_exceptions import StackSizeException
+from words.exceptions.parser_exceptions import StackSizeException, InvalidPredicateException
 from words.helper.Debuggable import Debuggable
 from words.helper.PrintableABC import PrintableABC
 from words.interpreter.interpret_util import exhaustive_interpret_tokens
@@ -122,6 +122,9 @@ class WhileParserToken(ParserToken):
         self.predicate: List[ParserToken] = predicate
         self.statements: List[ParserToken] = statements
 
+    def debug_str(self):
+        return f"\"WHILE\" token at line {self.debug_data.line + 1}"
+
     def execute(self, stack: list, dictionary: dict) -> Tuple[list, dict]:
         """
         Execute the token to get the result.
@@ -130,6 +133,8 @@ class WhileParserToken(ParserToken):
         :return: The stack and dictionary after executing the token.
         """
         predicate_outcome: bool = exhaustive_interpret_tokens(self.predicate, stack, dictionary)[0][0]
+        if not isinstance(predicate_outcome, bool):
+            raise InvalidPredicateException(self)
         if predicate_outcome:
             return self.execute(*exhaustive_interpret_tokens(self.statements, stack, dictionary))
         return stack, dictionary
@@ -184,7 +189,7 @@ class VariableParserToken(ParserToken, DictionaryToken):
         """
         if self.value in dictionary:
             raise KeyError(f"Variable {self.value} already exists in dictionary.")
-        return stack, {**dictionary, **{self.value: self}}
+        return stack, {**dictionary, **{self.value: self.assigned_value}}
 
     def visit(self, stack: list, dictionary: dict) -> Tuple[list, dict]:
         return stack + list([self.assigned_value]), dictionary

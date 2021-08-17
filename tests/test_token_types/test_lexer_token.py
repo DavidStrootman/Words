@@ -20,9 +20,11 @@ def _assert_token_parse_returns(token: LexerToken,
 
 def _assert_token_parse_raises(token: LexerToken,
                                tokens: Iterator[LexerToken],
-                               raises: Type[Exception]):
+                               raises: Type[Exception], capsys=None):
     with pytest.raises(raises):
         token.parse(tokens)
+        if capsys:
+            print(capsys.readouterr())
 
 
 class TestLexerToken:
@@ -342,11 +344,11 @@ class TestLiteralLexerToken:
         _assert_token_parse_raises(LiteralLexerToken(LiteralLexerToken.Types.NUMBER.value, Word("a", DebugData(0))),
                                    iter([]), ValueError)
 
-    def test_assert_number_token_too_large(self):
+    def test_parse_number_token_too_large(self, capsys):
         """Numbers must fit into a 32 bit register for correct compilation."""
         _assert_token_parse_raises(
-            LiteralLexerToken(LiteralLexerToken.Types.NUMBER.value, Word(str(0xFFFFFFFFF + 1), DebugData(0))),
-            iter([]), ValueError)
+            LiteralLexerToken(LiteralLexerToken.Types.NUMBER.value, Word(str(0x1000000000), DebugData(0))),
+            iter([]), ValueError, capsys)
 
     def test_parse_boolean_token_positive(self):
         """Parse a boolean literal."""

@@ -1,4 +1,4 @@
-from typing import Iterator
+from typing import Iterator, Union, Tuple
 import pathlib
 from words.token_types.lexer_token import LexerToken, MacroLexerToken, KeywordLexerToken, LiteralLexerToken, \
     DelimLexerToken, OpLexerToken, IdentLexerToken
@@ -24,7 +24,7 @@ class Lexer:
         return Lexer.lex_file_contents(file_contents)
 
     @staticmethod
-    def lex_file_contents(contents: Iterator[str]):
+    def lex_file_contents(contents: Union[Iterator[Tuple[int, str]], enumerate]):
         words: Iterator[Iterator[Word]] = (Lexer._split_line_into_words(line_nr, line) for line_nr, line in contents)
         return Lexer._exhaustive_lex(words)
 

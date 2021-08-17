@@ -146,8 +146,10 @@ class KeywordLexerToken(LexerToken):
         if self.value == self.Types.BEGIN:
             predicate = eat_until(tokens, [self.Types.WHILE])
             predicate_without_last_item = predicate[:-1]
-            statements = eat_until_discarding(tokens, [self.Types.REPEAT])
-            return WhileParserToken(self.debug_data, predicate_without_last_item, statements)
+            body = eat_until_discarding(tokens, [self.Types.REPEAT])
+            if not body:
+                raise MissingTokenError(self, )
+            return WhileParserToken(self.debug_data, predicate_without_last_item, body)
 
         if self.value == self.Types.WHILE:
             raise InvalidTokenError(self)

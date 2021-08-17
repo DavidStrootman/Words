@@ -1,20 +1,28 @@
 import random
-from typing import Iterator
+from typing import Iterator, List, Tuple, Dict
 
 import pytest
 
-from words.exceptions.parser_exceptions import StackSizeException
+from words.exceptions.parser_exceptions import StackSizeException, InvalidPredicateException
 from words.lexer.lex import Lexer
 from words.lexer.lex_util import DebugData
 from words.parser.parse import Parser
 from words.token_types.lexer_token import LexerToken
-from words.token_types.parser_token import NumberParserToken, BooleanParserToken, MacroParserToken, IdentParserToken, \
-    VariableParserToken, BooleanOperatorParserToken
+from words.token_types.parser_token import NumberParserToken, BooleanParserToken, MacroParserToken, ParserToken, \
+    WhileParserToken
+from words.interpreter.interpret_util import exhaustive_interpret_tokens
 
 
-def _parse_from_string(words: str):
-    lexed_tokens: Iterator[LexerToken] = Lexer.lex_file_contents(words.splitlines())
-    return Parser.parse(lexed_tokens)
+def _parse_from_string(words: str) -> List[ParserToken]:
+    contents_with_line_nums = enumerate(iter(words.splitlines()))
+    lexed_tokens: Iterator[LexerToken] = Lexer.lex_file_contents(contents_with_line_nums)
+    return Parser.parse(lexed_tokens).tokens
+
+
+def _execute_from_string(words: str) -> Tuple[List[ParserToken], Dict[str, ParserToken]]:
+    contents_with_line_nums = enumerate(iter(words.splitlines()))
+    lexed_tokens: Iterator[LexerToken] = Lexer.lex_file_contents(contents_with_line_nums)
+    return exhaustive_interpret_tokens(Parser.parse(lexed_tokens).tokens, [], {})
 
 
 class TestParserToken:
@@ -89,17 +97,43 @@ class TestMacroParserToken:
 
 class TestWhileParserToken:
     def test_execute_positive(self):
-        # Create a variable to use in predicate
-        some_var = VariableParserToken(DebugData(0), "SOME_VAR")
-        some_var.assigned_value = 0
-        stack, dictionary = some_var.execute([], {})
+        """Test a valid while loop configuration."""
+        # Fixture
+        initial_state: Tuple[List, Dict] = _execute_from_string(
+            "VARIABLE SOME_VAR "
+            "0 ASSIGN SOME_VAR"
+        )
 
-        predicate = [
-            IdentParserToken(DebugData(0), "SOME_VAR"),
-            NumberParserToken(DebugData(0), 10),
-            BooleanOperatorParserToken(DebugData(0), "<")
-        ]
+        predicate: List[ParserToken] = _parse_from_string(
+            "SOME_VAR 10 < "
+        )
 
-        body = [
+        body: List[ParserToken] = _parse_from_string(
+            "SOME_VAR 1 + "
+            "ASSIGN SOME_VAR"
+        )
 
-        ]
+        # Test
+        token = WhileParserToken(DebugData(0), predicate, body)
+        result = token.execute(*initial_state)
+        assert result[1]['SOME_VAR'] == 10
+
+    def test_execute_invalid_predicate(self):
+        """A while loop requires a valid (boolean) predicate."""
+        # Fixture
+        predicate: List[ParserToken] = _parse_from_string(
+            "10"
+        )
+        body: List[ParserToken] = _parse_from_string(
+            "203"
+        )
+
+        # Test
+        token = WhileParserToken(DebugData(0), predicate, body)
+        with pytest.raises(InvalidPredicateException):
+            token.execute([], {})
+
+    def test_execute_false_predicate(self):
+        """The while body should not run if the predicate is never true."""
+        token = WhileParserToken(DebugData(0), _parse_from_string("False"), _parse_from_string("0"))
+        assert not token.execute([], {})[0]
