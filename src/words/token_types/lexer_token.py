@@ -231,6 +231,9 @@ class KeywordLexerToken(LexerToken):
             except StopIteration:
                 raise MissingTokenError(self, f"closing \"{KeywordLexerToken.Types.FUNCTION.value}\"")
 
+            if not all(isinstance(token, ValueParserToken) for token in parameters):
+                raise RuntimeError(
+                    f"Got token that is not a ValueParserToken in Function Parameters in function {function_name}")
             return FunctionParserToken(self.debug_data, function_name, parameters, body)
 
         if self.value == self.Types.LAMBDA:

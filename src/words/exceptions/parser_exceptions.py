@@ -19,3 +19,10 @@ class UndefinedIdentifierException(NameError):
     def __init__(self, token: Debuggable):
         message = f"Undefined function or variable, {token.debug_str()}."
         super().__init__(message)
+
+
+class FunctionPreviouslyDefinedException(NameError):
+    """A function previously defined exception is raised whenever a function is defined multiple times."""
+    def __init__(self, token: Debuggable):
+        message = f"Token of type {token.debug_str()} was previously defined."
+        super().__init__(message)

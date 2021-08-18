@@ -2,7 +2,7 @@ from abc import abstractmethod
 from typing import List, Optional, Tuple
 
 from words.exceptions.parser_exceptions import StackSizeException, InvalidPredicateException, \
-    UndefinedIdentifierException
+    UndefinedIdentifierException, FunctionPreviouslyDefinedException
 from words.helper.Debuggable import Debuggable
 from words.helper.PrintableABC import PrintableABC
 from words.interpreter.interpret_util import exhaustive_interpret_tokens
@@ -283,15 +283,12 @@ class ReturnParserToken(ParserToken):
 
 
 class FunctionParserToken(ParserToken, DictionaryToken):
-    def __init__(self, debug_data: DebugData, name, parameters: List[ParserToken], body: List[ParserToken]):
+    def __init__(self, debug_data: DebugData, name: str, parameters: List[ParserToken], body: List[ParserToken]):
         super().__init__(debug_data)
 
-        self.name = name
-        if not all(isinstance(token, ValueParserToken) for token in parameters):
-            raise RuntimeError(
-                f"Got token that is not a ValueParserToken in Function Parameters in function {self.name}")
+        self.name: str = name
         self.parameters: List[ParserToken] = parameters
-        self.body = body
+        self.body: List[ParserToken] = body
 
     def execute(self, stack: list, dictionary: dict):
         """
@@ -301,19 +298,19 @@ class FunctionParserToken(ParserToken, DictionaryToken):
         :return: The stack and dictionary after executing the token.
         """
         if self.name in dictionary:
-            raise KeyError(f"Function {self.name} already exists in dictionary.")
+            raise FunctionPreviouslyDefinedException(self)
         dictionary[self.name] = self
         return stack, dictionary
 
     def visit(self, stack: list, dictionary: dict) -> Tuple[list, dict]:
         """
-        Execute the function body and get the result.
-        :param stack:
-        :param dictionary:
-        :return:
+        Set up the parameters and execute the function body and get the result.
+        :param stack: The stack to use for executing the token.
+        :param dictionary: The dictionary to use for executing the token.
+        :return: The stack and dictionary after executing the token.
         """
-        parameters = self.setup_parameters(stack, dictionary.copy())
-        new_stack = stack[:-len(self.parameters)] + exhaustive_interpret_tokens(self.body, *parameters)[0]
+        stripped_stack, parameters = self.setup_parameters(stack, dictionary.copy())
+        new_stack = exhaustive_interpret_tokens(self.body, stripped_stack, parameters)[0]
         return new_stack, dictionary
 
     def setup_parameters(self, stack: list, dictionary: dict) -> Tuple[list, dict]:

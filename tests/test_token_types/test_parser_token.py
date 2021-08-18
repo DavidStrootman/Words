@@ -4,13 +4,14 @@ from typing import Iterator, List, Tuple, Dict
 import pytest
 
 from words.exceptions.parser_exceptions import StackSizeException, InvalidPredicateException, \
-    UndefinedIdentifierException
+    UndefinedIdentifierException, FunctionPreviouslyDefinedException
 from words.lexer.lex import Lexer
 from words.lexer.lex_util import DebugData
 from words.parser.parse import Parser
 from words.token_types.lexer_token import LexerToken
 from words.token_types.parser_token import NumberParserToken, BooleanParserToken, MacroParserToken, ParserToken, \
-    WhileParserToken, IfParserToken, ValueParserToken, IdentParserToken, VariableParserToken, ReturnParserToken
+    WhileParserToken, IfParserToken, ValueParserToken, IdentParserToken, VariableParserToken, ReturnParserToken, \
+    FunctionParserToken
 from words.interpreter.interpret_util import exhaustive_interpret_tokens
 
 
@@ -303,3 +304,78 @@ class TestReturnParserToken:
         return_token = ReturnParserToken(DebugData(0), 0)
         result = return_token.execute(*values_on_stack_in_funcion)
         assert not result[0]
+
+
+class TestFunctionParserToken:
+    def test_execute_positive(self):
+        """Test placing a function in the dictionary that does not yet exist."""
+        function_decl = FunctionParserToken(DebugData(0), "SOME_FUNC", [], [])
+        result = function_decl.execute([], {})
+        assert "SOME_FUNC" in result[1]
+
+    def test_execute_function_already_defined(self):
+        """If the function was already defined, it cannot be defined again."""
+        # Fixture
+        initial_state = _execute_from_string(
+            "| DEFINED_FUNC ( ) |"
+        )
+        # Assert an exception is raised if the function was previously defined
+        function_decl = FunctionParserToken(DebugData(0), "DEFINED_FUNC", [], [])
+        with pytest.raises(FunctionPreviouslyDefinedException):
+            function_decl.execute(*initial_state)
+
+    def test_visit_positive(self):
+        """Test executing the function body."""
+        # Fixture
+        function_with_body = _parse_from_string(
+            "| FNC_BODY ( ) 1 2 3 RETURN 3 |"
+        )[0]
+        # Assert the parsed string returns a function
+        assert isinstance(function_with_body, FunctionParserToken)
+        # Assert the visit function executes the body correctly.
+        assert function_with_body.visit([], {})[0] == [1, 2, 3]
+
+    def test_visit_setup_parameters(self):
+        """The parameters should be accessible during visit."""
+        # Fixture
+        function_with_params = _parse_from_string(
+            "| FNC_PARAM ( VALUE X ) X RETURN 1 |"
+        )[0]
+        # Assert the parsed string returns a function
+        assert isinstance(function_with_params, FunctionParserToken)
+        # Assert the visit function accepts the parameter and returns it
+        assert function_with_params.visit([20], {})[0] == [20]
+
+    def test_visit_parameters_eaten_from_stack(self):
+        """Assert all parameters taken are removed from the stack."""
+        # Fixture
+        function = _parse_from_string(
+            "| FNC ( VALUE X VALUE Y VALUE Z ) |"
+        )[0]
+        # Assert the parsed string returns a function
+        assert isinstance(function, FunctionParserToken)
+        # Assert the visit function accepts the parameter and returns it
+        assert function.visit([1, 2, 3, 4], {})[0] == [1]
+
+    def test_setup_parameters_positive(self):
+        """Assert parameters are setup correctly."""
+        # Fixture
+        function = _parse_from_string(
+            "| FNC ( VALUE X VALUE Y ) |"
+        )[0]
+        # Assert the parsed string returns a function
+        assert isinstance(function, FunctionParserToken)
+        # Assert the visit function accepts the parameter and returns it
+        assert function.setup_parameters([37, 62], {})[1] == {"Y": 37, "X": 62}
+
+    def test_setup_parameters_invalid_stack_size(self):
+        """If the stack is not large enough to set up parameters an exception should be raised."""
+        # Fixture
+        function = _parse_from_string(
+            "| FNC ( VALUE X VALUE Y ) |"
+        )[0]
+        # Assert the parsed string returns a function
+        assert isinstance(function, FunctionParserToken)
+        # Assert an exception is raised, since only one of the two parameters can be set up
+        with pytest.raises(StackSizeException):
+            function.setup_parameters([37], {})
