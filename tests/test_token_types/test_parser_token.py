@@ -10,7 +10,7 @@ from words.lexer.lex_util import DebugData
 from words.parser.parse import Parser
 from words.token_types.lexer_token import LexerToken
 from words.token_types.parser_token import NumberParserToken, BooleanParserToken, MacroParserToken, ParserToken, \
-    WhileParserToken, IfParserToken, ValueParserToken, IdentParserToken, VariableParserToken
+    WhileParserToken, IfParserToken, ValueParserToken, IdentParserToken, VariableParserToken, ReturnParserToken
 from words.interpreter.interpret_util import exhaustive_interpret_tokens
 
 
@@ -28,10 +28,12 @@ def _execute_from_string(words: str) -> Tuple[List[ParserToken], Dict[str, Parse
 
 class TestParserToken:
     """Test base class functionality with a concrete implementation."""
+
     def test_debug_str(self):
         class ConcreteParserToken(ParserToken):
             def execute(self, stack: list, dictionary: dict) -> Tuple[list, dict]:
                 """Abstract method does not need to be tested"""
+
         assert isinstance(ConcreteParserToken(DebugData(0)).debug_str(), str)
 
 
@@ -252,3 +254,52 @@ class TestIdentParserToken:
         identifier = IdentParserToken(DebugData(0), "SOME_FUNC")
         result = identifier.execute(*func_decl)
         assert result[0] == [8, 12, 81751692]
+
+
+class TestReturnParserToken:
+    def test_execute_positive(self):
+        """Test the correct amount of values are returned onto the stack."""
+        # Fixture
+        values_on_stack_in_function = _execute_from_string(
+            "1512 125 92"
+        )
+        # Assert all values are on the new stack after returning them
+        return_token = ReturnParserToken(DebugData(0), 3)
+        result = return_token.execute(*values_on_stack_in_function)
+        assert result[0] == [1512, 125, 92]
+
+    def test_execute_return_not_all_values(self):
+        """If the return count is smaller than the local stack, only count values should be returned."""
+        # Fixture
+        values_on_stack_in_function = _execute_from_string(
+            "92 82928 9282 923839 162"
+        )
+        # Assert only the last two values are returned from the stack
+        return_token = ReturnParserToken(DebugData(0), 2)
+        result = return_token.execute(*values_on_stack_in_function)
+        assert result[0] == [923839, 162]
+
+    def test_execute_not_enough_values_on_stack(self):
+        """If fewer values exist on the stack than the return expects, an exception should be raised."""
+        # Fixture
+        values_on_stack_in_function = _execute_from_string(
+            "92 92"
+        )
+        # Assert an exception is raised, since not enough values are on the stack
+        return_token = ReturnParserToken(DebugData(0), 3)
+        with pytest.raises(StackSizeException):
+            return_token.execute(*values_on_stack_in_function)
+
+    def test_execute_zero_count(self):
+        """
+        If the return count is zero, no value should be returned,
+         this is equivalent to having no RETURN statement.
+        """
+        # Fixture
+        values_on_stack_in_funcion = _execute_from_string(
+            "9829 929"
+        )
+        # Assert no value is returned
+        return_token = ReturnParserToken(DebugData(0), 0)
+        result = return_token.execute(*values_on_stack_in_funcion)
+        assert not result[0]
