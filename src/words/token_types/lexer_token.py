@@ -71,7 +71,7 @@ class LexerToken(Debuggable, PrintableABC):
         :return: The amount of return values as an integer (1, 2 or 3).
         """
         LexerToken.assert_type(token, LiteralLexerToken.Types.NUMBER)
-        if int(token.content) not in range(3):
+        if int(token.content) not in range(4):
             raise IncorrectReturnCountError(token)
         return int(token.content)
 
@@ -133,6 +133,11 @@ class KeywordLexerToken(LexerToken):
         RETURN = "RETURN"
         FUNCTION = "|"
         LAMBDA = "λ"
+
+    def debug_str(self):
+        if self.value == self.Types.FUNCTION:
+            return f"\"{self.value.value}\" at line {self.debug_data}"
+        return super().debug_str()
 
     def parse(self, tokens: Iterator["LexerToken"]) -> Union[  # noqa: C901
         WhileParserToken, IfParserToken, VariableParserToken,
@@ -224,7 +229,7 @@ class KeywordLexerToken(LexerToken):
             try:
                 body = eat_until_discarding(tokens, [KeywordLexerToken.Types.FUNCTION])
             except StopIteration:
-                raise MissingTokenError(self, KeywordLexerToken.Types.FUNCTION)
+                raise MissingTokenError(self, f"closing \"{KeywordLexerToken.Types.FUNCTION.value}\"")
 
             return FunctionParserToken(self.debug_data, function_name, parameters, body)
 
@@ -251,7 +256,7 @@ class LiteralLexerToken(LexerToken):
         if self.value is self.Types.COMMENT:
             return f"\"COMMENT\" at line {self.debug_data}"
         if self.value is self.Types.NUMBER:
-            return f"{self.content}"
+            return f"{int(self.content):,}"
         return super().debug_str()
 
     def parse(self, tokens: Iterator["LexerToken"]) -> Union[NumberParserToken, BooleanParserToken]:
@@ -266,7 +271,7 @@ class LiteralLexerToken(LexerToken):
         if self.value == self.Types.NUMBER:
             number = int(self.content)
             if number > 0xFFFFFFFF:
-                raise ValueError(f"Number is too big, must be at most a 32 bit unsigned integer(4,294,967,295). "
+                raise ValueError(f"Number is too big, must be at most a 32 bit unsigned integer(4,294,967,295), got "
                                  f"{self.debug_str()}.")
 
             return NumberParserToken(self.debug_data, number)

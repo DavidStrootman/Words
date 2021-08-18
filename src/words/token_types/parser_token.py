@@ -1,7 +1,8 @@
 from abc import abstractmethod
 from typing import List, Optional, Tuple
 
-from words.exceptions.parser_exceptions import StackSizeException, InvalidPredicateException
+from words.exceptions.parser_exceptions import StackSizeException, InvalidPredicateException, \
+    UndefinedIdentifierException
 from words.helper.Debuggable import Debuggable
 from words.helper.PrintableABC import PrintableABC
 from words.interpreter.interpret_util import exhaustive_interpret_tokens
@@ -12,6 +13,7 @@ class ParserToken(Debuggable, PrintableABC):
     """
     Base parser token.
     """
+
     def __init__(self, debug_data: DebugData):
         self.debug_data = debug_data
 
@@ -49,6 +51,7 @@ class NumberParserToken(ParserToken):
     """
     The number token represents an integer.
     """
+
     def __init__(self, debug_data: DebugData, value: int):
         super().__init__(debug_data)
         self.value = value
@@ -67,6 +70,7 @@ class BooleanParserToken(ParserToken):
     """
     The boolean token represents a boolean.
     """
+
     def __init__(self, debug_data: DebugData, value: str):
         super().__init__(debug_data)
 
@@ -89,6 +93,7 @@ class MacroParserToken(ParserToken):
     """
     The macro token represents a macro, for example __PRINT___.
     """
+
     def __init__(self, debug_data: DebugData, function_name: str):
         super().__init__(debug_data)
 
@@ -116,6 +121,7 @@ class WhileParserToken(ParserToken):
     The while token represents a while loop. It holds a predicate that is checked every loop and the statements that
     should be executed as long as the predicate holds true.
     """
+
     def __init__(self, debug_data: DebugData, predicate: List[ParserToken], statements: List[ParserToken]):
         super().__init__(debug_data)
 
@@ -123,7 +129,7 @@ class WhileParserToken(ParserToken):
         self.statements: List[ParserToken] = statements
 
     def debug_str(self):
-        return f"\"WHILE\" token at line {self.debug_data.line + 1}"
+        return f"\"WHILE\" token at line {self.debug_data}"
 
     def execute(self, stack: list, dictionary: dict) -> Tuple[list, dict]:
         """
@@ -144,6 +150,7 @@ class IfParserToken(ParserToken):
     """
     The if token represents an if statement, with an optional else statement.
     """
+
     def __init__(self, debug_data: DebugData,
                  if_body: List[ParserToken],
                  else_body: Optional[List[ParserToken]] = None):
@@ -153,7 +160,7 @@ class IfParserToken(ParserToken):
         self.else_body: Optional[List[ParserToken]] = else_body
 
     def debug_str(self):
-        return f"\"IF\" token at line {self.debug_data.line + 1}"
+        return f"\"IF\" token at line {self.debug_data}"
 
     def execute(self, stack: list, dictionary: dict) -> Tuple[list, dict]:
         """
@@ -176,6 +183,7 @@ class VariableParserToken(ParserToken, DictionaryToken):
     """
     The variable token represents a variable. The variable token gets placed in the dictionary.
     """
+
     class VarUnassigned:
         pass
 
@@ -204,6 +212,7 @@ class ValueParserToken(ParserToken):
     """
     The value parser token represents a function parameter, which is called a value in Words.
     """
+
     def __init__(self, debug_data: DebugData, value: str):
         super().__init__(debug_data)
 
@@ -211,22 +220,28 @@ class ValueParserToken(ParserToken):
 
     def execute(self, stack: list, dictionary: dict) -> Tuple[list, dict]:
         """
-        Execute the token to get the result.
+        Values cannot be executed, only added to the dictionary when instantiating a function.
+
         :param stack: The stack to use for executing the token.
         :param dictionary: The dictionary to use for executing the token.
         :return: The stack and dictionary after executing the token.
         """
-        return stack + list([self.value]), dictionary
+        raise RuntimeError("Value parser tokens cannot be executed, but must instead be"
+                           " added to the dictionary by the function.")
 
 
 class IdentParserToken(ParserToken):
     """
-    The identifier token represents an identifier.
+    The identifier parser token represents an identifier.
     """
+
     def __init__(self, debug_data: DebugData, value: str):
         super().__init__(debug_data)
 
         self.value = value
+
+    def debug_str(self) -> str:
+        return f"\"{self.value}\" at line {self.debug_data}"
 
     def execute(self, stack: list, dictionary: dict) -> Tuple[list, dict]:
         """
@@ -241,7 +256,7 @@ class IdentParserToken(ParserToken):
                 return dictionary[self.value].visit(stack, dictionary)
             else:
                 return stack + [dictionary[self.value]], dictionary
-        raise KeyError(f"Undefined function or variable {self.value} in dictionary.")
+        raise UndefinedIdentifierException(self)
 
 
 class ReturnParserToken(ParserToken):
@@ -251,6 +266,12 @@ class ReturnParserToken(ParserToken):
         self.count = count
 
     def execute(self, stack: list, dictionary: dict) -> Tuple[list, dict]:
+        """
+
+        :param stack:
+        :param dictionary:
+        :return:
+        """
         if len(stack) < self.count:
             raise StackSizeException(token=self, expected_size=self.count, actual_size=len(stack))
         if self.count == 0:

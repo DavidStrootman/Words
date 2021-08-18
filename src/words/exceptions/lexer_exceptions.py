@@ -12,7 +12,7 @@ class UnexpectedTokenError(SyntaxError):
 
 class MissingTokenError(SyntaxError):
     """A missing token error is raised whenever a token is expected, but never found. For example a closing brace."""
-    def __init__(self, opening_token: Debuggable, expected_token: Union[TokenTypeEnum, Type[Debuggable]]):
+    def __init__(self, opening_token: Debuggable, expected_token: Union[str, Type[Debuggable]]):
         message = f"Expected {expected_token} was never found for token {opening_token.debug_str()}."
         super().__init__(message)
 

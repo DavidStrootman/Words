@@ -12,3 +12,10 @@ class InvalidPredicateException(RuntimeError):
     def __init__(self, token: Debuggable):
         message = f"Got a non-boolean value as a predicate of {token.debug_str()}."
         super().__init__(message)
+
+
+class UndefinedIdentifierException(NameError):
+    """An undefined identifier exception is raised whenever an identifier is used, that was not (yet) defined."""
+    def __init__(self, token: Debuggable):
+        message = f"Undefined function or variable, {token.debug_str()}."
+        super().__init__(message)
