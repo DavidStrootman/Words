@@ -24,8 +24,13 @@ class Lexer:
         return Lexer.lex_file_contents(file_contents)
 
     @staticmethod
-    def lex_file_contents(contents: Union[Iterator[Tuple[int, str]], enumerate]):
+    def lex_file_contents(contents: Union[Iterator[Tuple[int, str]], enumerate]) -> Iterator[LexerToken]:
         words: Iterator[Iterator[Word]] = (Lexer._split_line_into_words(line_nr, line) for line_nr, line in contents)
+        return Lexer._exhaustive_lex(words)
+
+    @staticmethod
+    def lex_from_string(line: str):
+        words: Iterator[Iterator[Word]] = (Lexer._split_line_into_words(0, line) for _ in range(1))
         return Lexer._exhaustive_lex(words)
 
     @staticmethod
