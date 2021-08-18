@@ -21,8 +21,8 @@ class UndefinedIdentifierException(NameError):
         super().__init__(message)
 
 
-class FunctionPreviouslyDefinedException(NameError):
-    """A function previously defined exception is raised whenever a function is defined multiple times."""
+class IdentifierPreviouslyDefinedException(NameError):
+    """An identifier previously defined exception is raised whenever a function is defined multiple times."""
     def __init__(self, token: Debuggable):
         message = f"Token of type {token.debug_str()} was previously defined."
         super().__init__(message)

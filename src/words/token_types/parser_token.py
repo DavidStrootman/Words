@@ -2,7 +2,7 @@ from abc import abstractmethod
 from typing import List, Optional, Tuple
 
 from words.exceptions.parser_exceptions import StackSizeException, InvalidPredicateException, \
-    UndefinedIdentifierException, FunctionPreviouslyDefinedException
+    UndefinedIdentifierException, IdentifierPreviouslyDefinedException
 from words.helper.Debuggable import Debuggable
 from words.helper.PrintableABC import PrintableABC
 from words.interpreter.interpret_util import exhaustive_interpret_tokens
@@ -193,6 +193,9 @@ class VariableParserToken(ParserToken, DictionaryToken):
         self.value: str = value
         self.assigned_value: any = self.VarUnassigned
 
+    def debug_str(self) -> str:
+        return f"variable with name \"{self.value}\" at line {self.debug_data}"
+
     def execute(self, stack: list, dictionary: dict) -> Tuple[list, dict]:
         """
         Execute the token to get the result.
@@ -201,7 +204,7 @@ class VariableParserToken(ParserToken, DictionaryToken):
         :return: The stack and dictionary after executing the token.
         """
         if self.value in dictionary:
-            raise KeyError(f"Variable {self.value} already exists in dictionary.")
+            raise IdentifierPreviouslyDefinedException(self)
         return stack, {**dictionary, **{self.value: self.assigned_value}}
 
     def visit(self, stack: list, dictionary: dict) -> Tuple[list, dict]:
@@ -298,7 +301,7 @@ class FunctionParserToken(ParserToken, DictionaryToken):
         :return: The stack and dictionary after executing the token.
         """
         if self.name in dictionary:
-            raise FunctionPreviouslyDefinedException(self)
+            raise IdentifierPreviouslyDefinedException(self)
         dictionary[self.name] = self
         return stack, dictionary
 
@@ -339,7 +342,6 @@ class LambdaParserToken(ParserToken):
 class ArithmeticOperatorParserToken(ParserToken):
     def __init__(self, debug_data: DebugData, value: str):
         super().__init__(debug_data)
-
         self.value = value
 
     def execute(self, stack: list, dictionary: dict) -> Tuple[list, dict]:
@@ -349,6 +351,8 @@ class ArithmeticOperatorParserToken(ParserToken):
         :param dictionary: The dictionary to use for executing the token.
         :return: The stack and dictionary after executing the token.
         """
+        if len(stack) < 2:
+            raise StackSizeException(self, 2, len(stack))
         topmost_value = stack[-1]
         second_value = stack[-2]
 
@@ -372,18 +376,30 @@ class BooleanOperatorParserToken(ParserToken):
         :param dictionary: The dictionary to use for executing the token.
         :return: The stack and dictionary after executing the token.
         """
+        if len(stack) < 2:
+            raise StackSizeException(self, 2, len(stack))
+
         if self.value == "==":
             topmost_value = stack[-1]
             second_value = stack[-2]
             return stack[:-2] + [second_value == topmost_value], dictionary
-        if self.value == ">=":
+        if self.value == ">":
             topmost_value = stack[-1]
             second_value = stack[-2]
-            return stack[:-2] + [second_value >= topmost_value], dictionary
+            return stack[:-2] + [second_value > topmost_value], dictionary
         if self.value == "<":
             topmost_value = stack[-1]
             second_value = stack[-2]
             return stack[:-2] + [second_value < topmost_value], dictionary
+        if self.value == ">=":
+            topmost_value = stack[-1]
+            second_value = stack[-2]
+            return stack[:-2] + [second_value >= topmost_value], dictionary
+        if self.value == "<=":
+            topmost_value = stack[-1]
+            second_value = stack[-2]
+            return stack[:-2] + [second_value <= topmost_value], dictionary
+
         raise NotImplementedError(f"Unimplemented BooleanOperator {self.value}")
 
 
@@ -401,7 +417,11 @@ class DictionaryOperatorParserToken(ParserToken):
         :param dictionary: The dictionary to use for executing the token.
         :return: The stack and dictionary after executing the token.
         """
+
         if self.value == "ASSIGN":
+            if len(stack) < 1:
+                raise StackSizeException(self, 1, len(stack))
+
             topmost_value = stack[-1]
             return stack[:-1], {**dictionary, **{self.variable_name: topmost_value}}
         if self.value == "RETRIEVE":

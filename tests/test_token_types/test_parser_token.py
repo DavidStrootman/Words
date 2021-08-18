@@ -4,14 +4,15 @@ from typing import Iterator, List, Tuple, Dict
 import pytest
 
 from words.exceptions.parser_exceptions import StackSizeException, InvalidPredicateException, \
-    UndefinedIdentifierException, FunctionPreviouslyDefinedException
+    UndefinedIdentifierException, IdentifierPreviouslyDefinedException
 from words.lexer.lex import Lexer
 from words.lexer.lex_util import DebugData
 from words.parser.parse import Parser
 from words.token_types.lexer_token import LexerToken
 from words.token_types.parser_token import NumberParserToken, BooleanParserToken, MacroParserToken, ParserToken, \
     WhileParserToken, IfParserToken, ValueParserToken, IdentParserToken, VariableParserToken, ReturnParserToken, \
-    FunctionParserToken
+    FunctionParserToken, LambdaParserToken, ArithmeticOperatorParserToken, BooleanOperatorParserToken, \
+    DictionaryOperatorParserToken
 from words.interpreter.interpret_util import exhaustive_interpret_tokens
 
 
@@ -212,6 +213,32 @@ class TestIfParserToken:
             if_statement.execute(*condition)
 
 
+class TestVariableParserToken:
+    def test_execute_positive(self):
+        """Test creating a variable in the dictionary."""
+        variable = VariableParserToken(DebugData(0), "SOME_VAR")
+        result = variable.execute([], {})
+        assert "SOME_VAR" in result[1]
+
+    def test_execute_duplicate_definition(self):
+        """
+        If a variable is defined that already exists an
+         exception should be raised, since shadowing is not allowed
+        """
+        variable_definition = _execute_from_string(
+            "VARIABLE DEFINED_VAR"
+        )
+        variable = VariableParserToken(DebugData(0), "DEFINED_VAR")
+        with pytest.raises(IdentifierPreviouslyDefinedException):
+            variable.execute(*variable_definition)
+
+    def test_visit_positive(self):
+        """Test visiting a variable returns its value on the stack."""
+        variable = VariableParserToken(DebugData(0), "VAR")
+        variable.assigned_value = 62
+        assert variable.visit([12], {})[0] == [12, 62]
+
+
 class TestValueParserToken:
     def test_execute(self):
         """Values cannot be executed, only added to the dictionary when instantiating a function."""
@@ -313,7 +340,7 @@ class TestFunctionParserToken:
         result = function_decl.execute([], {})
         assert "SOME_FUNC" in result[1]
 
-    def test_execute_function_already_defined(self):
+    def test_execute_duplicate_definition(self):
         """If the function was already defined, it cannot be defined again."""
         # Fixture
         initial_state = _execute_from_string(
@@ -321,7 +348,7 @@ class TestFunctionParserToken:
         )
         # Assert an exception is raised if the function was previously defined
         function_decl = FunctionParserToken(DebugData(0), "DEFINED_FUNC", [], [])
-        with pytest.raises(FunctionPreviouslyDefinedException):
+        with pytest.raises(IdentifierPreviouslyDefinedException):
             function_decl.execute(*initial_state)
 
     def test_visit_positive(self):
@@ -379,3 +406,125 @@ class TestFunctionParserToken:
         # Assert an exception is raised, since only one of the two parameters can be set up
         with pytest.raises(StackSizeException):
             function.setup_parameters([37], {})
+
+
+@pytest.mark.xfail(reason="Lambdas are not implemented.")
+class TestLambdaParserToken:
+    def test_execute_positive(self):
+        token = LambdaParserToken(DebugData(0))
+        token.execute([], {})
+
+
+class TestArithmeticOperatorParserToken:
+    def test_execute_addition(self):
+        addition_operator = ArithmeticOperatorParserToken(DebugData(0), "+")
+        result = addition_operator.execute([25, 52], {})
+        assert result[0] == [25 + 52]
+
+    def test_execute_subtraction(self):
+        subtraction_operator = ArithmeticOperatorParserToken(DebugData(0), "-")
+        result = subtraction_operator.execute([25, 52], {})
+        assert result[0] == [25 - 52]
+
+    def test_execute_unimplemented_operator(self):
+        operator = ArithmeticOperatorParserToken(DebugData(0), "SOME_UNIMPLEMENTED_OP")
+        with pytest.raises(NotImplementedError):
+            operator.execute([643, 72], {})
+
+    def test_execute_invalid_stack_size(self):
+        """An arithmetic operator expects at least two values on the stack."""
+        operator = ArithmeticOperatorParserToken(DebugData(0), "+")
+        with pytest.raises(StackSizeException):
+            operator.execute([25], {})
+
+
+class TestBooleanOperatorParserToken:
+    def test_execute_equality(self):
+        operator = BooleanOperatorParserToken(DebugData(0), "==")
+        result = operator.execute([52, 52], {})
+        assert result[0] == [True]
+        operator = BooleanOperatorParserToken(DebugData(0), "==")
+        result = operator.execute([52, 85], {})
+        assert result[0] == [False]
+
+    def test_execute_greater(self):
+        operator = BooleanOperatorParserToken(DebugData(0), ">")
+        result = operator.execute([52, 27], {})
+        assert result[0] == [True]
+        operator = BooleanOperatorParserToken(DebugData(0), ">")
+        result = operator.execute([52, 85], {})
+        assert result[0] == [False]
+        operator = BooleanOperatorParserToken(DebugData(0), ">")
+        result = operator.execute([52, 52], {})
+        assert result[0] == [False]
+
+    def test_execute_lesser(self):
+        operator = BooleanOperatorParserToken(DebugData(0), "<")
+        result = operator.execute([64, 108], {})
+        assert result[0] == [True]
+        operator = BooleanOperatorParserToken(DebugData(0), "<")
+        result = operator.execute([872, 87], {})
+        assert result[0] == [False]
+        operator = BooleanOperatorParserToken(DebugData(0), "<")
+        result = operator.execute([64, 64], {})
+        assert result[0] == [False]
+
+    def test_execute_greater_eq(self):
+        operator = BooleanOperatorParserToken(DebugData(0), ">=")
+        result = operator.execute([1252, 87], {})
+        assert result[0] == [True]
+        operator = BooleanOperatorParserToken(DebugData(0), ">=")
+        result = operator.execute([728, 27822], {})
+        assert result[0] == [False]
+        operator = BooleanOperatorParserToken(DebugData(0), ">=")
+        result = operator.execute([252, 252], {})
+        assert result[0] == [True]
+
+    def test_execute_lesser_eq(self):
+        operator = BooleanOperatorParserToken(DebugData(0), "<=")
+        result = operator.execute([728, 2758], {})
+        assert result[0] == [True]
+        operator = BooleanOperatorParserToken(DebugData(0), "<=")
+        result = operator.execute([5172, 1272], {})
+        assert result[0] == [False]
+        operator = BooleanOperatorParserToken(DebugData(0), "<=")
+        result = operator.execute([2782, 2782], {})
+        assert result[0] == [True]
+
+    def test_execute_invalid_stack_size(self):
+        """A boolean operator expects at least two values on the stack."""
+        operator = BooleanOperatorParserToken(DebugData(0), "==")
+        with pytest.raises(StackSizeException):
+            operator.execute([9262], {})
+
+    def test_execute_unimplemented_operator(self):
+        operator = BooleanOperatorParserToken(DebugData(0), "SOME_UNIMPLEMENTED_OP")
+        with pytest.raises(NotImplementedError):
+            operator.execute([825, 92], {})
+
+
+class TestDictionaryOperatorParserToken:
+    def test_execute_assign(self):
+        operator = DictionaryOperatorParserToken(DebugData(0), "ASSIGN", "X")
+        result = operator.execute([28], {"X": VariableParserToken.VarUnassigned})
+        # Assert the value is removed from the stack
+        assert not result[0]
+        # Assert the value from the stack is assigned to the variable
+        assert result[1]["X"] == 28
+
+    def test_execute_retrieve(self):
+        operator = DictionaryOperatorParserToken(DebugData(0), "RETRIEVE", "X")
+        result = operator.execute([], {"X": 82})
+        # Assert the value of the variable is placed on the stack
+        assert result[0] == [82]
+
+    def test_execute_assign_invalid_stack_size(self):
+        """A dictionary operator expects at least one value on the stack."""
+        operator = DictionaryOperatorParserToken(DebugData(0), "ASSIGN", "SOME_VAR")
+        with pytest.raises(StackSizeException):
+            operator.execute([], {})
+
+    def test_execute_unimplemented_operator(self):
+        operator = DictionaryOperatorParserToken(DebugData(0), "SOME_UNIMPLEMENTED_OP", "SOME_OTHER_VAR")
+        with pytest.raises(NotImplementedError):
+            operator.execute([23], {})
