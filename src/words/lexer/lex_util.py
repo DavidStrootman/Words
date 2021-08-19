@@ -7,7 +7,7 @@ class DebugData:
     line: int
     start_pos: int = None
 
-    def __str__(self):
+    def __str__(self) -> str:
         return f"{self.line + 1}"
 
 

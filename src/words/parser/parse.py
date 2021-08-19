@@ -1,8 +1,6 @@
 from typing import Iterator, List
-from words.lexer.lex import Lexer
 from words.token_types.lexer_token import LexerToken
 from words.parser.parse_util import Program
-from pathlib import Path
 
 
 class Parser:
@@ -36,9 +34,3 @@ class Parser:
             return [next(tokens).parse(tokens)] + Parser._parse_exhaustive(tokens)
         except StopIteration:
             return []
-
-
-# Debug main
-if __name__ == '__main__':
-    lexed_tokens_ = Lexer.lex_file(Path("../../../examples/words/loop.word"))
-    program_ = Parser.parse(lexed_tokens_)

@@ -26,7 +26,7 @@ class LexerToken(Debuggable, PrintableABC):
         self.debug_data = word.debug_data
         self.value = self.Types(word.content)
 
-    def debug_str(self):
+    def debug_str(self) -> str:
         return f"\"{self.value}\" at line {self.debug_data}"
 
     @abstractmethod
@@ -134,7 +134,7 @@ class KeywordLexerToken(LexerToken):
         FUNCTION = "|"
         LAMBDA = "λ"
 
-    def debug_str(self):
+    def debug_str(self) -> str:
         if self.value == self.Types.FUNCTION:
             return f"\"{self.value.value}\" at line {self.debug_data}"
         return super().debug_str()
@@ -153,7 +153,7 @@ class KeywordLexerToken(LexerToken):
             predicate_without_last_item = predicate[:-1]
             body = eat_until_discarding(tokens, [self.Types.REPEAT])
             if not body:
-                raise MissingTokenError(self, )
+                raise MissingTokenError(self, "any token")
             return WhileParserToken(self.debug_data, predicate_without_last_item, body)
 
         if self.value == self.Types.WHILE:
@@ -166,13 +166,13 @@ class KeywordLexerToken(LexerToken):
             try:
                 if_body = eat_until(tokens, [self.Types.ELSE, self.Types.THEN])
             except StopIteration:
-                raise MissingTokenError(self, self.Types.THEN)
+                raise MissingTokenError(self, self.Types.THEN.value)
             if if_body[-1].value == self.Types.ELSE:
                 if_body = if_body[:-1]  # Discard ELSE token
                 try:
                     else_body = eat_until_discarding(tokens, [self.Types.THEN])
                 except StopIteration:
-                    raise MissingTokenError(self, self.Types.THEN)
+                    raise MissingTokenError(self, self.Types.THEN.value)
             else:
                 if_body = if_body[:-1]  # Discard THEN token
                 else_body = None
@@ -207,7 +207,7 @@ class KeywordLexerToken(LexerToken):
             try:
                 return_value = LexerToken.try_get_return_value(next(tokens))
             except StopIteration:
-                raise MissingTokenError(self, LiteralLexerToken.Types.NUMBER)
+                raise MissingTokenError(self, LiteralLexerToken.Types.NUMBER.value)
             return ReturnParserToken(self.debug_data, return_value)
 
         if self.value == self.Types.FUNCTION:
@@ -312,7 +312,6 @@ class OpLexerToken(LexerToken):
         GREATER_EQ = ">="
         LESSER_EQ = "<="
         ASSIGNMENT = "ASSIGN"
-        RETRIEVAL = "RETRIEVE"
 
     def parse(self, tokens: Iterator["LexerToken"]) -> Union[
         ArithmeticOperatorParserToken, BooleanOperatorParserToken, DictionaryOperatorParserToken]:
@@ -328,7 +327,7 @@ class OpLexerToken(LexerToken):
             return ArithmeticOperatorParserToken(self.debug_data, self.value.value)
         if self.value.value in ["==", ">", "<", ">=", "<="]:
             return BooleanOperatorParserToken(self.debug_data, self.value.value)
-        if self.value.value in ["ASSIGN", "RETRIEVE"]:
+        if self.value.value in ["ASSIGN"]:
             try:
                 targeted_variable = next(tokens)
             except StopIteration:

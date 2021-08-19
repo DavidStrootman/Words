@@ -21,12 +21,14 @@ class ParserToken(Debuggable, PrintableABC):
     def execute(self, stack: list, dictionary: dict) -> Tuple[list, dict]:
         """
         Execute the token to get the result.
+
         :param stack: The stack to use fo2r executing the token.
         :param dictionary: The dictionary to use for executing the token.
         :return: The stack and dictionary after executing the token.
         """
 
     def debug_str(self) -> str:
+        """A debug string is used for providing better error messages during both parsing and at runtime."""
         return f"\"{self}\" at line {self.debug_data}"
 
 
@@ -39,7 +41,8 @@ class DictionaryToken:
     @abstractmethod
     def visit(self, stack: list, dictionary: dict) -> Tuple[list, dict]:
         """
-        The visit method is used to place a token on the dictionary, without executing it.
+        The visit method is used for tokens that might have some other use after the initial execute. For example the
+        function parser token is placed in the dictionary during execution, and run during visiting.
 
         :param stack: The stack used for visiting this token.
         :param dictionary: The dictionary used for visiting this token.
@@ -58,7 +61,8 @@ class NumberParserToken(ParserToken):
 
     def execute(self, stack: list, dictionary: dict) -> Tuple[list, dict]:
         """
-        Execute the token to get the result.
+        Executing a number parser token places its value on the stack.
+
         :param stack: The stack to use for executing the token.
         :param dictionary: The dictionary to use for executing the token.
         :return: The stack and dictionary after executing the token.
@@ -81,7 +85,8 @@ class BooleanParserToken(ParserToken):
 
     def execute(self, stack: list, dictionary: dict) -> Tuple[list, dict]:
         """
-        Execute the token to get the result.
+        Executing a boolean parser token places its value on the stack.
+
         :param stack: The stack to use for executing the token.
         :param dictionary: The dictionary to use for executing the token.
         :return: The stack and dictionary after executing the token.
@@ -99,12 +104,14 @@ class MacroParserToken(ParserToken):
 
         self.function_name = function_name
 
-    def debug_str(self):
+    def debug_str(self) -> str:
+        """A debug string is used for providing better error messages during both parsing and at runtime."""
         return f"\"{self.function_name}\" at line {self.debug_data}"
 
     def execute(self, stack: list, dictionary: dict) -> Tuple[list, dict]:
         """
-        Execute the token to get the result.
+        Execute the macro.
+
         :param stack: The stack to use for executing the token.
         :param dictionary: The dictionary to use for executing the token.
         :return: The stack and dictionary after executing the token.
@@ -128,15 +135,19 @@ class WhileParserToken(ParserToken):
         self.predicate: List[ParserToken] = predicate
         self.statements: List[ParserToken] = statements
 
-    def debug_str(self):
+    def debug_str(self) -> str:
+        """A debug string is used for providing better error messages during both parsing and at runtime."""
         return f"\"WHILE\" token at line {self.debug_data}"
 
     def execute(self, stack: list, dictionary: dict) -> Tuple[list, dict]:
         """
-        Execute the token to get the result.
+        Run the while loop as long as the predicate holds true.
+
         :param stack: The stack to use for executing the token.
         :param dictionary: The dictionary to use for executing the token.
         :return: The stack and dictionary after executing the token.
+        :raises InvalidPredicateException: If the predicate does not return a boolean value the while loop cannot know
+        if it should run.
         """
         predicate_outcome: bool = exhaustive_interpret_tokens(self.predicate, stack, dictionary)[0][0]
         if not isinstance(predicate_outcome, bool):
@@ -159,15 +170,19 @@ class IfParserToken(ParserToken):
         self.if_body: List[ParserToken] = if_body
         self.else_body: Optional[List[ParserToken]] = else_body
 
-    def debug_str(self):
+    def debug_str(self) -> str:
+        """A debug string is used for providing better error messages during both parsing and at runtime."""
         return f"\"IF\" token at line {self.debug_data}"
 
     def execute(self, stack: list, dictionary: dict) -> Tuple[list, dict]:
         """
-        Execute the token to get the result.
+        Either run the if or else body, based on the predicate.
+
         :param stack: The stack to use for executing the token.
         :param dictionary: The dictionary to use for executing the token.
         :return: The stack and dictionary after executing the token.
+        :raises InvalidPredicateException: If the predicate does not return a boolean value the if statement cannot know
+        if it should run.
         """
         predicate = stack[-1]
         if not isinstance(predicate, bool):
@@ -194,20 +209,30 @@ class VariableParserToken(ParserToken, DictionaryToken):
         self.assigned_value: any = self.VarUnassigned
 
     def debug_str(self) -> str:
+        """A debug string is used for providing better error messages during both parsing and at runtime."""
         return f"variable with name \"{self.value}\" at line {self.debug_data}"
 
     def execute(self, stack: list, dictionary: dict) -> Tuple[list, dict]:
         """
-        Execute the token to get the result.
+        Execute the variable to place it in the dictionary, with Unassigned as its value.
+
         :param stack: The stack to use for executing the token.
         :param dictionary: The dictionary to use for executing the token.
         :return: The stack and dictionary after executing the token.
+        :raises IdentifierPreviouslyDefinedException: Since shadowing is not allowed, a variable cannot be defined
+        twice.
         """
         if self.value in dictionary:
             raise IdentifierPreviouslyDefinedException(self)
         return stack, {**dictionary, **{self.value: self.assigned_value}}
 
     def visit(self, stack: list, dictionary: dict) -> Tuple[list, dict]:
+        """
+        Visiting a variable retrieves its assigned value and places it on the stack.
+        :param stack:
+        :param dictionary:
+        :return:
+        """
         return stack + list([self.assigned_value]), dictionary
 
 
@@ -244,6 +269,7 @@ class IdentParserToken(ParserToken):
         self.value = value
 
     def debug_str(self) -> str:
+        """A debug string is used for providing better error messages during both parsing and at runtime."""
         return f"\"{self.value}\" at line {self.debug_data}"
 
     def execute(self, stack: list, dictionary: dict) -> Tuple[list, dict]:
@@ -281,11 +307,16 @@ class ReturnParserToken(ParserToken):
             return [], dictionary
         return stack[-self.count:], dictionary
 
-    def debug_str(self):
+    def debug_str(self) -> str:
+        """A debug string is used for providing better error messages during both parsing and at runtime."""
         return f"\"RETURN\" at line {self.debug_data}"
 
 
 class FunctionParserToken(ParserToken, DictionaryToken):
+    """
+    A function parser token represents a function. It can be executed to place it in the dictionary and visited to run
+     the statements in the body of the function.
+    """
     def __init__(self, debug_data: DebugData, name: str, parameters: List[ParserToken], body: List[ParserToken]):
         super().__init__(debug_data)
 
@@ -296,6 +327,7 @@ class FunctionParserToken(ParserToken, DictionaryToken):
     def execute(self, stack: list, dictionary: dict):
         """
         Setup the function by placing it in the dictionary.
+
         :param stack: The stack to use for executing the token.
         :param dictionary: The dictionary to use for executing the token.
         :return: The stack and dictionary after executing the token.
@@ -307,7 +339,8 @@ class FunctionParserToken(ParserToken, DictionaryToken):
 
     def visit(self, stack: list, dictionary: dict) -> Tuple[list, dict]:
         """
-        Set up the parameters and execute the function body and get the result.
+        Set up the parameters and execute the function body.
+
         :param stack: The stack to use for executing the token.
         :param dictionary: The dictionary to use for executing the token.
         :return: The stack and dictionary after executing the token.
@@ -328,7 +361,8 @@ class FunctionParserToken(ParserToken, DictionaryToken):
 
         return rec_setup_parameters(stack, dictionary, self.parameters)
 
-    def debug_str(self):
+    def debug_str(self) -> str:
+        """A debug string is used for providing better error messages during both parsing and at runtime."""
         return f"function \"{self.name}\" at line {self.debug_data}"
 
 
@@ -340,16 +374,23 @@ class LambdaParserToken(ParserToken):
 
 
 class ArithmeticOperatorParserToken(ParserToken):
+    """
+    An arithmetic operator parser token represents an arithmetic operation. For example the addition operation. It holds
+    both the type of operation, as well as the values it will operate on.
+    """
     def __init__(self, debug_data: DebugData, value: str):
         super().__init__(debug_data)
         self.value = value
 
     def execute(self, stack: list, dictionary: dict) -> Tuple[list, dict]:
         """
-        Execute the token to get the result.
+        Execute the arithmetic operation.
+
         :param stack: The stack to use for executing the token.
         :param dictionary: The dictionary to use for executing the token.
         :return: The stack and dictionary after executing the token.
+        :raises StackSizeException: An arithmetic operator always needs two values to run.
+        :raises NotImplementedError: If an undefined operator is specified it cannot run.
         """
         if len(stack) < 2:
             raise StackSizeException(self, 2, len(stack))
@@ -364,6 +405,10 @@ class ArithmeticOperatorParserToken(ParserToken):
 
 
 class BooleanOperatorParserToken(ParserToken):
+    """
+    An boolean operator parser token represents a boolean operation. For example the equality operation. It holds
+    both the type of operation, as well as the values it will operate on.
+    """
     def __init__(self, debug_data: DebugData, value: str):
         super().__init__(debug_data)
 
@@ -371,10 +416,13 @@ class BooleanOperatorParserToken(ParserToken):
 
     def execute(self, stack: list, dictionary: dict) -> Tuple[list, dict]:
         """
-        Execute the token to get the result.
+        Execute the boolean operation.
+
         :param stack: The stack to use for executing the token.
         :param dictionary: The dictionary to use for executing the token.
         :return: The stack and dictionary after executing the token.
+        :raises StackSizeException: A boolean operation always needs two values to run.
+        :raises NotImplementedError: If an undefined operator is specified it cannot run.
         """
         if len(stack) < 2:
             raise StackSizeException(self, 2, len(stack))
@@ -404,6 +452,11 @@ class BooleanOperatorParserToken(ParserToken):
 
 
 class DictionaryOperatorParserToken(ParserToken):
+    """
+    A dictionary operator parser token represents a dictionary operation. Dictionary operators are used for interacting
+    with the dictionary. For example the assign operator assigns the top value from the stack to the provided
+    identifier in the dictionary.
+    """
     def __init__(self, debug_data: DebugData, value: str, variable_name: str):
         super().__init__(debug_data)
 
@@ -412,10 +465,12 @@ class DictionaryOperatorParserToken(ParserToken):
 
     def execute(self, stack: list, dictionary: dict) -> Tuple[list, dict]:
         """
-        Execute the token to get the result.
+        Execute the dictionary operation.
+
         :param stack: The stack to use for executing the token.
         :param dictionary: The dictionary to use for executing the token.
         :return: The stack and dictionary after executing the token.
+        :raises NotImplementedError: If an undefined operator is specified it cannot run.
         """
 
         if self.value == "ASSIGN":
@@ -424,7 +479,5 @@ class DictionaryOperatorParserToken(ParserToken):
 
             topmost_value = stack[-1]
             return stack[:-1], {**dictionary, **{self.variable_name: topmost_value}}
-        if self.value == "RETRIEVE":
-            return stack + [dictionary[self.variable_name]], dictionary
         else:
             raise NotImplementedError(f"Dictionary Operator {self.value} not implemented.")

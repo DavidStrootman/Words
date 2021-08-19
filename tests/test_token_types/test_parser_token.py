@@ -512,12 +512,6 @@ class TestDictionaryOperatorParserToken:
         # Assert the value from the stack is assigned to the variable
         assert result[1]["X"] == 28
 
-    def test_execute_retrieve(self):
-        operator = DictionaryOperatorParserToken(DebugData(0), "RETRIEVE", "X")
-        result = operator.execute([], {"X": 82})
-        # Assert the value of the variable is placed on the stack
-        assert result[0] == [82]
-
     def test_execute_assign_invalid_stack_size(self):
         """A dictionary operator expects at least one value on the stack."""
         operator = DictionaryOperatorParserToken(DebugData(0), "ASSIGN", "SOME_VAR")

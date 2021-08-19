@@ -9,7 +9,7 @@
     N 1 -                   # Subtract 1 from N
     ASSIGN N                # Assign to N
   REPEAT                    # End of while body
-  RETRIEVE result           # Place value of result on top of stack
+  result                    # Place value of result on top of stack
   RETURN 1 |                # Place n values from local stack onto stack (n is 1 in this case)
 
 1400 summy                  # Call summy function

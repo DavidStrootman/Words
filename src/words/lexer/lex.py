@@ -29,7 +29,7 @@ class Lexer:
         return Lexer._exhaustive_lex(words)
 
     @staticmethod
-    def lex_from_string(line: str):
+    def lex_from_string(line: str) -> Iterator[LexerToken]:
         words: Iterator[Iterator[Word]] = (Lexer._split_line_into_words(0, line) for _ in range(1))
         return Lexer._exhaustive_lex(words)
 

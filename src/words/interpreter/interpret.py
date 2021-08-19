@@ -1,9 +1,9 @@
 from pathlib import Path
 from typing import Optional, Iterator
 
+from words.interpreter.interpret_util import execute_program
 from words.lexer.lex import Lexer
 from words.parser.parse import Program, Parser
-from words.interpreter.interpret_util import execute_program
 from words.token_types.lexer_token import LexerToken
 
 
