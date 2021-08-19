@@ -90,7 +90,7 @@ class DelimLexerToken(LexerToken):
         Delimiter lexer tokens cannot be parsed by themselves. They are parsed by the preceding function token.
 
         :param tokens: The list of lexer tokens, which might be used during parsing of this token depending on it's
-        type.
+         type.
         :return: None
         """
         raise InvalidTokenError(self)

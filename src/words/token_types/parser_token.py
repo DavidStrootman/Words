@@ -126,7 +126,7 @@ class MacroParserToken(ParserToken):
 class WhileParserToken(ParserToken):
     """
     The while token represents a while loop. It holds a predicate that is checked every loop and the statements that
-    should be executed as long as the predicate holds true.
+     should be executed as long as the predicate holds true.
     """
 
     def __init__(self, debug_data: DebugData, predicate: List[ParserToken], statements: List[ParserToken]):
@@ -147,7 +147,7 @@ class WhileParserToken(ParserToken):
         :param dictionary: The dictionary to use for executing the token.
         :return: The stack and dictionary after executing the token.
         :raises InvalidPredicateException: If the predicate does not return a boolean value the while loop cannot know
-        if it should run.
+         if it should run.
         """
         predicate_outcome: bool = exhaustive_interpret_tokens(self.predicate, stack, dictionary)[0][0]
         if not isinstance(predicate_outcome, bool):
@@ -182,7 +182,7 @@ class IfParserToken(ParserToken):
         :param dictionary: The dictionary to use for executing the token.
         :return: The stack and dictionary after executing the token.
         :raises InvalidPredicateException: If the predicate does not return a boolean value the if statement cannot know
-        if it should run.
+         if it should run.
         """
         predicate = stack[-1]
         if not isinstance(predicate, bool):
@@ -220,7 +220,7 @@ class VariableParserToken(ParserToken, DictionaryToken):
         :param dictionary: The dictionary to use for executing the token.
         :return: The stack and dictionary after executing the token.
         :raises IdentifierPreviouslyDefinedException: Since shadowing is not allowed, a variable cannot be defined
-        twice.
+         twice.
         """
         if self.value in dictionary:
             raise IdentifierPreviouslyDefinedException(self)

@@ -1,12 +1,12 @@
 Lexer
 =================================
-.. automodule:: src.lexer
+.. automodule:: words.lexer
     :members:
 
-.. automodule:: src.lexer.lex
+.. automodule:: words.lexer.lex
     :members:
 
 Lex Utils
 =================================
-.. automodule:: src.lexer.lex_util
+.. automodule:: words.lexer.lex_util
     :members:

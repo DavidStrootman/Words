@@ -1,12 +1,12 @@
 Interpreter
 =================================
-.. automodule:: src.interpreter
+.. automodule:: words.interpreter
     :members:
 
-.. automodule:: src.interpreter.interpret
+.. automodule:: words.interpreter.interpret
     :members:
 
 Interpreter Utils
 =================================
-.. automodule:: src.interpreter.interpret_util
+.. automodule:: words.interpreter.interpret_util
     :members:
