@@ -17,6 +17,13 @@ class MissingTokenError(SyntaxError):
         super().__init__(message)
 
 
+class NoReturnTokenError(SyntaxError):
+    """A no return token error is raised whenever no return value is given for a function."""
+    def __init__(self, opening_token: "KeywordLexerToken"):
+        message = f"No RETURN was found for function at line {opening_token.debug_data}."
+        super().__init__(message)
+
+
 class UnexpectedTokenTypeError(SyntaxError):
     """An unexpected token type error is raised whenever a specific token type is expected, but not found."""
     def __init__(self, actual_token: Debuggable, expected_type: TokenTypeEnum):

@@ -344,7 +344,7 @@ class TestFunctionParserToken:
         """If the function was already defined, it cannot be defined again."""
         # Fixture
         initial_state = _execute_from_string(
-            "| DEFINED_FUNC ( ) |"
+            "| DEFINED_FUNC ( ) RETURN 0 |"
         )
         # Assert an exception is raised if the function was previously defined
         function_decl = FunctionParserToken(DebugData(0), "DEFINED_FUNC", [], [])
@@ -377,7 +377,7 @@ class TestFunctionParserToken:
         """Assert all parameters taken are removed from the stack."""
         # Fixture
         function = _parse_from_string(
-            "| FNC ( VALUE X VALUE Y VALUE Z ) |"
+            "| FNC ( VALUE X VALUE Y VALUE Z ) RETURN 0 |"
         )[0]
         # Assert the parsed string returns a function
         assert isinstance(function, FunctionParserToken)
@@ -388,7 +388,7 @@ class TestFunctionParserToken:
         """Assert parameters are setup correctly."""
         # Fixture
         function = _parse_from_string(
-            "| FNC ( VALUE X VALUE Y ) |"
+            "| FNC ( VALUE X VALUE Y ) RETURN 0 |"
         )[0]
         # Assert the parsed string returns a function
         assert isinstance(function, FunctionParserToken)
@@ -399,7 +399,7 @@ class TestFunctionParserToken:
         """If the stack is not large enough to set up parameters an exception should be raised."""
         # Fixture
         function = _parse_from_string(
-            "| FNC ( VALUE X VALUE Y ) |"
+            "| FNC ( VALUE X VALUE Y ) RETURN 0 |"
         )[0]
         # Assert the parsed string returns a function
         assert isinstance(function, FunctionParserToken)

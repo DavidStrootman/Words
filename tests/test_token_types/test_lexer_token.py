@@ -285,19 +285,23 @@ class TestKeywordLexerToken:
             DelimLexerToken(Word("(", DebugData(0))),
             DelimLexerToken(Word(")", DebugData(0))),
             LiteralLexerToken(LiteralLexerToken.Types.NUMBER.value, Word("9", DebugData(0))),
+            KeywordLexerToken(Word("RETURN", DebugData(0))),
+            LiteralLexerToken(LiteralLexerToken.Types.NUMBER.value, Word("0", DebugData(0))),
             KeywordLexerToken(Word("|", DebugData(0)))
         ])
         _assert_token_parse_returns(KeywordLexerToken(Word("|", DebugData(0))), function_token_no_return,
                                     FunctionParserToken)
 
     def test_parse_function_token_no_body(self):
-        """A FUNCTION token should support having no body."""
+        """A FUNCTION token should support having only a return token."""
         function_token_no_body = iter([
             IdentLexerToken(Word("FUNCTION_NAME", DebugData(0))),
             DelimLexerToken(Word("(", DebugData(0))),
             KeywordLexerToken(Word("VALUE", DebugData(0))),
             IdentLexerToken(Word("VALUE_NAME", DebugData(0))),
             DelimLexerToken(Word(")", DebugData(0))),
+            KeywordLexerToken(Word("RETURN", DebugData(0))),
+            LiteralLexerToken(LiteralLexerToken.Types.NUMBER.value, Word("0", DebugData(0))),
             KeywordLexerToken(Word("|", DebugData(0)))
         ])
         _assert_token_parse_returns(KeywordLexerToken(Word("|", DebugData(0))), function_token_no_body,

@@ -17,10 +17,4 @@ if __name__ == '__main__':
 
     sys.setrecursionlimit(4000)
 
-    lexed_tokens: Iterator[LexerToken] = Lexer.lex_file(args.input_file)
-
-    program = Parser.parse(lexed_tokens)
-
-    interpreter_result = Interpreter.interpret(program)
-
-    # TODO: unit testing and integration testing with python counterpart
+    print(Interpreter.interpret_file(args.input_file))

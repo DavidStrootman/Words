@@ -2,7 +2,7 @@ from abc import abstractmethod
 from typing import Iterator, Type, Union
 
 from words.exceptions.lexer_exceptions import UnexpectedTokenError, UnexpectedTokenTypeError, \
-    IncorrectReturnCountError, InvalidTokenError, MissingTokenError
+    IncorrectReturnCountError, InvalidTokenError, MissingTokenError, NoReturnTokenError
 from words.helper.Debuggable import Debuggable
 from words.helper.PrintableABC import PrintableABC
 from words.helper.TokenTypeEnum import TokenTypeEnum
@@ -224,10 +224,12 @@ class KeywordLexerToken(LexerToken):
             try:
                 parameters = eat_until_discarding(tokens, [DelimLexerToken.Types.PAREN_CLOSE])
             except StopIteration:
-                raise MissingTokenError(self, DelimLexerToken.Types.PAREN_CLOSE)
+                raise MissingTokenError(self, DelimLexerToken.Types.PAREN_CLOSE.value)
 
             try:
                 body = eat_until_discarding(tokens, [KeywordLexerToken.Types.FUNCTION])
+                if not any(isinstance(token, ReturnParserToken) for token in body):
+                    raise NoReturnTokenError(self)
             except StopIteration:
                 raise MissingTokenError(self, f"closing \"{KeywordLexerToken.Types.FUNCTION.value}\"")
 

@@ -313,7 +313,7 @@ class FunctionParserToken(ParserToken, DictionaryToken):
         :return: The stack and dictionary after executing the token.
         """
         stripped_stack, parameters = self.setup_parameters(stack, dictionary.copy())
-        new_stack = exhaustive_interpret_tokens(self.body, stripped_stack, parameters)[0]
+        new_stack = stripped_stack + exhaustive_interpret_tokens(self.body, stripped_stack, parameters)[0]
         return new_stack, dictionary
 
     def setup_parameters(self, stack: list, dictionary: dict) -> Tuple[list, dict]:
