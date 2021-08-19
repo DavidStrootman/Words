@@ -8,98 +8,131 @@ Words programming language
 Contains my own programming language "Words".  
 Includes a lexer/parser, an interpreter in python and (hopefully soon) a compiler for Cortex-M0
 
-### Words
+## Words
 
 - Inspired by (the syntax of) Forth
 - Stack based (stack, dictionary, local stack)
 
-Should support:
 
-- Functions/Subroutines
-- Anonymous functions
+## Stack based
+Words is a stack based language. This means that it's operations are done using a stack machine.
+Words consists of two main parts: the stack, and the dictionary. The stack is used to store values, while the dictionary 
+holds variables or functions.  
+All Words code boils down to a few basic operations: changing the state of the stack by removing or adding values,
+creating new variables or changing their values.  
+One main way Words differs from Forth, is that variable retrieval is implicit, making it easier to use variables.
 
-- Goto:  
-  `LABEL mylabel`  
-  `GOTO mylabel`
 
-### Syntax
 
-- [Operators](#Operators):  
-  `X Y ==` -> `x==y`
-- [Stack Manipulation](#Stack Manipulation)  
-  `DUP` -> `X Y -- X Y Y`
-- Functions/Subroutines  
-  `| NAME ( VALUE X, VALUE Y ) X Y == RETURN 1|`  
-- Anonymous functions  
-  `λ ( VALUE X, VALUE Y ) X Y == λ`  
-  Takes the top element of the global stack for every argument and places it in the dictionary
-  
+## Syntax
+All parts of the syntax must be separated with whitespace. There is no limit on the amount or location of line-breaks.
 
-### Keywords
-Keywords must be placed on their own line.
+### Operators
+Words has three types of operators: 
+##### Arithmetic Operators
+Arithmetic operators are used to calculate a new value using the stack. For example, the `-` operator subtracts the
+topmost value from the value beneath it:
+```text
+10 20 -  # place 10 and 20 on the stack and subtract 20 from 10, resulting in -10
+```
+| **Arithmetic Operators** | Syntax | Description         |
+|--------------------------|--------|---------------------|
+| +                        | X Y +  | Add Y and X*        |
+| -                        | X Y -  | Subtracts Y from X* |
+&ast;The result gets placed back on the stack
+##### Boolean Operators
+Boolean operators are used to compare values on the stack, resulting in a boolean value, for example the `>` operator
+compares the second value on the stack with the topmost one.
+```text
+30 7000 >  # place 30 and 7000 on the stack and check if 30 > 7000, resulting in False
+```
+| **Boolean Operators** | Syntax | Description                               |
+|-----------------------|--------|-------------------------------------------|
+| ==                    | X Y == | Check if Y and X are equal*               |
+| \>                    | X Y >  | Check if Y is greater than X*             |
+| <                     | X Y <  | Check if Y is lesser than X*              |
+| >=                    | X Y >= | Check if Y is greater than or equal to X* |
+| <=                    | X Y <= | Check if Y is lesser than or equal to X*  |
+&ast;The result gets placed back on the stack
+
+##### Dictionary Operators
+Dictionary Operators are used to interact with the dictionary. For example the ASSIGN operator assigns the topmost value
+on the stack to the provided variable:
+```text
+VARIABLE X  # create a variable named X
+5           # Place the value 5 on the stack
+ASSIGN X    # Assign 5 to X, removing it from the stack
+```
+| **Dictionary Operators** | Syntax   | Description                                  |
+|--------------------------|----------|----------------------------------------------|
+| ASSIGN                   | ASSIGN X | Assign the topmost value from the stack to X |
+
+### Functions
+Functions in Words behave like in most languages. They are first defined, and can be called later.
+Function syntax is as follows:
+```text
+|                   # Start of function declaration, using a pipe
+SOME_FUNC           # Function name
+(                   # Start of parameters
+VALUE X             # First parameter
+VALUE Y             # Second parameter
+                    # etc.
+)                   # End of parameters
+20 Y + 35 X + +     # Some body for the function
+RETURN              # Return statement
+1                   # Return count (either 1, 2 or 3)
+|                   # End of function declaration, another pipe
+```
+While this is completely valid Words code, it might be more readable to not spread it out so much:
+```text
+| SOME_FUNC ( VALUE X VALUE Y ) 
+20 Y +
+35 X + 
++
+RETURN 1 |
+```
+
+### Loops
+Words supports while loops. While are defined using three keywords:
 #### BEGIN  
 Marks the start of a while loop. It is followed by an expression, and then the `WHILE` keyword
-```python
-BEGIN
-1 0 > # Loop while 1 is greater than 0
-WHILE
-```
+
 #### WHILE  
 Marks the start of the body of a while loop. Is preceded by an expression and followed by a block of code. 
-```python
-1 0 > # Loop while 1 is greater than 0
-WHILE
-1 0 +
-```
+
 #### REPEAT  
 Marks the end of the body of a while loop. Goes back to the BEGIN, and if the following expression holds true, it loops again.
 If the expression is false, it continues with the line below it.
-```python
+```text
 BEGIN
 1 0 > # Loop while 1 is greater than 0
 WHILE
 1 0 +
 REPEAT
 ```
-#### Conditionals (IF ELSE THEN)  
-Conditionals in Words are built up of three keywords: IF, ELSE and THEN. Conditionals work the same way
-as they do in Forth. The IF is preceded by a boolean operator of some sort. If the result is true, the block of code following IF is called.
-If a ELSE block is given, the execution continues at THEN. If the result if false, the else block is called. [Forth documentation](https://www.forth.com/starting-forth/4-conditional-if-then-statements/)
-```python
-12 12 == # Places 12 and 12 on the stack and checks if they are equal
-IF # If the statement is true
-# Do something and go to THEN
-ELSE # If the statement is false
-# Do something else and go to THEN
-THEN
-# Continue here
+### Conditionals (if else)  
+Conditionals in Words are built up of three keywords: IF, ELSE and THEN. The IF requires a boolean value to be on top of
+the stack. If the value on top of the stack is True, the block of code following IF is run. If a ELSE block is given and
+the result is false, the else block is called. After running either of the blocks, the code continues after the THEN 
+keyword.
+```text
+12 12 ==        # Places 12 and 12 on the stack and checks if they are equal
+IF              # If the statement is true
+1 __PRINT__     # print 1
+ELSE            # If the statement is false
+0 __PRINT__     # Do something else and go to THEN
+THEN            # Continue after this line
 ```
-#### VARIABLE
-global and local variables are defined using the `VARIABLE` keyword:
-```python
-VARIABLE count
-```  
-Words uses one dictionary for all variables, both local and global. Shadowing is not allowed, and all variables in functions
-that are not defined in the local scope must be passed as parameters. Using a global variable in a local scope will cause a 
-compile error.
-#### ASSIGN
-The `ASSIGN` keyword assigns the topmost value from the stack to the variable stored in the dictionary:
-```python
-40
-count ASSIGN # Assigns the topmost value (40) to count (= in other languages)
-```
-#### RETURN
-TODO
-### Operators
-Operators take between 0 and 2 arguments, depending on how many should be taken from the stack.
-```python
-20 10 - # subtracts 10 from 20 and places the result on the stack
-10 - # subtracts 10 from the value on the top of the stack and places the result on the stack
-- # If the stack is [5, 20, 30, 10], first takes 10, then 30 and places (30 - 10) back on the stack. 
-```
-The arguments could be seen as extending the stack with new values before executing the opration. For 
-example the expression `20 /`, placing the complete operation between parentheses:  
-if the stack is [10, 20, 30] the operation would be `[10, 20, (30], 20 /)`, taking only 30 from the stack and dividing it by 20.
 
-### Macros
-TODO
+### VARIABLES
+global and local variables are defined using the `VARIABLE` keyword:
+```text
+VARIABLE count
+```
+Words uses one dictionary for all variables, both local and global. Shadowing is not allowed, and all variables in functions
+that are not defined in the local scope must be passed as parameters using the `VALUE` keyword. Using a global variable in a local scope will cause a 
+compile error.
+
+### MACROS
+Macros are used to execute some predefined program. The only implemented macro is the `__PRINT__` macro, which 
+prints the topmost value on the stack to stdout.
