@@ -1,13 +1,9 @@
 #!/usr/bin/env python3
 
-from typing import Iterator
 from argparse import ArgumentParser
 from pathlib import Path
 import sys
 
-from words.lexer.lex import Lexer
-from words.parser.parse import Parser
-from words.token_types.lexer_token import LexerToken
 from words.interpreter.interpret import Interpreter
 
 if __name__ == '__main__':

@@ -24,4 +24,4 @@ class TestExamples:
 
     def test_rec(self, set_up):
         result = Interpreter.interpret_file(Path("examples/words/rec.word"))
-        assert result == True
+        assert result is True

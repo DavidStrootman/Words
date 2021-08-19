@@ -19,7 +19,7 @@ class MissingTokenError(SyntaxError):
 
 class NoReturnTokenError(SyntaxError):
     """A no return token error is raised whenever no return value is given for a function."""
-    def __init__(self, opening_token: "KeywordLexerToken"):
+    def __init__(self, opening_token: "KeywordLexerToken"):  # noqa: F821
         message = f"No RETURN was found for function at line {opening_token.debug_data}."
         super().__init__(message)
 
