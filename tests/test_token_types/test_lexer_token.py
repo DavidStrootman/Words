@@ -2,7 +2,7 @@ from typing import Iterator, Type
 import pytest
 from words.lexer.lex_util import Word, DebugData
 from words.exceptions.lexer_exceptions import InvalidTokenError, MissingTokenError, UnexpectedTokenError, \
-    UnexpectedTokenTypeError, IncorrectReturnCountError
+    UnexpectedTokenTypeError, IncorrectReturnCountError, NoReturnTokenError
 from words.token_types.lexer_token import LexerToken, DelimLexerToken, IdentLexerToken, LiteralLexerToken, \
     KeywordLexerToken, MacroLexerToken, OpLexerToken
 from words.token_types.parser_token import ParserToken, IdentParserToken, WhileParserToken, IfParserToken, \
@@ -107,6 +107,15 @@ class TestKeywordLexerToken:
 
         # Parsing an out of place REPEAT token
         _assert_token_parse_raises(KeywordLexerToken(Word("REPEAT", DebugData(0))), iter([]), InvalidTokenError)
+
+    def test_parse_while_statement_empty_body(self):
+        """A while statement should always have a body to execute, since an empty body would always run forever."""
+        while_statement = iter([
+            LiteralLexerToken(LiteralLexerToken.Types.NUMBER.value, Word("1", DebugData(0))),
+            KeywordLexerToken(Word(KeywordLexerToken.Types.WHILE.value, DebugData(0))),
+            KeywordLexerToken(Word(KeywordLexerToken.Types.REPEAT.value, DebugData(0))),
+        ])
+        _assert_token_parse_raises(KeywordLexerToken(Word("BEGIN", DebugData(0))), while_statement, MissingTokenError)
 
     def test_parse_if_statement_positive(self):
         # Parsing a complete correct IF statement
@@ -268,7 +277,7 @@ class TestKeywordLexerToken:
         _assert_token_parse_raises(KeywordLexerToken(Word("|", DebugData(0))), function_token_no_return,
                                    MissingTokenError)
 
-    def test_parse_function_token_missing_params(self):
+    def test_parse_function_token_missing_param_delims(self):
         """A FUNCTION TOKEN must contain open and closing brackets for parameters."""
         function_token_missing_params = iter([
             IdentLexerToken(Word("FUNCTION_NAME", DebugData(0))),
@@ -320,6 +329,39 @@ class TestKeywordLexerToken:
         ])
         _assert_token_parse_raises(KeywordLexerToken(Word("|", DebugData(0))), function_token_no_closing_bracket,
                                    MissingTokenError)
+
+    def test_parse_function_token_invalid_value(self):
+        """
+        A function must make sure the tokens in the parameter list are actually values.
+        """
+        function_token_invalid_value = iter([
+            IdentLexerToken(Word("FUNCTION_NAME", DebugData(0))),
+            DelimLexerToken(Word("(", DebugData(0))),
+            LiteralLexerToken(LiteralLexerToken.Types.NUMBER.value, Word("1200", DebugData(0))),
+            DelimLexerToken(Word(")", DebugData(0))),
+            LiteralLexerToken(LiteralLexerToken.Types.NUMBER.value, Word("9", DebugData(0))),
+            KeywordLexerToken(Word("RETURN", DebugData(0))),
+            LiteralLexerToken(LiteralLexerToken.Types.NUMBER.value, Word("0", DebugData(0))),
+            KeywordLexerToken(Word("|", DebugData(0)))
+        ])
+        _assert_token_parse_raises(KeywordLexerToken(Word("|", DebugData(0))), function_token_invalid_value,
+                                   RuntimeError)
+
+    def test_parse_function_token_no_return(self):
+        """
+        A function must have a return token.
+        """
+        function_token_no_return = iter([
+            IdentLexerToken(Word("FUNCTION_NAME", DebugData(0))),
+            DelimLexerToken(Word("(", DebugData(0))),
+            KeywordLexerToken(Word("VALUE", DebugData(0))),
+            IdentLexerToken(Word("VALUE_NAME", DebugData(0))),
+            DelimLexerToken(Word(")", DebugData(0))),
+            LiteralLexerToken(LiteralLexerToken.Types.NUMBER.value, Word("9", DebugData(0))),
+            KeywordLexerToken(Word("|", DebugData(0)))
+        ])
+        _assert_token_parse_raises(KeywordLexerToken(Word("|", DebugData(0))), function_token_no_return,
+                                   NoReturnTokenError)
 
     @pytest.mark.xfail(reason="Lambdas are not implemented.")
     def test_parse_lambda_token_positive(self):
