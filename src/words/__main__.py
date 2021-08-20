@@ -13,4 +13,4 @@ if __name__ == '__main__':
 
     sys.setrecursionlimit(4000)
 
-    print(Interpreter.interpret_file(args.input_file))
+    Interpreter.interpret_file(args.input_file)
