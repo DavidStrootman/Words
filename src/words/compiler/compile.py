@@ -1,4 +1,3 @@
-from abc import ABC
 from pathlib import Path
 from typing import Callable, Dict, List, Type, Iterator
 
@@ -21,7 +20,7 @@ class Compiler:
 
         if selected_target not in platform_compilers:
             raise NotImplementedError(f"{target:} not supported")
-        
+
         return platform_compilers[target](ast)
 
     @staticmethod
@@ -58,11 +57,11 @@ class M0Compiler:
     @staticmethod
     def _compile_bss_segment(ast: Program):
         bytes_to_reserve = len(Compiler.find_token_in_ast(ast.tokens, VariableParserToken))
-        
-        bss_segment = f".bss \n" \
-                      f".byte " + ",".join(["0" for byte in range(bytes_to_reserve)]) + "\n" \
-                      f"test:\n" \
-                      f".byte 0"
+
+        bss_segment = ".bss \n" \
+                      ".byte " + ",".join(["0" for byte in range(bytes_to_reserve)]) + "\n" \
+                      "test:\n" \
+                      ".byte 0"
 
         return bss_segment
 

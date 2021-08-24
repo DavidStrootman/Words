@@ -7,7 +7,7 @@ import sys
 
 from words.compiler.compile import Compiler
 from words.interpreter.interpret import Interpreter
-from pathlib import Path
+
 if __name__ == '__main__':
     argument_parser = argparse.ArgumentParser(description="Words programming language.")
     argument_parser.add_argument("input_file", metavar="I", help="Path to the input file.", type=Path)
