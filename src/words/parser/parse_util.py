@@ -5,7 +5,7 @@ from words.token_types.parser_token import ParserToken
 
 class Program:
     """
-    A collection of parser tokens that can be interpreted by the interpreter.
+    A collection of parser tokens that can be interpreted or compiled.
     """
     def __init__(self, tokens: List[ParserToken]):
         self.tokens = tokens
