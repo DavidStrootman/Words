@@ -2,6 +2,7 @@ from collections.abc import Callable
 import inspect
 from typing import List
 
+
 def trace(args: List[str]):
     """
     Print function name and optionally the provided args.
