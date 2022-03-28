@@ -7,6 +7,8 @@ Eigen taal (Words)
 
 Turing-compleet omdat:
 
+Er geen limiet aan de stack, of de parameters die een functie kan meekrijgen zit. Er is random access dmv variabelen. Er
+kan geloopt, er zit ook geen limiet aan de lengte van deze loop.
  
 
 Code is geschreven in functionele stijl. ✓
