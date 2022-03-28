@@ -13,7 +13,7 @@ class TestInterpretUtil:
 
         program = Parser.parse(lexed_tokens)
 
-        assert execute_program(program) == 921
+        assert execute_program(program, init=[]) == 921
 
     def test_return_value_or_none_value(self):
         assert _return_value_or_none(([20], {})) == 20
