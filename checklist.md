@@ -92,3 +92,6 @@ Aan de laatste regel in de trace kun je dus zien waar je syntaxfout zit.
 
 [meerdere parameters] Functies kunnen meerdere parameters meekrijgen
 
+Hoewel het geen specifieke eigenschap van de taal is, heb ik moeite gestopt in het opzetten van het project als een complete
+python package. Dit maakt het gemakkelijk om de code te installeren. Ook is er een CI pipeline en is de code voor het 
+overgrote deel getest. Ook de voorbeeld Words code wordt als integratietest uitgevoerd bij het pushen naar github.

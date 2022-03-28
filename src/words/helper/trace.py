@@ -1,8 +1,8 @@
 from collections.abc import Callable
 import inspect
+from typing import List
 
-
-def trace(args: list[str]):
+def trace(args: List[str]):
     """
     Print function name and optionally the provided args.
     Only works on functions that take no kwargs.
