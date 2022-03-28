@@ -33,4 +33,3 @@ if __name__ == '__main__':
         subprocess.run(["pio", "run", "--environment", "due"], cwd=output_dir / "..")
     else:
         Interpreter.interpret_file(args.input_file, init=init)
-
