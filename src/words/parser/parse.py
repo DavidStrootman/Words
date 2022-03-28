@@ -1,4 +1,5 @@
 from typing import Iterator, List
+from words.helper.trace import trace
 from words.token_types.lexer_token import LexerToken
 from words.parser.parse_util import Program
 
@@ -23,6 +24,7 @@ class Parser:
         return program
 
     @staticmethod
+    @trace(["tokens"])
     def _parse_exhaustive(tokens: Iterator[LexerToken]) -> List["ParserToken"]:  # noqa: F821
         """
         parse parser tokens from iterator until it is empty.

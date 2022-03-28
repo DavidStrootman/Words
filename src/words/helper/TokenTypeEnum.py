@@ -6,4 +6,4 @@ from typing import Tuple
 class TokenTypeEnum(Enum):
     @classmethod
     def values(cls) -> Tuple[any, ...]:
-        return tuple(value.value for value in cls.__members__.values())
+        return tuple(map(lambda value: value.value, cls.__members__.values()))

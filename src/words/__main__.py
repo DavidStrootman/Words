@@ -16,7 +16,7 @@ if __name__ == '__main__':
     args = argument_parser.parse_args()
 
     sys.setrecursionlimit(4000)
-    if "native" in args:
+    if "--native" in args:
         output_dir = Path("src/words/compiler/native_due/src")
 
         src = Compiler.compile_file(args.input_file)

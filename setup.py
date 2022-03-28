@@ -9,5 +9,6 @@ setup(
         'sphinx',
         'pytest',
         'coverage',
+        'platformio'
     ],
 )
