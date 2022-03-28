@@ -22,7 +22,7 @@ Recursie:
 examples/words/rec.word  
 examples/words/fibonacci.word
 
-Goto-statements? Voorbeeld: [file] - [regel]
+Goto-statements? Nee
 
 Lambda-calculus? Voorbeeld:
 Lambdas zijn niet expliciet toegevoegd, maar functions kunnen een voor een over elkaar uitgevoerd worden, wat 
@@ -60,14 +60,14 @@ Functie-parameters kunnen aan de interpreter meegegeven worden door:
 
 een initiele stack mee te geven
 
-Functies kunnen andere functies aanroepen: zie voorbeeld
+Functies kunnen andere functies aanroepen: zie voorbeeld:
 
 examples/words/fibonacci.word - regel 14, 15 (roept zichzelf recursief aan)
 examples/words/rec.word - regel 6, 15
 
 
 Functie resultaat wordt op de volgende manier weergegeven:
-Via de `__PRINT__` macro wordt naar de stdout geschreven
+Via de `__PRINT__` macro kan naar de stdout geschreven worden.
 
  
 
@@ -88,9 +88,7 @@ words.exceptions.lexer_exceptions.InvalidTokenError: Got an invalid token "Types
 ```
 Aan de laatste regel in de trace kun je dus zien waar je syntaxfout zit.
 
-[zelf-recursie] Functies kunnen op zichzelf recursen zoals te zien in het fibonacci voorbeeld.
-[Gekozen functionaliteit] geïmplementeerd door middel van de volgende functies: a) [functie] in [file] op regel [regel]
-[Gekozen functionaliteit] geïmplementeerd door middel van de volgende functies: a) [functie] in [file] op regel [regel]
-[Gekozen functionaliteit] geïmplementeerd door middel van de volgende functies: a) [functie] in [file] op regel [regel]
+[zelf-recursie] Functies kunnen zichzelf recursief aanroepen zoals te zien in het fibonacci voorbeeld.
 
-[Extra functionaliteit overlegd met docent, goedkeuring: datum e-mail; overeengekomen max. aantal punten: X]
+[meerdere parameters] Functies kunnen meerdere parameters meekrijgen
+

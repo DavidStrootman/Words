@@ -13,9 +13,15 @@ if __name__ == '__main__':
     argument_parser.add_argument("input_file", metavar="I", help="Path to the input file.", type=Path)
     argument_parser.add_argument("--native", metavar="N", nargs="?", choices=["arduino_due"],
                                  help="If provided, will compile the program to run natively on target.")
+    argument_parser.add_argument("--init", metavar="S", nargs="+",
+                                 help="If provided, will place the following values in an initial stack")
     args = argument_parser.parse_args()
 
     sys.setrecursionlimit(4000)
+    init = []
+    if "init" in args:
+        init = args.init
+
     if "--native" in args:
         output_dir = Path("src/words/compiler/native_due/src")
 
@@ -26,4 +32,5 @@ if __name__ == '__main__':
 
         subprocess.run(["pio", "run", "--environment", "due"], cwd=output_dir / "..")
     else:
-        Interpreter.interpret_file(args.input_file)
+        Interpreter.interpret_file(args.input_file, init=init)
+

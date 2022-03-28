@@ -1,7 +1,7 @@
 from typing import Dict, List, Tuple, Optional
 
 
-def execute_program(program: "Program") -> Optional[any]:  # noqa: F821
+def execute_program(program: "Program", init: List) -> Optional[any]:  # noqa: F821
     """
     Execute a program.
 
@@ -9,7 +9,7 @@ def execute_program(program: "Program") -> Optional[any]:  # noqa: F821
      directly.
     :return: The return value of the program executed, if any.
     """
-    global_stack = list()
+    global_stack = init
     dictionary = dict()
     result: Tuple[List, Dict] = exhaustive_interpret_tokens(program.tokens, global_stack, dictionary)
 
