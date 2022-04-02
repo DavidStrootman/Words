@@ -10,8 +10,8 @@ from words.interpreter.interpret import Interpreter
 
 if __name__ == '__main__':
     argument_parser = argparse.ArgumentParser(description="Words programming language.")
-    argument_parser.add_argument("input_file", metavar="I", help="Path to the input file.", type=Path)
-    argument_parser.add_argument("--native", metavar="N", nargs="?", choices=["arduino_due"],
+    argument_parser.add_argument("input_file", help="Path to the input file.", type=Path)
+    argument_parser.add_argument("--native", metavar="N", nargs="?", choices=["Cortex-M0"],
                                  help="If provided, will compile the program to run natively on target.")
     argument_parser.add_argument("--init", metavar="S", nargs="+",
                                  help="If provided, will place the following values in an initial stack")
@@ -22,10 +22,10 @@ if __name__ == '__main__':
     if "init" in args:
         init = args.init
 
-    if "--native" in args:
+    if "native" in args:
         output_dir = Path("src/words/compiler/native_due/src")
 
-        src = Compiler.compile_file(args.input_file)
+        src = Compiler.compile_file(args.input_file, target=args.native)
 
         with open(output_dir / "my_words_script.S", "w") as output_file:
             output_file.write(src)
