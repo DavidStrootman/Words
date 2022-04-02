@@ -61,12 +61,10 @@ class M0Compiler:
         bytes_to_reserve = len(Compiler.find_token_in_ast(ast.tokens, VariableParserToken))
 
         bss_segment = (
-                ".bss \n"
-                ".byte " +
-                ",".join(["0" for byte in range(bytes_to_reserve)]) +
-                "\n"
-                "test:\n"
-                ".byte 0")
+            ".bss \n"
+            ".byte " + ",".join(["0" for byte in range(bytes_to_reserve)]) + "\n"
+            "test:\n"
+            ".byte 0")
 
         return bss_segment
 
@@ -76,8 +74,7 @@ class M0Compiler:
             ".global setup, loop\n\n"
         )
         code_segment = (
-            public +
-            "setup: \n"
+            public + "setup: \n"
             "mov r4, lr\n"
             "mov pc, r4\n"
             "loop: \n"
