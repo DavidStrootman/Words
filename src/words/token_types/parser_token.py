@@ -22,7 +22,7 @@ class ParserToken(Debuggable, PrintableABC):
         """
         Execute the token to get the result.
 
-        :param stack: The stack to use fo2r executing the token.
+        :param stack: The stack to use for executing the token.
         :param dictionary: The dictionary to use for executing the token.
         :return: The stack and dictionary after executing the token.
         """
@@ -270,7 +270,7 @@ class IdentParserToken(ParserToken):
 
     def debug_str(self) -> str:
         """A debug string is used for providing better error messages during both parsing and at runtime."""
-        return f"\"{self.value}\" at line {self.debug_data}"
+        return f"identifier \"{self.value}\" at line {self.debug_data}"
 
     def execute(self, stack: list, dictionary: dict) -> Tuple[list, dict]:
         """

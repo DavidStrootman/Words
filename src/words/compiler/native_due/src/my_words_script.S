@@ -6,8 +6,5 @@ test:
 .global setup, loop
 
 setup: 
-mov r4, lr
-mov pc, r4
 loop: 
-mov pc, lr
 

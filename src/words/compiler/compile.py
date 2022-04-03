@@ -5,7 +5,8 @@ from words.lexer.lex import Lexer
 from words.parser.parse import Parser
 from words.parser.parse_util import Program
 from words.token_types.lexer_token import LexerToken
-from words.token_types.parser_token import ParserToken, VariableParserToken
+from words.token_types.parser_token import ParserToken, VariableParserToken, FunctionParserToken, NumberParserToken, \
+    IdentParserToken, MacroParserToken
 
 
 class Compiler:
@@ -69,16 +70,46 @@ class M0Compiler:
         return bss_segment
 
     @staticmethod
+    def _compile_function_token(token) -> str:
+        return ""
+
+    @staticmethod
+    def _compile_number_token(token) -> str:
+        return ""
+
+    @staticmethod
+    def _compile_ident_token(token) -> str:
+        return ""
+
+    @staticmethod
+    def _compile_macro_token(token) -> str:
+        return ""
+
+    @staticmethod
+    def _compile_token(token: ParserToken) -> str:
+        if isinstance(token, FunctionParserToken):
+            return M0Compiler._compile_function_token(token)
+        elif isinstance(token, NumberParserToken):
+            return M0Compiler._compile_number_token(token)
+        elif isinstance(token, IdentParserToken):
+            return M0Compiler._compile_ident_token(token)
+        elif isinstance(token, MacroParserToken):
+            return M0Compiler._compile_macro_token(token)
+        raise RuntimeError(f"Cannot compile token {token.debug_str()}")
+
+
+    @staticmethod
     def _compile_code_segment(ast: Program) -> str:
-        public = (
+        dot_global = (
             ".global setup, loop\n\n"
         )
+        code = []
+        for token in ast.tokens:
+            code = code + [M0Compiler._compile_token(token)]
         code_segment = (
-            public + "setup: \n"
-            "mov r4, lr\n"
-            "mov pc, r4\n"
+            dot_global + "setup: \n"
+                         
             "loop: \n"
-            "mov pc, lr\n"
         )
 
         return code_segment

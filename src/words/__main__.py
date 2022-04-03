@@ -22,7 +22,7 @@ if __name__ == '__main__':
     if "init" in args:
         init = args.init
 
-    if "native" in args:
+    if args.native is not None:
         output_dir = Path("src/words/compiler/native_due/src")
 
         src = Compiler.compile_file(args.input_file, target=args.native)
