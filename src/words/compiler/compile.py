@@ -70,8 +70,19 @@ class M0Compiler:
         return bss_segment
 
     @staticmethod
+    def _asm_instruction_list(inst: str, regs: list[int]):
+        regs_str = ", ".join([f"r{str(reg)}" for reg in regs])
+        return f"push {{{regs_str}}}\n"
+
+    @staticmethod
     def _compile_function_token(token) -> str:
-        return ""
+        output = ""
+        used_registers = []
+        # Reserve parameters
+        used_registers = used_registers + list(range(len(token.parameters)))
+        output = M0Compiler._asm_instruction_list("push", used_registers)
+        x = 3
+
 
     @staticmethod
     def _compile_number_token(token) -> str:
@@ -96,7 +107,6 @@ class M0Compiler:
         elif isinstance(token, MacroParserToken):
             return M0Compiler._compile_macro_token(token)
         raise RuntimeError(f"Cannot compile token {token.debug_str()}")
-
 
     @staticmethod
     def _compile_code_segment(ast: Program) -> str:
