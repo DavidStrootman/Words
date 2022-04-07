@@ -24,3 +24,12 @@ class M0Util:
     def reg_from_val(ident_val: str, used_regs: dict) -> int:
         index = list(used_regs.values()).index(ident_val)
         return index
+
+    boolean_compile_map = {
+        "==": "beq",
+        "!=": "bne",
+        ">=": "bge",
+        "<=": "bls",
+        ">": "bgt",
+        "<": "blt",
+    }

@@ -99,12 +99,14 @@ class M0Compiler:
         output = ""
 
         output += m0.asm_instruction_list("pop", [0, 1])
+        skip_false_if_true_branch = f"true_line{str(token.debug_data)}_{str(uuid.uuid4())[:8]}"
         false_branch = f"false_line{str(token.debug_data)}_{str(uuid.uuid4())[:8]}"
         # TODO: check what comparison instead of only bne
-        output += f"bne {false_branch}\n"
         output += m0.asm_instruction_move(0, 1)
+        output += f"{m0.boolean_compile_map[token.value]} {skip_false_if_true_branch}\n"
         output += f"{false_branch}:\n"
         output += m0.asm_instruction_move(0, 0)
+        output += f"{skip_false_if_true_branch}:\n"
         output += m0.asm_instruction_list("push", [0])
 
         return output
