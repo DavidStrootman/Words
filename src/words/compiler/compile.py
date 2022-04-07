@@ -1,12 +1,14 @@
 from pathlib import Path
 from typing import Callable, Dict, List, Type, Iterator
+import uuid
 
+from words.compiler.compile_util import M0Util as m0
 from words.lexer.lex import Lexer
 from words.parser.parse import Parser
 from words.parser.parse_util import Program
 from words.token_types.lexer_token import LexerToken
 from words.token_types.parser_token import ParserToken, VariableParserToken, FunctionParserToken, NumberParserToken, \
-    IdentParserToken, MacroParserToken
+    IdentParserToken, MacroParserToken, BooleanOperatorParserToken
 
 
 class Compiler:
@@ -64,48 +66,65 @@ class M0Compiler:
         bss_segment = (
             ".bss \n"
             ".byte " + ",".join(["0" for byte in range(bytes_to_reserve)]) + "\n"
-            "test:\n"
-            ".byte 0")
+                                                                             "test:\n"
+                                                                             ".byte 0")
 
         return bss_segment
 
     @staticmethod
-    def _asm_instruction_list(inst: str, regs: list[int]):
-        regs_str = ", ".join([f"r{str(reg)}" for reg in regs])
-        return f"push {{{regs_str}}}\n"
-
-    @staticmethod
-    def _compile_function_token(token) -> str:
+    def _compile_function_token(function_token: FunctionParserToken) -> str:
         output = ""
-        used_registers = []
+        param_regs = {i + 4: prm.value for i, prm in enumerate(function_token.parameters)}
         # Reserve parameters
-        used_registers = used_registers + list(range(len(token.parameters)))
-        output = M0Compiler._asm_instruction_list("push", used_registers)
-        x = 3
 
+        output = output + m0.asm_instruction_list("pop", list(param_regs.keys()))
+
+        for token in function_token.body:
+            M0Compiler._compile_token(token, param_regs)
+
+        return output
 
     @staticmethod
     def _compile_number_token(token) -> str:
-        return ""
+
+        return f"#{token.value}"
 
     @staticmethod
-    def _compile_ident_token(token) -> str:
-        return ""
+    def _compile_ident_token(token, used_regs) -> str:
+        reg_to_push: List[int] = [m0.reg_from_val(token.value, used_regs)]
+        return m0.asm_instruction_list("push", reg_to_push)
+
+    @staticmethod
+    def _compile_boolean_op_token(token, used_regs) -> str:
+        output = ""
+
+        output += m0.asm_instruction_list("pop", [0, 1])
+        false_branch = f"false_line{str(token.debug_data)}_{str(uuid.uuid4())[:8]}"
+        # TODO: check what comparison instead of only bne
+        output += f"bne {false_branch}\n"
+        output += m0.asm_instruction_move(0, 1)
+        output += f"{false_branch}:\n"
+        output += m0.asm_instruction_move(0, 0)
+        output += m0.asm_instruction_list("push", [0])
+
+        return output
 
     @staticmethod
     def _compile_macro_token(token) -> str:
         return ""
 
     @staticmethod
-    def _compile_token(token: ParserToken) -> str:
+    def _compile_token(token: ParserToken, used_regs: dict) -> str:
         if isinstance(token, FunctionParserToken):
             return M0Compiler._compile_function_token(token)
         elif isinstance(token, NumberParserToken):
             return M0Compiler._compile_number_token(token)
         elif isinstance(token, IdentParserToken):
-            return M0Compiler._compile_ident_token(token)
+            return M0Compiler._compile_ident_token(token, used_regs)
         elif isinstance(token, MacroParserToken):
             return M0Compiler._compile_macro_token(token)
+        elif isinstance(token, BooleanOperatorParserToken):
+            return M0Compiler._compile_boolean_op_token(token, used_regs)
         raise RuntimeError(f"Cannot compile token {token.debug_str()}")
 
     @staticmethod
@@ -115,11 +134,11 @@ class M0Compiler:
         )
         code = []
         for token in ast.tokens:
-            code = code + [M0Compiler._compile_token(token)]
+            code = code + [M0Compiler._compile_token(token, {}), ]
         code_segment = (
             dot_global + "setup: \n"
-                         
-            "loop: \n"
+
+                         "loop: \n"
         )
 
         return code_segment

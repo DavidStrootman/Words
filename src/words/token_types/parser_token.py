@@ -317,6 +317,7 @@ class FunctionParserToken(ParserToken, DictionaryToken):
     A function parser token represents a function. It can be executed to place it in the dictionary and visited to run
      the statements in the body of the function.
     """
+
     def __init__(self, debug_data: DebugData, name: str, parameters: List[ParserToken], body: List[ParserToken]):
         super().__init__(debug_data)
 
@@ -378,6 +379,7 @@ class ArithmeticOperatorParserToken(ParserToken):
     An arithmetic operator parser token represents an arithmetic operation. For example the addition operation. It holds
     both the type of operation, as well as the values it will operate on.
     """
+
     def __init__(self, debug_data: DebugData, value: str):
         super().__init__(debug_data)
         self.value = value
@@ -409,6 +411,7 @@ class BooleanOperatorParserToken(ParserToken):
     An boolean operator parser token represents a boolean operation. For example the equality operation. It holds
     both the type of operation, as well as the values it will operate on.
     """
+
     def __init__(self, debug_data: DebugData, value: str):
         super().__init__(debug_data)
 
@@ -457,6 +460,7 @@ class DictionaryOperatorParserToken(ParserToken):
     with the dictionary. For example the assign operator assigns the top value from the stack to the provided
     identifier in the dictionary.
     """
+
     def __init__(self, debug_data: DebugData, value: str, variable_name: str):
         super().__init__(debug_data)
 
