@@ -1,3 +1,6 @@
+from typing import Optional
+
+
 class M0Util:
     @staticmethod
     def asm_reg(reg: int):
@@ -37,6 +40,24 @@ class M0Util:
     @staticmethod
     def asm_branch(target: str) -> str:
         return f"b {target}\n"
+
+    @staticmethod
+    def asm_arithmetic(inst: str, reg1: int,
+                       reg2: int,
+                       *,
+                       reg3: Optional[int] = None,
+                       immed3: Optional[int] = None,
+                       immed8: Optional[int] = None):
+        if not any([reg3, immed3, immed8]):
+            raise RuntimeError("Expected some third parameter for asm arithmetic instruction.")
+        if bool(reg3) + bool(immed3) + bool(immed8) > 1:
+            raise RuntimeError("Too many keyword arguments for asm arithmetic instruction.")
+        # TODO: Fix this
+        if reg3 is not None:
+            return f"{inst}, {M0Util.asm_reg(reg1)}, {M0Util.asm_reg(reg2)}, {M0Util.asm_reg(reg3)}"
+
+        immed = immed3 or immed8
+        return f"{inst}, {M0Util.asm_reg(reg1)}, {M0Util.asm_reg(reg2)}, #{immed}"
 
     @staticmethod
     def reg_from_val(ident_val: str, used_regs: dict) -> int:
