@@ -1,0 +1,10 @@
+| TEST_IF ( )
+  1 1 ==
+  IF
+  43
+  ELSE
+  45
+  THEN
+  RETURN 1 |
+ 35 TEST_IF
+__PRINT__

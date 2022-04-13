@@ -30,6 +30,7 @@ if __name__ == '__main__':
         with open(output_dir / "my_words_script.S", "w") as output_file:
             output_file.write(src)
 
-        subprocess.run(["pio", "run", "--environment", "due"], cwd=output_dir / "..")
+        subprocess.run(["pio", "run", "--environment", "due", "--target", "upload", "--upload-port", "/dev/ttyACM0"],
+                       cwd=output_dir / "..")
     else:
         Interpreter.interpret_file(args.input_file, init=init)
