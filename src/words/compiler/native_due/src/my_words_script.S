@@ -6,7 +6,7 @@
 
 setup: 
 bl serial_begin
-mov r0, #3
+mov r0, #2
 push { r0 }
 mov r0, #2
 push { r0 }
@@ -18,77 +18,79 @@ push { r0 }
 @ Start of function ACKERMANN at line 0
 b ACKERMANN_end 
 ACKERMANN:
-pop { r4, r5 }
-push { lr }
-bl blink_led
+mov r5, lr
+pop { r3, r4 }
+push { r5 }
+push { r3, r4 }
+push { r3 }
+mov r0, #0
+push { r0 }
+pop { r1, r2 }
+mov r0, #1
+cmp r2, r1
+beq true_line2_2b72d160
+false_line2_8fb91504:
+mov r0, #0
+true_line2_2b72d160:
+push { r0 }
+pop { r0 }
+cmp r0, #0
+beq else_body_of_if_on_line3_d37bf7f7
+if_body_of_if_on_line3_d37bf7f7:
+push { r4 }
+mov r0, #1
+push { r0 }
+pop { r0, r1 }
+add r0, r1, r0
+push { r0 }
+b end_if_on_line3_d37bf7f7
+else_body_of_if_on_line3_d37bf7f7:
 push { r4 }
 mov r0, #0
 push { r0 }
 pop { r1, r2 }
-mov r3, #1
-cmp r2, r1
-beq true_line2_d5debf32
-false_line2_5358fdf6:
-mov r3, #0
-true_line2_d5debf32:
-push { r3 }
-pop { r3 }
-cmp r3, #0
-beq else_body_of_if_on_line3_2109a18b
-if_body_of_if_on_line3_2109a18b:
-push { r5 }
 mov r0, #1
-push { r0 }
-pop { r0, r1 }
-add r0, r0, r1
-push { r0 }
-b end_if_on_line3_2109a18b
-else_body_of_if_on_line3_2109a18b:
-push { r5 }
+cmp r2, r1
+beq true_line6_f86776b8
+false_line6_4e192073:
 mov r0, #0
+true_line6_f86776b8:
 push { r0 }
-pop { r1, r2 }
-mov r3, #1
-cmp r2, r1
-beq true_line6_f979a256
-false_line6_2d595c15:
-mov r3, #0
-true_line6_f979a256:
+pop { r0 }
+cmp r0, #0
+beq else_body_of_if_on_line7_e90d3edb
+if_body_of_if_on_line7_e90d3edb:
+mov r0, #1
+push { r0 }
 push { r3 }
-pop { r3 }
-cmp r3, #0
-beq else_body_of_if_on_line7_7d9f457d
-if_body_of_if_on_line7_7d9f457d:
 mov r0, #1
 push { r0 }
+pop { r0, r1 }
+sub r0, r1, r0
+push { r0 }
+bl ACKERMANN
+b end_if_on_line7_e90d3edb
+else_body_of_if_on_line7_e90d3edb:
 push { r4 }
 mov r0, #1
 push { r0 }
 pop { r0, r1 }
-sub r0, r0, r1
+sub r0, r1, r0
 push { r0 }
+push { r3 }
 bl ACKERMANN
-b end_if_on_line7_7d9f457d
-else_body_of_if_on_line7_7d9f457d:
-push { r5 }
+push { r3 }
 mov r0, #1
 push { r0 }
 pop { r0, r1 }
-sub r0, r0, r1
-push { r0 }
-push { r4 }
-bl ACKERMANN
-push { r4 }
-mov r0, #1
-push { r0 }
-pop { r0, r1 }
-sub r0, r0, r1
+sub r0, r1, r0
 push { r0 }
 bl ACKERMANN
-end_if_on_line7_7d9f457d:
-end_if_on_line3_2109a18b:
-@ Flip output and lr.
+end_if_on_line7_e90d3edb:
+end_if_on_line3_d37bf7f7:
+@ r6 holds return, r7 holds lr
 pop { r6 }
+pop { r3, r4 }
 pop { r7 }
 push { r6 }
 mov pc, r7

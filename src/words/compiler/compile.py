@@ -65,9 +65,9 @@ class M0Compiler:
         bytes_to_reserve = len(Compiler.find_token_in_ast(ast.tokens, VariableParserToken))
 
         bss_segment = (
-            ".bss \n"
-            ".byte " + ",".join(["0" for byte in range(bytes_to_reserve)]) + "\n"
-                                                                             ".byte 0")
+                ".bss \n"
+                ".byte " + ",".join(["0" for byte in range(bytes_to_reserve)]) + "\n"
+                                                                                 ".byte 0")
 
         return bss_segment
 
@@ -83,15 +83,26 @@ class M0Compiler:
         param_regs = {}
         # Reserve parameters
         if function_token.parameters:
-            param_regs = {i + 4: prm.value for i, prm in enumerate(function_token.parameters)}
-            output = output + m0.asm_instruction_list("pop", list(param_regs.keys()))
-
-        output += m0.asm_push_lr()
-
-        output += "bl blink_led\n"
+            param_regs = {i + 3: prm.value for i, prm in enumerate(function_token.parameters)}
+            output += m0.asm_instruction_move_lr_into(5)
+            output += m0.asm_instruction_list("pop", list(param_regs.keys()))
+            output += m0.asm_instruction_list("push", [5])
+            output += m0.asm_instruction_list("push", list(param_regs.keys()))
+        else:
+            output += m0.asm_push_lr()
 
         for token in function_token.body:
             output += M0Compiler._compile_token(token, param_regs)
+
+        # r6 holds return, r7 holds lr
+        output += m0.asm_comment("r6 holds return, r7 holds lr")
+        output += m0.asm_instruction_list("pop", [6])
+        output += m0.asm_instruction_list("pop", list(param_regs.keys()))
+        output += m0.asm_instruction_list("pop", [7])
+        # Place output on stack
+        output += m0.asm_instruction_list("push", [6])
+
+        output += m0.asm_instruction_move_into_pc(7)
 
         output += f"{func_end}:\n"
         output += m0.asm_comment(f"End of function {function_token.name} at line {function_token.debug_data.line}")
@@ -104,12 +115,17 @@ class M0Compiler:
 
     @staticmethod
     def _compile_ident_token(token, used_regs) -> str:
+        output = ""
+
         if token.value not in used_regs.values():
             # It must be a function (or some undefined identifier)
-            return m0.asm_branch_link(token.value)
-        # It is a parameter or variable
-        reg_to_push: List[int] = [m0.reg_from_val(token.value, used_regs)]
-        return m0.asm_instruction_list("push", reg_to_push)
+            output += m0.asm_branch_link(token.value)
+        else:
+            # It is a parameter or variable
+            reg_to_push: List[int] = [m0.reg_from_val(token.value, used_regs)]
+            output += m0.asm_instruction_list("push", reg_to_push)
+
+        return output
 
     @staticmethod
     def _compile_boolean_op_token(token) -> str:
@@ -118,13 +134,13 @@ class M0Compiler:
         output += m0.asm_instruction_list("pop", [1, 2])
         skip_false_if_true_branch = f"true_line{str(token.debug_data)}_{str(uuid.uuid4())[:8]}"
         false_branch = f"false_line{str(token.debug_data)}_{str(uuid.uuid4())[:8]}"
-        output += m0.asm_instruction_move(dest_reg=3, immed8=1)
+        output += m0.asm_instruction_move(dest_reg=0, immed8=1)
         output += m0.asm_instruction_cmp_reg(2, 1)
         output += f"{m0.boolean_compile_map[token.value]} {skip_false_if_true_branch}\n"
         output += f"{false_branch}:\n"
-        output += m0.asm_instruction_move(dest_reg=3, immed8=0)
+        output += m0.asm_instruction_move(dest_reg=0, immed8=0)
         output += f"{skip_false_if_true_branch}:\n"
-        output += m0.asm_instruction_list("push", [3])
+        output += m0.asm_instruction_list("push", [0])
 
         return output
 
@@ -145,8 +161,8 @@ class M0Compiler:
         else_branch = f"else_body_of_if_on_line{str(if_token.debug_data)}_{if_uuid}"
         end_of_if = f"end_if_on_line{str(if_token.debug_data)}_{if_uuid}"
 
-        output += m0.asm_instruction_list("pop", [3])
-        output += m0.asm_instruction_cmp_immed(3, 0)
+        output += m0.asm_instruction_list("pop", [0])
+        output += m0.asm_instruction_cmp_immed(0, 0)
         output += f"beq {else_branch}\n"
         output += f"if_body_of_if_on_line{str(if_token.debug_data)}_{if_uuid}:\n"
         for token in if_token.if_body:
@@ -161,14 +177,7 @@ class M0Compiler:
 
     @staticmethod
     def _compile_return_token(token, used_regs) -> str:
-        output = ""
-        # 6 holds return, 7 holds lr
-        output += m0.asm_comment("Flip output and lr.")
-        output += m0.asm_instruction_list("pop", [6])
-        output += m0.asm_instruction_list("pop", [7])
-        output += m0.asm_instruction_list("push", [6])
-        output += m0.asm_instruction_move_pc(7)
-        return output
+        return ""
 
     @staticmethod
     def _compile_boolean_token(token: BooleanParserToken) -> str:
@@ -183,7 +192,7 @@ class M0Compiler:
         # Pop 2 values
         output += m0.asm_instruction_list("pop", [0, 1])
         # Do some arithmetic
-        output += f"{m0.arithmetic_compile_map[token.value]} {m0.reg(0)}, {m0.reg(0)}, {m0.reg(1)}\n"
+        output += f"{m0.arithmetic_compile_map[token.value]} {m0.reg(0)}, {m0.reg(1)}, {m0.reg(0)}\n"
         # Push the new value
         output += m0.asm_instruction_list("push", [0])
 

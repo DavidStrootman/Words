@@ -15,8 +15,16 @@ class M0Util:
         return f"mov {M0Util.reg(dest_reg)}, #{immed8}\n"
 
     @staticmethod
-    def asm_instruction_move_pc(reg: int):
+    def asm_instruction_move_reg(dest_reg: int, from_reg: int) -> str:
+        return f"mov {M0Util.reg(dest_reg)}, {M0Util.reg(from_reg)}\n"
+
+    @staticmethod
+    def asm_instruction_move_into_pc(reg: int):
         return f"mov pc, {M0Util.reg(reg)}\n"
+
+    @staticmethod
+    def asm_instruction_move_lr_into(reg: int):
+        return f"mov {M0Util.reg(reg)}, lr\n"
 
     @staticmethod
     def asm_instruction_cmp_immed(cmp_reg: int, immed8: int):
@@ -42,6 +50,13 @@ class M0Util:
     @staticmethod
     def asm_push_lr() -> str:
         return "push { lr }\n"
+
+    @staticmethod
+    def asm_push_regs_lr(regs: list[int]) -> str:
+        output = ""
+        regs_str = ", ".join([M0Util.reg(reg) for reg in regs])
+        output += "push { lr }\n"
+        output += f"push {{ {regs_str} }}\n"
 
     @staticmethod
     def asm_pop_pc() -> str:
@@ -90,7 +105,7 @@ class M0Util:
 
     @staticmethod
     def reg_from_val(ident_val: str, used_regs: dict) -> int:
-        index = list(used_regs.values()).index(ident_val) + 4
+        index = list(used_regs.values()).index(ident_val) + 3
         return index
 
     boolean_compile_map = {
