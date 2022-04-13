@@ -65,9 +65,9 @@ class M0Compiler:
         bytes_to_reserve = len(Compiler.find_token_in_ast(ast.tokens, VariableParserToken))
 
         bss_segment = (
-                ".bss \n"
-                ".byte " + ",".join(["0" for byte in range(bytes_to_reserve)]) + "\n"
-                                                                                 ".byte 0")
+            ".bss \n"
+            ".byte " + ",".join(["0" for byte in range(bytes_to_reserve)]) + "\n"
+                                                                             ".byte 0")
 
         return bss_segment
 
@@ -80,7 +80,6 @@ class M0Compiler:
         output += f"b {func_end} \n"
         output += f"{function_token.name}:\n"
 
-
         param_regs = {}
         # Reserve parameters
         if function_token.parameters:
@@ -89,7 +88,7 @@ class M0Compiler:
 
         output += m0.asm_push_lr()
 
-        output += f"bl blink_led\n"
+        output += "bl blink_led\n"
 
         for token in function_token.body:
             output += M0Compiler._compile_token(token, param_regs)
@@ -242,7 +241,6 @@ class M0Compiler:
                 code_segment
             ]
         )
-        # return cpu_directive + ".global setup, loop\n\n" + "setup: \n\nbl serial_begin \nloop: \nldr r0, =212 \nbl print_num\nb loop"
 
 
 platform_compilers: Dict[str, Callable[[Program], str]] = {
