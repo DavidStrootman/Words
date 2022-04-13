@@ -73,6 +73,7 @@ class M0Compiler:
 
     @staticmethod
     def _compile_function_token(function_token: FunctionParserToken) -> str:
+        # TODO: Fix param regs getting popped too early ( before push)
         output = ""
         func_end = function_token.name + "_end"
         output += "\n"
@@ -85,9 +86,14 @@ class M0Compiler:
         if function_token.parameters:
             param_regs = {i + 3: prm.value for i, prm in enumerate(function_token.parameters)}
             output += m0.asm_instruction_move_lr_into(5)
-            output += m0.asm_instruction_list("pop", list(param_regs.keys()))
+            for reg in param_regs.keys():
+                output += m0.asm_instruction_move_reg(reg + 5, reg)
+                output += m0.asm_instruction_list("pop", [reg])
+
             output += m0.asm_instruction_list("push", [5])
-            output += m0.asm_instruction_list("push", list(param_regs.keys()))
+            for reg in param_regs.keys():
+                output += m0.asm_instruction_move_reg(0, reg + 5)
+                output += m0.asm_instruction_list("push", [0])
         else:
             output += m0.asm_push_lr()
 
@@ -192,9 +198,9 @@ class M0Compiler:
         # Pop 2 values
         output += m0.asm_instruction_list("pop", [0, 1])
         # Do some arithmetic
-        output += f"{m0.arithmetic_compile_map[token.value]} {m0.reg(0)}, {m0.reg(1)}, {m0.reg(0)}\n"
+        output += f"{m0.arithmetic_compile_map[token.value]} {m0.reg(1)}, {m0.reg(1)}, {m0.reg(0)}\n"
         # Push the new value
-        output += m0.asm_instruction_list("push", [0])
+        output += m0.asm_instruction_list("push", [1])
 
         return output
 
