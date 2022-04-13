@@ -65,9 +65,9 @@ class M0Compiler:
         bytes_to_reserve = len(Compiler.find_token_in_ast(ast.tokens, VariableParserToken))
 
         bss_segment = (
-                ".bss \n"
-                ".byte " + ",".join(["0" for byte in range(bytes_to_reserve)]) + "\n"
-                                                                                 ".byte 0")
+            ".bss \n"
+            ".byte " + ",".join(["0" for byte in range(bytes_to_reserve)]) + "\n"
+                                                                             ".byte 0")
 
         return bss_segment
 
