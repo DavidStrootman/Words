@@ -119,5 +119,6 @@ class M0Util:
 
     arithmetic_compile_map = {
         "+": "add",
-        "-": "sub"
+        "-": "sub",
+        "*": "mul",
     }
