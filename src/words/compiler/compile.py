@@ -87,23 +87,27 @@ class M0Compiler:
             param_regs = {i + 3: prm.value for i, prm in enumerate(function_token.parameters)}
             output += m0.asm_instruction_move_lr_into(5)
             for reg in param_regs.keys():
-                output += m0.asm_instruction_move_reg(reg + 5, reg)
-                output += m0.asm_instruction_list("pop", [reg])
+                output += m0.asm_instruction_move_reg(reg - 2, reg)
+            output += m0.asm_instruction_list("pop", list(param_regs.keys()))
 
             output += m0.asm_instruction_list("push", [5])
             for reg in param_regs.keys():
-                output += m0.asm_instruction_move_reg(0, reg + 5)
-                output += m0.asm_instruction_list("push", [0])
+                output += m0.asm_instruction_list("push", [reg - 2])
+            output += "\n"
         else:
-            output += m0.asm_push_lr()
+            output += m0.asm_push_lr() + "\n"
 
+        output += m0.asm_comment("Function body:")
         for token in function_token.body:
             output += M0Compiler._compile_token(token, param_regs)
 
         # r6 holds return, r7 holds lr
-        output += m0.asm_comment("r6 holds return, r7 holds lr")
+        output += "\n"
+        output += m0.asm_comment("Function end cleanup:")
+        output += m0.asm_comment("return value, assuming function solves:")
         output += m0.asm_instruction_list("pop", [6])
         output += m0.asm_instruction_list("pop", list(param_regs.keys()))
+        output += m0.asm_comment("link register:")
         output += m0.asm_instruction_list("pop", [7])
         # Place output on stack
         output += m0.asm_instruction_list("push", [6])
@@ -111,7 +115,7 @@ class M0Compiler:
         output += m0.asm_instruction_move_into_pc(7)
 
         output += f"{func_end}:\n"
-        output += m0.asm_comment(f"End of function {function_token.name} at line {function_token.debug_data.line}")
+        output += m0.asm_comment(f"End of function {function_token.name} at line {function_token.debug_data.line}\n")
 
         return output
 

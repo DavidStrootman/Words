@@ -35,26 +35,27 @@ push { r0 }
 b FIBONACCI_end 
 FIBONACCI:
 mov r5, lr
-mov r8, r3
+mov r1, r3
 pop { r3 }
 push { r5 }
-mov r0, r8
-push { r0 }
+push { r1 }
+
+@ Function body:
 push { r3 }
 mov r0, #0
 push { r0 }
 pop { r1, r2 }
 mov r0, #1
 cmp r2, r1
-blt true_line2_d5c4bdd9
-false_line2_c14ed9ac:
+blt true_line2_d23cbdd6
+false_line2_ec34894d:
 mov r0, #0
-true_line2_d5c4bdd9:
+true_line2_d23cbdd6:
 push { r0 }
 pop { r0 }
 cmp r0, #0
-beq else_body_of_if_on_line3_56773126
-if_body_of_if_on_line3_56773126:
+beq else_body_of_if_on_line3_30004883
+if_body_of_if_on_line3_30004883:
 mov r0, #0
 push { r0 }
 mov r0, #1
@@ -62,65 +63,65 @@ push { r0 }
 pop { r0, r1 }
 sub r1, r1, r0
 push { r1 }
-b end_if_on_line3_56773126
-else_body_of_if_on_line3_56773126:
+b end_if_on_line3_30004883
+else_body_of_if_on_line3_30004883:
 push { r3 }
 mov r0, #0
 push { r0 }
 pop { r1, r2 }
 mov r0, #1
 cmp r2, r1
-beq true_line6_35d67a51
-false_line6_781de5c3:
+beq true_line6_08e934b9
+false_line6_1d0cc3a8:
 mov r0, #0
-true_line6_35d67a51:
+true_line6_08e934b9:
 push { r0 }
 pop { r0 }
 cmp r0, #0
-beq else_body_of_if_on_line7_fe359b4a
-if_body_of_if_on_line7_fe359b4a:
+beq else_body_of_if_on_line7_7319c0f4
+if_body_of_if_on_line7_7319c0f4:
 mov r0, #0
 push { r0 }
-b end_if_on_line7_fe359b4a
-else_body_of_if_on_line7_fe359b4a:
+b end_if_on_line7_7319c0f4
+else_body_of_if_on_line7_7319c0f4:
 push { r3 }
 mov r0, #1
 push { r0 }
 pop { r1, r2 }
 mov r0, #1
 cmp r2, r1
-beq true_line10_b98342fd
-false_line10_f41899ec:
+beq true_line10_a81d3663
+false_line10_190d0f00:
 mov r0, #0
-true_line10_b98342fd:
+true_line10_a81d3663:
 push { r0 }
 pop { r0 }
 cmp r0, #0
-beq else_body_of_if_on_line11_21b0d6bf
-if_body_of_if_on_line11_21b0d6bf:
+beq else_body_of_if_on_line11_4369da5c
+if_body_of_if_on_line11_4369da5c:
 mov r0, #1
 push { r0 }
-b end_if_on_line11_21b0d6bf
-else_body_of_if_on_line11_21b0d6bf:
+b end_if_on_line11_4369da5c
+else_body_of_if_on_line11_4369da5c:
 push { r3 }
 mov r0, #2
 push { r0 }
 pop { r1, r2 }
 mov r0, #1
 cmp r2, r1
-beq true_line14_3ee9148b
-false_line14_1e1bd443:
+beq true_line14_5257d35a
+false_line14_a2ce6843:
 mov r0, #0
-true_line14_3ee9148b:
+true_line14_5257d35a:
 push { r0 }
 pop { r0 }
 cmp r0, #0
-beq else_body_of_if_on_line15_02a12eb7
-if_body_of_if_on_line15_02a12eb7:
+beq else_body_of_if_on_line15_73674a76
+if_body_of_if_on_line15_73674a76:
 mov r0, #1
 push { r0 }
-b end_if_on_line15_02a12eb7
-else_body_of_if_on_line15_02a12eb7:
+b end_if_on_line15_73674a76
+else_body_of_if_on_line15_73674a76:
 push { r3 }
 mov r0, #1
 push { r0 }
@@ -138,18 +139,22 @@ bl FIBONACCI
 pop { r0, r1 }
 add r1, r1, r0
 push { r1 }
-end_if_on_line15_02a12eb7:
-end_if_on_line11_21b0d6bf:
-end_if_on_line7_fe359b4a:
-end_if_on_line3_56773126:
-@ r6 holds return, r7 holds lr
+end_if_on_line15_73674a76:
+end_if_on_line11_4369da5c:
+end_if_on_line7_7319c0f4:
+end_if_on_line3_30004883:
+
+@ Function end cleanup:
+@ return value, assuming function solves:
 pop { r6 }
 pop { r3 }
+@ link register:
 pop { r7 }
 push { r6 }
 mov pc, r7
 FIBONACCI_end:
 @ End of function FIBONACCI at line 0
+
 loop: 
 b loop
  
