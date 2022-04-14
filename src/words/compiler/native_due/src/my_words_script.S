@@ -47,102 +47,102 @@ push { r0 }
 pop { r1, r2 }
 mov r0, #1
 cmp r2, r1
-blt true_line2_d23cbdd6
-false_line2_ec34894d:
+blt true_line2_496bba12
+false_line2_464a0669:
 mov r0, #0
-true_line2_d23cbdd6:
+true_line2_496bba12:
 push { r0 }
 pop { r0 }
 cmp r0, #0
-beq else_body_of_if_on_line3_30004883
-if_body_of_if_on_line3_30004883:
+beq else_body_of_if_on_line3_d2ac7e80
+if_body_of_if_on_line3_d2ac7e80:
 mov r0, #0
 push { r0 }
 mov r0, #1
 push { r0 }
 pop { r0, r1 }
-sub r1, r1, r0
-push { r1 }
-b end_if_on_line3_30004883
-else_body_of_if_on_line3_30004883:
+sub r0, r1, r0
+push { r0 }
+b end_if_on_line3_d2ac7e80
+else_body_of_if_on_line3_d2ac7e80:
 push { r3 }
 mov r0, #0
 push { r0 }
 pop { r1, r2 }
 mov r0, #1
 cmp r2, r1
-beq true_line6_08e934b9
-false_line6_1d0cc3a8:
+beq true_line6_1d312c24
+false_line6_6c02750b:
 mov r0, #0
-true_line6_08e934b9:
+true_line6_1d312c24:
 push { r0 }
 pop { r0 }
 cmp r0, #0
-beq else_body_of_if_on_line7_7319c0f4
-if_body_of_if_on_line7_7319c0f4:
+beq else_body_of_if_on_line7_d6c27de3
+if_body_of_if_on_line7_d6c27de3:
 mov r0, #0
 push { r0 }
-b end_if_on_line7_7319c0f4
-else_body_of_if_on_line7_7319c0f4:
+b end_if_on_line7_d6c27de3
+else_body_of_if_on_line7_d6c27de3:
 push { r3 }
 mov r0, #1
 push { r0 }
 pop { r1, r2 }
 mov r0, #1
 cmp r2, r1
-beq true_line10_a81d3663
-false_line10_190d0f00:
+beq true_line10_5afdc7ab
+false_line10_ff0ab482:
 mov r0, #0
-true_line10_a81d3663:
+true_line10_5afdc7ab:
 push { r0 }
 pop { r0 }
 cmp r0, #0
-beq else_body_of_if_on_line11_4369da5c
-if_body_of_if_on_line11_4369da5c:
+beq else_body_of_if_on_line11_4ff0df76
+if_body_of_if_on_line11_4ff0df76:
 mov r0, #1
 push { r0 }
-b end_if_on_line11_4369da5c
-else_body_of_if_on_line11_4369da5c:
+b end_if_on_line11_4ff0df76
+else_body_of_if_on_line11_4ff0df76:
 push { r3 }
 mov r0, #2
 push { r0 }
 pop { r1, r2 }
 mov r0, #1
 cmp r2, r1
-beq true_line14_5257d35a
-false_line14_a2ce6843:
+beq true_line14_6fa14bfc
+false_line14_65c45751:
 mov r0, #0
-true_line14_5257d35a:
+true_line14_6fa14bfc:
 push { r0 }
 pop { r0 }
 cmp r0, #0
-beq else_body_of_if_on_line15_73674a76
-if_body_of_if_on_line15_73674a76:
+beq else_body_of_if_on_line15_3485e10b
+if_body_of_if_on_line15_3485e10b:
 mov r0, #1
 push { r0 }
-b end_if_on_line15_73674a76
-else_body_of_if_on_line15_73674a76:
+b end_if_on_line15_3485e10b
+else_body_of_if_on_line15_3485e10b:
 push { r3 }
 mov r0, #1
 push { r0 }
 pop { r0, r1 }
-sub r1, r1, r0
-push { r1 }
+sub r0, r1, r0
+push { r0 }
 bl FIBONACCI
 push { r3 }
 mov r0, #2
 push { r0 }
 pop { r0, r1 }
-sub r1, r1, r0
-push { r1 }
+sub r0, r1, r0
+push { r0 }
 bl FIBONACCI
 pop { r0, r1 }
-add r1, r1, r0
-push { r1 }
-end_if_on_line15_73674a76:
-end_if_on_line11_4369da5c:
-end_if_on_line7_7319c0f4:
-end_if_on_line3_30004883:
+add r0, r1, r0
+push { r0 }
+end_if_on_line15_3485e10b:
+end_if_on_line11_4ff0df76:
+end_if_on_line7_d6c27de3:
+end_if_on_line3_d2ac7e80:
 
 @ Function end cleanup:
 @ return value, assuming function solves:

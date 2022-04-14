@@ -73,7 +73,6 @@ class M0Compiler:
 
     @staticmethod
     def _compile_function_token(function_token: FunctionParserToken) -> str:
-        # TODO: Fix param regs getting popped too early ( before push)
         output = ""
         func_end = function_token.name + "_end"
         output += "\n"
@@ -91,15 +90,13 @@ class M0Compiler:
             output += m0.asm_instruction_list("pop", list(param_regs.keys()))
 
             output += m0.asm_instruction_list("push", [5])
-            for reg in param_regs.keys():
-                output += m0.asm_instruction_list("push", [reg - 2])
+            output += m0.asm_instruction_list("push", [reg - 2 for reg in list(param_regs.keys())])
             output += "\n"
         else:
             output += m0.asm_push_lr() + "\n"
 
         output += m0.asm_comment("Function body:")
-        for token in function_token.body:
-            output += M0Compiler._compile_token(token, param_regs)
+        output += "".join(M0Compiler._compile_token(token, param_regs) for token in function_token.body)
 
         # r6 holds return, r7 holds lr
         output += "\n"
@@ -175,13 +172,11 @@ class M0Compiler:
         output += m0.asm_instruction_cmp_immed(0, 0)
         output += f"beq {else_branch}\n"
         output += f"if_body_of_if_on_line{str(if_token.debug_data)}_{if_uuid}:\n"
-        for token in if_token.if_body:
-            output += M0Compiler._compile_token(token, used_regs)
+        output += "".join(M0Compiler._compile_token(token, used_regs) for token in if_token.if_body)
         output += m0.asm_branch(end_of_if)
 
         output += f"{else_branch}:\n"
-        for token in if_token.else_body:
-            output += M0Compiler._compile_token(token, used_regs)
+        output += "".join(M0Compiler._compile_token(token, used_regs) for token in if_token.else_body)
         output += f"{end_of_if}:\n"
         return output
 
@@ -202,9 +197,9 @@ class M0Compiler:
         # Pop 2 values
         output += m0.asm_instruction_list("pop", [0, 1])
         # Do some arithmetic
-        output += f"{m0.arithmetic_compile_map[token.value]} {m0.reg(1)}, {m0.reg(1)}, {m0.reg(0)}\n"
+        output += f"{m0.arithmetic_compile_map[token.value]} {m0.reg(0)}, {m0.reg(1)}, {m0.reg(0)}\n"
         # Push the new value
-        output += m0.asm_instruction_list("push", [1])
+        output += m0.asm_instruction_list("push", [0])
 
         return output
 

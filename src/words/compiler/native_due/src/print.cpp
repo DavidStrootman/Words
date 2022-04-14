@@ -10,7 +10,8 @@ extern "C" {
     }
 
     void print_num(int num) {
-        Serial.print(num);
+        Serial.println(num, BIN);
+        Serial.println(num, DEC);
     }
 
     void blink_led() {
