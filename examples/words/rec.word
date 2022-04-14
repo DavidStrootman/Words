@@ -16,5 +16,5 @@
   THEN
   RETURN 1 |
 
-0 odd
+31 odd
 __PRINT__

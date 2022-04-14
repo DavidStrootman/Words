@@ -367,6 +367,19 @@ class FunctionParserToken(ParserToken, DictionaryToken):
         return f"function \"{self.name}\" at line {self.debug_data}"
 
 
+class CopyParserToken(ParserToken):
+    """
+    A Copy Parser Token represents a COPY keyword.
+    The COPY keyword duplicates the topmost value on the stack.
+    """
+
+    def __init__(self, debug_data: DebugData):
+        super().__init__(debug_data)
+
+    def execute(self, stack: list, dictionary: dict) -> Tuple[list, dict]:
+        return stack + stack[-1], dictionary
+
+
 class LambdaParserToken(ParserToken):
     """TODO: Lambdas."""
 

@@ -10,7 +10,8 @@ from words.lexer.lex_util import Word
 from words.parser.parse_util import eat_until, eat_until_discarding
 from words.token_types.parser_token import ParserToken, DictionaryOperatorParserToken, BooleanOperatorParserToken, \
     ArithmeticOperatorParserToken, BooleanParserToken, MacroParserToken, NumberParserToken, FunctionParserToken, \
-    ReturnParserToken, ValueParserToken, VariableParserToken, IdentParserToken, IfParserToken, WhileParserToken
+    ReturnParserToken, ValueParserToken, VariableParserToken, IdentParserToken, IfParserToken, WhileParserToken, \
+    CopyParserToken
 
 
 class LexerToken(Debuggable, PrintableABC):
@@ -129,6 +130,7 @@ class KeywordLexerToken(LexerToken):
         ELSE = "ELSE"
         THEN = "THEN"
         VARIABLE = "VARIABLE"
+        COPY = "COPY"
         VALUE = "VALUE"
         RETURN = "RETURN"
         FUNCTION = "|"
@@ -238,8 +240,13 @@ class KeywordLexerToken(LexerToken):
                     f"Got token that is not a ValueParserToken in Function Parameters in function {function_name}")
             return FunctionParserToken(self.debug_data, function_name, parameters, body)
 
+        if self.value == self.Types.COPY:
+            return CopyParserToken(self.debug_data)
+
         if self.value == self.Types.LAMBDA:
             raise NotImplementedError("Lambdas not implemented yet.")
+
+        raise NotImplementedError(f"Keyword token with value {self.value} not implemented.")
 
 
 class LiteralLexerToken(LexerToken):

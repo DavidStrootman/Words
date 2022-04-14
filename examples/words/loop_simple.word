@@ -1,0 +1,11 @@
+| loopy ( VALUE N )
+  0
+  BEGIN
+  COPY 10 <
+  WHILE
+    1 +
+  REPEAT
+  RETURN 1 |
+
+14 loopy
+__PRINT__

@@ -9,7 +9,7 @@ from words.parser.parse_util import Program
 from words.token_types.lexer_token import LexerToken
 from words.token_types.parser_token import ParserToken, VariableParserToken, FunctionParserToken, NumberParserToken, \
     IdentParserToken, MacroParserToken, BooleanOperatorParserToken, IfParserToken, ReturnParserToken, \
-    ArithmeticOperatorParserToken, BooleanParserToken
+    ArithmeticOperatorParserToken, BooleanParserToken, WhileParserToken, CopyParserToken
 
 
 class Compiler:
@@ -185,10 +185,41 @@ class M0Compiler:
         return ""
 
     @staticmethod
+    def _compile_copy_token(token, used_regs) -> str:
+        output = ""
+
+        output += m0.asm_instruction_list("pop", [0])
+        output += m0.asm_instruction_list("push", [0])
+        output += m0.asm_instruction_list("push", [0])
+        return output
+
+    @staticmethod
     def _compile_boolean_token(token: BooleanParserToken) -> str:
         if token.value is True:
             return m0.asm_push_value_stack(1)
         return m0.asm_push_value_stack(0)
+
+    @staticmethod
+    def _compile_while_token(while_token: WhileParserToken, used_regs: dict) -> str:
+        output = ""
+        while_uuid = str(uuid.uuid4())[:8]
+        while_predicate = f"while_predicate_on_line{str(while_token.debug_data)}_{while_uuid}"
+        while_body_start = f"while_body_on_line{str(while_token.debug_data)}_{while_uuid}"
+        end_of_while = f"end_while_on_line{str(while_token.debug_data)}_{while_uuid}"
+
+        # Predicate
+        output += f"{while_predicate}:\n"
+        output += "".join(M0Compiler._compile_token(token, used_regs) for token in while_token.predicate)
+        output += m0.asm_instruction_list("pop", [0])
+        output += m0.asm_instruction_cmp_immed(0, 0)
+        output += f"beq {end_of_while}\n"
+
+        # While body
+        output += f"{while_body_start}:\n"
+        output += "".join(M0Compiler._compile_token(token, used_regs) for token in while_token.statements)
+        output += m0.asm_branch(while_predicate)
+        output += f"{end_of_while}:\n"
+        return output
 
     @staticmethod
     def _compile_arithmetic_op_token(token) -> str:
@@ -223,6 +254,11 @@ class M0Compiler:
             return M0Compiler._compile_arithmetic_op_token(token)
         elif isinstance(token, BooleanParserToken):
             return M0Compiler._compile_boolean_token(token)
+        elif isinstance(token, WhileParserToken):
+            return M0Compiler._compile_while_token(token, used_regs)
+        elif isinstance(token, CopyParserToken):
+            return M0Compiler._compile_copy_token(token, used_regs)
+
         raise RuntimeError(f"Cannot compile token {token.debug_str()}")
 
     @staticmethod
