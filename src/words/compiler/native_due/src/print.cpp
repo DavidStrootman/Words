@@ -10,8 +10,17 @@ extern "C" {
     }
 
     void print_num(int num) {
+        Serial.print("Binary output: ");
         Serial.println(num, BIN);
+        Serial.print("Decimal output: ");
         Serial.println(num, DEC);
+    }
+
+    void a_unittest(int x, int y) {
+        Serial.print("test_output: ");
+        bool test = false;
+        test = x + y == 3;
+        Serial.println(test);
     }
 
     void blink_led() {

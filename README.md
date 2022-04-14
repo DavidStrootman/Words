@@ -7,7 +7,7 @@
 Words programming language
 
 Contains my own programming language "Words".  
-Includes a lexer/parser, an interpreter in python and (hopefully soon) a compiler for Cortex-M0
+Includes a lexer/parser, an interpreter in python and a compiler for Cortex-M
 
 ## Words
 

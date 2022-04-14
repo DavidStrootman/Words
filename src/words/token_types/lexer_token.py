@@ -291,7 +291,7 @@ class MacroLexerToken(LexerToken):
     def parse(self, tokens: Iterator["LexerToken"]):
         """
         Parse the lexer token into a parser token.
-        :param tokens: The list of lexer tokens, which might be used during parsing of this token depending on it's
+        :param tokens: The list of lexer tokens, which might be used during parsing of this token depending on its
         type.
         :return: A Macro parser token.
         """

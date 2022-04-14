@@ -238,7 +238,11 @@ class M0Compiler:
             else:
                 code = code + M0Compiler._compile_token(token, {})
 
-        setup = "setup: \n" + m0.asm_branch_link("serial_begin") + code + "\n\n".join(functions)
+        unittest = "mov r0, #2\n" \
+                   "mov r1, #1\n" \
+                   "bl a_unittest \n\n"
+
+        setup = "setup: \n" + m0.asm_branch_link("serial_begin") + unittest + code + "\n\n".join(functions)
 
         return dot_global + setup + "loop: \nb loop\n "
 
