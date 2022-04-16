@@ -1,4 +1,4 @@
 [flake8]
-ignore = E125
+ignore = E125, C901
 max-line-length = 120
 exclude = python/*

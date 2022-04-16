@@ -7,6 +7,7 @@ def execute_program(program: "Program", init: List) -> Optional[any]:  # noqa: F
 
     :param program: The program to execute. This function is used internally by the interpreter, but can be called
      directly.
+    :param init: initial stack provided as an argument to main.
     :return: The return value of the program executed, if any.
     """
     global_stack = init

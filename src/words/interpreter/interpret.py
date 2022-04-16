@@ -9,6 +9,7 @@ from words.token_types.lexer_token import LexerToken
 
 class Interpreter:
     """The Interpreter class is used to for interpreting a Words program."""
+
     @staticmethod
     def interpret(program: Program, init: List) -> Optional[any]:
         """
@@ -18,6 +19,9 @@ class Interpreter:
         :param init: The initial values to place on the stack.
         :return: The return value of the program executed, if any.
         """
+        if not init:
+            init = []
+
         return execute_program(program, init=init)
 
     @staticmethod
@@ -29,6 +33,9 @@ class Interpreter:
         :param init: The initial values to place on the stack.
         :return:  The return value of the program executed, if any.
         """
+        if not init:
+            init = []
+
         lexed_tokens: Iterator[LexerToken] = Lexer.lex_file(file_path)
 
         program = Parser.parse(lexed_tokens)
