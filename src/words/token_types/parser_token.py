@@ -149,7 +149,7 @@ class WhileParserToken(ParserToken):
         :raises InvalidPredicateException: If the predicate does not return a boolean value the while loop cannot know
          if it should run.
         """
-        predicate_outcome: bool = exhaustive_interpret_tokens(self.predicate, stack, dictionary)[0][0]
+        predicate_outcome: bool = exhaustive_interpret_tokens(self.predicate, stack, dictionary)[0][-1]
         if not isinstance(predicate_outcome, bool):
             raise InvalidPredicateException(self)
         if predicate_outcome:

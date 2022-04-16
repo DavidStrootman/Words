@@ -19,7 +19,7 @@ if __name__ == '__main__':
 
     sys.setrecursionlimit(4000)
     init = []
-    if "init" in args:
+    if "init" in args and args.init is not None:
         init = args.init
 
     if args.native is not None:
