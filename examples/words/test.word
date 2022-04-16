@@ -1,0 +1,21 @@
+| MULTILINE ( VALUE X )
+  0
+  X
+  ==
+
+  IF
+  True
+    IF
+      5 10 +
+    THEN
+  ELSE
+    20
+  THEN
+
+  RETURN 1
+|
+
+| MINIMIZED ( VALUE X ) 0 X == IF 5 10 + ELSE 20 THEN RETURN 1 |
+
+2 MULTILINE __PRINT__
+# 2 MINIMIZED __PRINT__

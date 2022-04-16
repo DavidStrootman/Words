@@ -1,5 +1,5 @@
 from pathlib import Path
-from typing import Callable, Dict, List, Type, Iterator
+from typing import Callable, Dict, List, Iterator
 import uuid
 
 from words.compiler.compile_util import M0Util as m0
@@ -20,6 +20,13 @@ class Compiler:
 
     @staticmethod
     def compile(ast: Program, target: str) -> str:
+        """
+        Compile a program.
+
+        :param ast: The AST to compile.
+        :param target: What platform to compile for.
+        :return: The compiled assembly.
+        """
         selected_target = target.lower()
 
         if selected_target not in platform_compilers:
@@ -29,16 +36,12 @@ class Compiler:
 
     @staticmethod
     def build_asm(sections: List[str]) -> str:
+        """
+        Join all assembly sections into a complete program.
+        :param sections: The sections to join.
+        :return: Joined sections as a string.
+        """
         return "\n".join(sections) + "\n"
-
-    @staticmethod
-    def find_token_in_ast(ast: List[ParserToken], token: Type[ParserToken]) -> List[ParserToken]:
-        """Recursively find token in ast tree"""
-
-        def _find_token_in_token(token_: Type[ParserToken]) -> ParserToken:
-            pass
-
-        return [_find_token_in_token(token)]
 
     @staticmethod
     def compile_file(file_path: Path, target: str) -> str:
@@ -46,6 +49,7 @@ class Compiler:
         Compile from a file, this is the most common entrypoint for the Compiler.
 
         :param file_path: Path to the file to interpret.
+        :param target: The platform to compile for.
         :return: The return value of the program executed, if any.
         """
         lexed_tokens: Iterator[LexerToken] = Lexer.lex_file(file_path)
@@ -58,10 +62,20 @@ class Compiler:
 class M0Compiler:
     @staticmethod
     def _compile_directives(ast: Program):
+        """
+        Compile M0 Directives.
+        :param ast: The ast to compile from.
+        :return: The M0 directives.
+        """
         return ".cpu cortex-m0\n.align 2\n.text\n"
 
     @staticmethod
-    def _compile_bss_segment(ast: Program):
+    def _compile_bss_segment(ast: Program) -> str:
+        """
+        Compile the M0 Bss segment.
+        :param ast: The ast to compile from
+        :return: The compiled Bss segment.
+        """
         bytes_to_reserve = len(Compiler.find_token_in_ast(ast.tokens, VariableParserToken))
 
         bss_segment = (
@@ -73,6 +87,12 @@ class M0Compiler:
 
     @staticmethod
     def _compile_function_token(function_token: FunctionParserToken) -> str:
+        """
+        Compile a function token.
+
+        :param function_token: The token to compile from.
+        :return: The Compiled token.
+        """
         output = ""
         func_end = function_token.name + "_end"
         output += "\n"
@@ -118,10 +138,23 @@ class M0Compiler:
 
     @staticmethod
     def _compile_number_token(token) -> str:
+        """
+        Compile a number token.
+
+        :param token: The token to compile from.
+        :return: The Compiled token.
+        """
         return m0.asm_push_value_stack(token.value)
 
     @staticmethod
     def _compile_ident_token(token, used_regs) -> str:
+        """
+        Compile an identifier.
+
+        :param token: The token to compile from.
+        :param used_regs: The registers that are already in use.
+        :return: The Compiled token.
+        """
         output = ""
 
         if token.value not in used_regs.values():
@@ -136,6 +169,12 @@ class M0Compiler:
 
     @staticmethod
     def _compile_boolean_op_token(token) -> str:
+        """
+        Compile a boolean operator.
+
+        :param token: The token to compile from.
+        :return: The Compiled token.
+        """
         output = ""
 
         output += m0.asm_instruction_list("pop", [1, 2])
@@ -153,6 +192,12 @@ class M0Compiler:
 
     @staticmethod
     def _compile_macro_token(token: MacroParserToken) -> str:
+        """
+        Compile a macro.
+
+        :param token: The token to compile from.
+        :return: The Compiled token
+        """
         output = ""
         if token.function_name == "__PRINT__":
             output += m0.asm_instruction_list("pop", [0])
@@ -163,6 +208,13 @@ class M0Compiler:
 
     @staticmethod
     def _compile_if_token(if_token, used_regs) -> str:
+        """
+        Compile an if statement.
+
+        :param if_token: The token to compile from.
+        :param used_regs: The registers already in use.
+        :return: The Compiled token.
+        """
         output = ""
         if_uuid = str(uuid.uuid4())[:8]
         else_branch = f"else_body_of_if_on_line{str(if_token.debug_data)}_{if_uuid}"
@@ -182,10 +234,23 @@ class M0Compiler:
 
     @staticmethod
     def _compile_return_token(token, used_regs) -> str:
+        """
+        Compile a return statement.
+
+        :param token: The token to compile from.
+        :param used_regs: The registers already in use.
+        :return: The Compiled token
+        """
         return ""
 
     @staticmethod
     def _compile_copy_token(token, used_regs) -> str:
+        """
+        Compile a copy statement.
+        :param token: The token to compile from.
+        :param used_regs: The registers already in use.
+        :return: The Compiled token.
+        """
         output = ""
 
         output += m0.asm_instruction_list("pop", [0])
@@ -195,12 +260,24 @@ class M0Compiler:
 
     @staticmethod
     def _compile_boolean_token(token: BooleanParserToken) -> str:
+        """
+        Compile a boolean.
+
+        :param token: The token to compile from.
+        :return: The Compiled token
+        """
         if token.value is True:
             return m0.asm_push_value_stack(1)
         return m0.asm_push_value_stack(0)
 
     @staticmethod
     def _compile_while_token(while_token: WhileParserToken, used_regs: dict) -> str:
+        """
+        Compile a while loop.
+        :param while_token: The token to compile from.
+        :param used_regs: The registers already in use.
+        :return: The Compiled token.
+        """
         output = ""
         while_uuid = str(uuid.uuid4())[:8]
         while_predicate = f"while_predicate_on_line{str(while_token.debug_data)}_{while_uuid}"
@@ -223,6 +300,11 @@ class M0Compiler:
 
     @staticmethod
     def _compile_arithmetic_op_token(token) -> str:
+        """
+        Compile an arithmetic operator.
+        :param token: The token to compile from.
+        :return: The Compiled token.
+        """
         output = ""
 
         # Pop 2 values
@@ -236,6 +318,12 @@ class M0Compiler:
 
     @staticmethod
     def _compile_token(token: ParserToken, used_regs: dict) -> str:
+        """
+        Compile a parser token into M0 Assembly.
+        :param token: The token to compile from.
+        :param used_regs: The registers already in use.
+        :return: The Compiled token.
+        """
         if isinstance(token, FunctionParserToken):
             return M0Compiler._compile_function_token(token)
         elif isinstance(token, NumberParserToken):
@@ -263,6 +351,11 @@ class M0Compiler:
 
     @staticmethod
     def _compile_code_segment(ast: Program) -> str:
+        """
+        Compile the Code segment.
+        :param ast: The AST to compile from.
+        :return: Compiled Code segment.
+        """
         dot_global = (
             ".global setup, loop\n\n"
         )
@@ -283,7 +376,12 @@ class M0Compiler:
         return dot_global + setup + "loop: \nb loop\n "
 
     @staticmethod
-    def compile(ast: Program):
+    def compile(ast: Program) -> str:
+        """
+        Compile a program from an AST.
+        :param ast: The parsed AST.
+        :return: The complete M0 Assembly.
+        """
         cpu_directive = M0Compiler._compile_directives(ast)
         # bss_segment = M0Compiler._compile_bss_segment(ast)
         code_segment = M0Compiler._compile_code_segment(ast)

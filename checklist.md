@@ -7,9 +7,9 @@ Eigen taal (Words)
 
 Turing-compleet omdat:
 
-Er geen limiet aan de stack, of de parameters die een functie kan meekrijgen zit. Er is random access dmv variabelen. Er
-kan geloopt, er zit ook geen limiet aan de lengte van deze loop.
- 
+Een turing complete Minsky Machine is makkelijk te implementeren met ingebouwde multiplication en deling kan 
+geimplementeerd worden dmv een loop. Afhankelijk van deze deling
+kan er een andere functie uitgevoerd worden.
 
 Code is geschreven in functionele stijl. ✓
 
