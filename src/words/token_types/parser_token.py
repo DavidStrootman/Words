@@ -289,6 +289,10 @@ class IdentParserToken(ParserToken):
 
 
 class ReturnParserToken(ParserToken):
+    """
+    The Return parser token represents the RETURN keyword, which specifies how many values should be kept from the stack
+    after returning.    
+    """
     def __init__(self, debug_data: DebugData, count: int):
         super().__init__(debug_data)
 
