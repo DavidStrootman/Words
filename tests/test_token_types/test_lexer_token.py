@@ -117,6 +117,15 @@ class TestKeywordLexerToken:
         ])
         _assert_token_parse_raises(KeywordLexerToken(Word("BEGIN", DebugData(0))), while_statement, MissingTokenError)
 
+    def test_parse_while_statement_empty_predicate(self):
+        """A while statement should always have a predicate, even if it is just a static value."""
+        while_statement = iter([
+            KeywordLexerToken(Word(KeywordLexerToken.Types.WHILE.value, DebugData(0))),
+            LiteralLexerToken(LiteralLexerToken.Types.NUMBER.value, Word("1", DebugData(0))),
+            KeywordLexerToken(Word(KeywordLexerToken.Types.REPEAT.value, DebugData(0))),
+        ])
+        _assert_token_parse_raises(KeywordLexerToken(Word("BEGIN", DebugData(0))), while_statement, MissingTokenError)
+
     def test_parse_if_statement_positive(self):
         # Parsing a complete correct IF statement
         if_statement_positive = iter([
