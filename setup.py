@@ -8,6 +8,7 @@ setup(
     install_requires=[
         'wheel',
         'sphinx',
+        'sphinx-rtd-theme',
         'pytest',
         'coverage',
         'platformio'
