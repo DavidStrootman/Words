@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Lexer &mdash; Words  documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/sphinx_highlight.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Parser" href="../parser/parser.html" />
+    <link rel="prev" title="Interpreter" href="../interpreter/interpreter.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../index.html" class="icon icon-home"> Words
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../interpreter/interpreter.html">Interpreter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../interpreter/interpreter.html#module-words.interpreter.interpret_util">Interpreter Utils</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Lexer</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#words.lexer.lex.Lexer"><code class="docutils literal notranslate"><span class="pre">Lexer</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#words.lexer.lex.Lexer.lex_file"><code class="docutils literal notranslate"><span class="pre">Lexer.lex_file()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#words.lexer.lex.Lexer.lex_line"><code class="docutils literal notranslate"><span class="pre">Lexer.lex_line()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#words.lexer.lex.Lexer.lex_word"><code class="docutils literal notranslate"><span class="pre">Lexer.lex_word()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="#module-words.lexer.lex_util">Lex Utils</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#words.lexer.lex_util.DebugData"><code class="docutils literal notranslate"><span class="pre">DebugData</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#words.lexer.lex_util.Word"><code class="docutils literal notranslate"><span class="pre">Word</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../parser/parser.html">Parser</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../parser/parser.html#module-words.parser.parse_util">Parse Utils</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../token/token.html">Tokens</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Words</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home"></a></li>
+      <li class="breadcrumb-item active">Lexer</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/lexer/lexer.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-words.lexer">
+<span id="lexer"></span><h1>Lexer<a class="headerlink" href="#module-words.lexer" title="Permalink to this heading"></a></h1>
+<p>This module provides lexing functionality for the Words programming language.</p>
+<span class="target" id="module-words.lexer.lex"></span><dl class="py class">
+<dt class="sig sig-object py" id="words.lexer.lex.Lexer">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">words.lexer.lex.</span></span><span class="sig-name descname"><span class="pre">Lexer</span></span><a class="headerlink" href="#words.lexer.lex.Lexer" title="Permalink to this definition"></a></dt>
+<dd><p>Lexer, also known as a Tokenizer.</p>
+<p>Supplies functionality for reading text from a file and changing them into tokens the parser can accept.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="words.lexer.lex.Lexer.lex_file">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">lex_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Iterator</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="../token/token.html#words.token_types.lexer_token.LexerToken" title="words.token_types.lexer_token.LexerToken"><span class="pre">LexerToken</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#words.lexer.lex.Lexer.lex_file" title="Permalink to this definition"></a></dt>
+<dd><p>Lex all tokens from a file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>file</strong> – Path to the file to lex.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>An iterator over lexer tokens.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="words.lexer.lex.Lexer.lex_line">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">lex_line</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">line</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Iterator</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#words.lexer.lex_util.Word" title="words.lexer.lex_util.Word"><span class="pre">Word</span></a><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Iterator</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="../token/token.html#words.token_types.lexer_token.LexerToken" title="words.token_types.lexer_token.LexerToken"><span class="pre">LexerToken</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#words.lexer.lex.Lexer.lex_line" title="Permalink to this definition"></a></dt>
+<dd><p>Lex all words from a line into tokens.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>line</strong> – An iterator over words to lex.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>An iterator of lexer tokens.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="words.lexer.lex.Lexer.lex_word">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">lex_word</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">word</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#words.lexer.lex_util.Word" title="words.lexer.lex_util.Word"><span class="pre">Word</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="../token/token.html#words.token_types.lexer_token.LexerToken" title="words.token_types.lexer_token.LexerToken"><span class="pre">LexerToken</span></a></span></span><a class="headerlink" href="#words.lexer.lex.Lexer.lex_word" title="Permalink to this definition"></a></dt>
+<dd><p>Lex a single word.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>word</strong> – The word to lex into a token.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>A lexer token.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-words.lexer.lex_util">
+<span id="lex-utils"></span><h1>Lex Utils<a class="headerlink" href="#module-words.lexer.lex_util" title="Permalink to this heading"></a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="words.lexer.lex_util.DebugData">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">words.lexer.lex_util.</span></span><span class="sig-name descname"><span class="pre">DebugData</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">line</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_pos</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#words.lexer.lex_util.DebugData" title="Permalink to this definition"></a></dt>
+<dd><p>Holds data used during exception handling for debugging purposes.</p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="words.lexer.lex_util.Word">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">words.lexer.lex_util.</span></span><span class="sig-name descname"><span class="pre">Word</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">content</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">debug_data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#words.lexer.lex_util.DebugData" title="words.lexer.lex_util.DebugData"><span class="pre">DebugData</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#words.lexer.lex_util.Word" title="Permalink to this definition"></a></dt>
+<dd><p>Wrapper for a word holding the original lexed word and debug data.</p>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="../interpreter/interpreter.html" class="btn btn-neutral float-left" title="Interpreter" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../parser/parser.html" class="btn btn-neutral float-right" title="Parser" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2021, D. Strootman.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

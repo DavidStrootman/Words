@@ -1,0 +1,949 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Tokens &mdash; Words  documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/sphinx_highlight.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="prev" title="Parser" href="../parser/parser.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../index.html" class="icon icon-home"> Words
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../interpreter/interpreter.html">Interpreter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../interpreter/interpreter.html#module-words.interpreter.interpret_util">Interpreter Utils</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../lexer/lexer.html">Lexer</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../lexer/lexer.html#module-words.lexer.lex_util">Lex Utils</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../parser/parser.html">Parser</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../parser/parser.html#module-words.parser.parse_util">Parse Utils</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Tokens</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#words.token_types.lexer_token.DelimLexerToken"><code class="docutils literal notranslate"><span class="pre">DelimLexerToken</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#words.token_types.lexer_token.DelimLexerToken.Types"><code class="docutils literal notranslate"><span class="pre">DelimLexerToken.Types</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#words.token_types.lexer_token.DelimLexerToken.parse"><code class="docutils literal notranslate"><span class="pre">DelimLexerToken.parse()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#words.token_types.lexer_token.IdentLexerToken"><code class="docutils literal notranslate"><span class="pre">IdentLexerToken</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#words.token_types.lexer_token.IdentLexerToken.parse"><code class="docutils literal notranslate"><span class="pre">IdentLexerToken.parse()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#words.token_types.lexer_token.KeywordLexerToken"><code class="docutils literal notranslate"><span class="pre">KeywordLexerToken</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#words.token_types.lexer_token.KeywordLexerToken.Types"><code class="docutils literal notranslate"><span class="pre">KeywordLexerToken.Types</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#words.token_types.lexer_token.KeywordLexerToken.debug_str"><code class="docutils literal notranslate"><span class="pre">KeywordLexerToken.debug_str()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#words.token_types.lexer_token.KeywordLexerToken.parse"><code class="docutils literal notranslate"><span class="pre">KeywordLexerToken.parse()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#words.token_types.lexer_token.LexerToken"><code class="docutils literal notranslate"><span class="pre">LexerToken</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#words.token_types.lexer_token.LexerToken.Types"><code class="docutils literal notranslate"><span class="pre">LexerToken.Types</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#words.token_types.lexer_token.LexerToken.assert_kind_of"><code class="docutils literal notranslate"><span class="pre">LexerToken.assert_kind_of()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#words.token_types.lexer_token.LexerToken.assert_type"><code class="docutils literal notranslate"><span class="pre">LexerToken.assert_type()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#words.token_types.lexer_token.LexerToken.debug_str"><code class="docutils literal notranslate"><span class="pre">LexerToken.debug_str()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#words.token_types.lexer_token.LexerToken.parse"><code class="docutils literal notranslate"><span class="pre">LexerToken.parse()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#words.token_types.lexer_token.LexerToken.try_get_return_value"><code class="docutils literal notranslate"><span class="pre">LexerToken.try_get_return_value()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#words.token_types.lexer_token.LiteralLexerToken"><code class="docutils literal notranslate"><span class="pre">LiteralLexerToken</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#words.token_types.lexer_token.LiteralLexerToken.Types"><code class="docutils literal notranslate"><span class="pre">LiteralLexerToken.Types</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#words.token_types.lexer_token.LiteralLexerToken.debug_str"><code class="docutils literal notranslate"><span class="pre">LiteralLexerToken.debug_str()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#words.token_types.lexer_token.LiteralLexerToken.parse"><code class="docutils literal notranslate"><span class="pre">LiteralLexerToken.parse()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#words.token_types.lexer_token.MacroLexerToken"><code class="docutils literal notranslate"><span class="pre">MacroLexerToken</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#words.token_types.lexer_token.MacroLexerToken.Types"><code class="docutils literal notranslate"><span class="pre">MacroLexerToken.Types</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#words.token_types.lexer_token.MacroLexerToken.parse"><code class="docutils literal notranslate"><span class="pre">MacroLexerToken.parse()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#words.token_types.lexer_token.OpLexerToken"><code class="docutils literal notranslate"><span class="pre">OpLexerToken</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#words.token_types.lexer_token.OpLexerToken.Types"><code class="docutils literal notranslate"><span class="pre">OpLexerToken.Types</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#words.token_types.lexer_token.OpLexerToken.parse"><code class="docutils literal notranslate"><span class="pre">OpLexerToken.parse()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#words.token_types.parser_token.ArithmeticOperatorParserToken"><code class="docutils literal notranslate"><span class="pre">ArithmeticOperatorParserToken</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#words.token_types.parser_token.ArithmeticOperatorParserToken.execute"><code class="docutils literal notranslate"><span class="pre">ArithmeticOperatorParserToken.execute()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#words.token_types.parser_token.BooleanOperatorParserToken"><code class="docutils literal notranslate"><span class="pre">BooleanOperatorParserToken</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#words.token_types.parser_token.BooleanOperatorParserToken.execute"><code class="docutils literal notranslate"><span class="pre">BooleanOperatorParserToken.execute()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#words.token_types.parser_token.BooleanParserToken"><code class="docutils literal notranslate"><span class="pre">BooleanParserToken</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#words.token_types.parser_token.BooleanParserToken.execute"><code class="docutils literal notranslate"><span class="pre">BooleanParserToken.execute()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#words.token_types.parser_token.CopyParserToken"><code class="docutils literal notranslate"><span class="pre">CopyParserToken</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#words.token_types.parser_token.CopyParserToken.execute"><code class="docutils literal notranslate"><span class="pre">CopyParserToken.execute()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#words.token_types.parser_token.DictionaryOperatorParserToken"><code class="docutils literal notranslate"><span class="pre">DictionaryOperatorParserToken</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#words.token_types.parser_token.DictionaryOperatorParserToken.execute"><code class="docutils literal notranslate"><span class="pre">DictionaryOperatorParserToken.execute()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#words.token_types.parser_token.DictionaryToken"><code class="docutils literal notranslate"><span class="pre">DictionaryToken</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#words.token_types.parser_token.DictionaryToken.RemovedDictionaryToken"><code class="docutils literal notranslate"><span class="pre">DictionaryToken.RemovedDictionaryToken</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#words.token_types.parser_token.DictionaryToken.visit"><code class="docutils literal notranslate"><span class="pre">DictionaryToken.visit()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#words.token_types.parser_token.FunctionParserToken"><code class="docutils literal notranslate"><span class="pre">FunctionParserToken</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#words.token_types.parser_token.FunctionParserToken.debug_str"><code class="docutils literal notranslate"><span class="pre">FunctionParserToken.debug_str()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#words.token_types.parser_token.FunctionParserToken.execute"><code class="docutils literal notranslate"><span class="pre">FunctionParserToken.execute()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#words.token_types.parser_token.FunctionParserToken.visit"><code class="docutils literal notranslate"><span class="pre">FunctionParserToken.visit()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#words.token_types.parser_token.IdentParserToken"><code class="docutils literal notranslate"><span class="pre">IdentParserToken</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#words.token_types.parser_token.IdentParserToken.debug_str"><code class="docutils literal notranslate"><span class="pre">IdentParserToken.debug_str()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#words.token_types.parser_token.IdentParserToken.execute"><code class="docutils literal notranslate"><span class="pre">IdentParserToken.execute()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#words.token_types.parser_token.IfParserToken"><code class="docutils literal notranslate"><span class="pre">IfParserToken</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#words.token_types.parser_token.IfParserToken.debug_str"><code class="docutils literal notranslate"><span class="pre">IfParserToken.debug_str()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#words.token_types.parser_token.IfParserToken.execute"><code class="docutils literal notranslate"><span class="pre">IfParserToken.execute()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#words.token_types.parser_token.LambdaParserToken"><code class="docutils literal notranslate"><span class="pre">LambdaParserToken</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#words.token_types.parser_token.LambdaParserToken.execute"><code class="docutils literal notranslate"><span class="pre">LambdaParserToken.execute()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#words.token_types.parser_token.MacroParserToken"><code class="docutils literal notranslate"><span class="pre">MacroParserToken</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#words.token_types.parser_token.MacroParserToken.debug_str"><code class="docutils literal notranslate"><span class="pre">MacroParserToken.debug_str()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#words.token_types.parser_token.MacroParserToken.execute"><code class="docutils literal notranslate"><span class="pre">MacroParserToken.execute()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#words.token_types.parser_token.NumberParserToken"><code class="docutils literal notranslate"><span class="pre">NumberParserToken</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#words.token_types.parser_token.NumberParserToken.execute"><code class="docutils literal notranslate"><span class="pre">NumberParserToken.execute()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#words.token_types.parser_token.ParserToken"><code class="docutils literal notranslate"><span class="pre">ParserToken</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#words.token_types.parser_token.ParserToken.debug_str"><code class="docutils literal notranslate"><span class="pre">ParserToken.debug_str()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#words.token_types.parser_token.ParserToken.execute"><code class="docutils literal notranslate"><span class="pre">ParserToken.execute()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#words.token_types.parser_token.ReturnParserToken"><code class="docutils literal notranslate"><span class="pre">ReturnParserToken</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#words.token_types.parser_token.ReturnParserToken.debug_str"><code class="docutils literal notranslate"><span class="pre">ReturnParserToken.debug_str()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#words.token_types.parser_token.ReturnParserToken.execute"><code class="docutils literal notranslate"><span class="pre">ReturnParserToken.execute()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#words.token_types.parser_token.ValueParserToken"><code class="docutils literal notranslate"><span class="pre">ValueParserToken</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#words.token_types.parser_token.ValueParserToken.execute"><code class="docutils literal notranslate"><span class="pre">ValueParserToken.execute()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#words.token_types.parser_token.VariableParserToken"><code class="docutils literal notranslate"><span class="pre">VariableParserToken</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#words.token_types.parser_token.VariableParserToken.debug_str"><code class="docutils literal notranslate"><span class="pre">VariableParserToken.debug_str()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#words.token_types.parser_token.VariableParserToken.execute"><code class="docutils literal notranslate"><span class="pre">VariableParserToken.execute()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#words.token_types.parser_token.VariableParserToken.visit"><code class="docutils literal notranslate"><span class="pre">VariableParserToken.visit()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#words.token_types.parser_token.WhileParserToken"><code class="docutils literal notranslate"><span class="pre">WhileParserToken</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#words.token_types.parser_token.WhileParserToken.debug_str"><code class="docutils literal notranslate"><span class="pre">WhileParserToken.debug_str()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#words.token_types.parser_token.WhileParserToken.execute"><code class="docutils literal notranslate"><span class="pre">WhileParserToken.execute()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Words</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home"></a></li>
+      <li class="breadcrumb-item active">Tokens</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/token/token.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-words.token_types">
+<span id="tokens"></span><h1>Tokens<a class="headerlink" href="#module-words.token_types" title="Permalink to this heading"></a></h1>
+<p>This module provides the tokens used during lexing, parsing and interpreting a Words program.</p>
+<span class="target" id="module-words.token_types.lexer_token"></span><dl class="py class">
+<dt class="sig sig-object py" id="words.token_types.lexer_token.DelimLexerToken">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">words.token_types.lexer_token.</span></span><span class="sig-name descname"><span class="pre">DelimLexerToken</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">word</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../lexer/lexer.html#words.lexer.lex_util.Word" title="words.lexer.lex_util.Word"><span class="pre">Word</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#words.token_types.lexer_token.DelimLexerToken" title="Permalink to this definition"></a></dt>
+<dd><p>A delimiter token is used to start and end a series of values.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="words.token_types.lexer_token.DelimLexerToken.Types">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Types</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#words.token_types.lexer_token.DelimLexerToken.Types" title="Permalink to this definition"></a></dt>
+<dd><p>An enumeration.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="words.token_types.lexer_token.DelimLexerToken.parse">
+<span class="sig-name descname"><span class="pre">parse</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tokens</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Iterator</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#words.token_types.lexer_token.LexerToken" title="words.token_types.lexer_token.LexerToken"><span class="pre">LexerToken</span></a><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#words.token_types.lexer_token.DelimLexerToken.parse" title="Permalink to this definition"></a></dt>
+<dd><p>Delimiter lexer tokens cannot be parsed by themselves. They are parsed by the preceding function token.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>tokens</strong> – The list of lexer tokens, which might be used during parsing of this token depending on it’s
+type.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="words.token_types.lexer_token.IdentLexerToken">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">words.token_types.lexer_token.</span></span><span class="sig-name descname"><span class="pre">IdentLexerToken</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">word</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../lexer/lexer.html#words.lexer.lex_util.Word" title="words.lexer.lex_util.Word"><span class="pre">Word</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#words.token_types.lexer_token.IdentLexerToken" title="Permalink to this definition"></a></dt>
+<dd><p>An identifier token holds the name of a variable or function.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="words.token_types.lexer_token.IdentLexerToken.parse">
+<span class="sig-name descname"><span class="pre">parse</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tokens</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Iterator</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#words.token_types.lexer_token.LexerToken" title="words.token_types.lexer_token.LexerToken"><span class="pre">LexerToken</span></a><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#words.token_types.parser_token.IdentParserToken" title="words.token_types.parser_token.IdentParserToken"><span class="pre">IdentParserToken</span></a></span></span><a class="headerlink" href="#words.token_types.lexer_token.IdentLexerToken.parse" title="Permalink to this definition"></a></dt>
+<dd><p>Parse the lexer token into a parser token.
+:param tokens: The list of lexer tokens, which might be used during parsing of this token depending on it’s
+type.
+:return: Identifier parser token.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="words.token_types.lexer_token.KeywordLexerToken">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">words.token_types.lexer_token.</span></span><span class="sig-name descname"><span class="pre">KeywordLexerToken</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">word</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../lexer/lexer.html#words.lexer.lex_util.Word" title="words.lexer.lex_util.Word"><span class="pre">Word</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#words.token_types.lexer_token.KeywordLexerToken" title="Permalink to this definition"></a></dt>
+<dd><p>A keyword token holds builtin words that mean something in the language. These keywords cannot be used as
+variable names.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="words.token_types.lexer_token.KeywordLexerToken.Types">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Types</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#words.token_types.lexer_token.KeywordLexerToken.Types" title="Permalink to this definition"></a></dt>
+<dd><p>An enumeration.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="words.token_types.lexer_token.KeywordLexerToken.debug_str">
+<span class="sig-name descname"><span class="pre">debug_str</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#words.token_types.lexer_token.KeywordLexerToken.debug_str" title="Permalink to this definition"></a></dt>
+<dd><p>A debug string is used for providing better error messages during both parsing and at runtime.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="words.token_types.lexer_token.KeywordLexerToken.parse">
+<span class="sig-name descname"><span class="pre">parse</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tokens</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Iterator</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#words.token_types.lexer_token.LexerToken" title="words.token_types.lexer_token.LexerToken"><span class="pre">LexerToken</span></a><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#words.token_types.parser_token.WhileParserToken" title="words.token_types.parser_token.WhileParserToken"><span class="pre">WhileParserToken</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#words.token_types.parser_token.IfParserToken" title="words.token_types.parser_token.IfParserToken"><span class="pre">IfParserToken</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#words.token_types.parser_token.VariableParserToken" title="words.token_types.parser_token.VariableParserToken"><span class="pre">VariableParserToken</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#words.token_types.parser_token.ValueParserToken" title="words.token_types.parser_token.ValueParserToken"><span class="pre">ValueParserToken</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#words.token_types.parser_token.ReturnParserToken" title="words.token_types.parser_token.ReturnParserToken"><span class="pre">ReturnParserToken</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#words.token_types.parser_token.FunctionParserToken" title="words.token_types.parser_token.FunctionParserToken"><span class="pre">FunctionParserToken</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#words.token_types.lexer_token.KeywordLexerToken.parse" title="Permalink to this definition"></a></dt>
+<dd><p>Parse the lexer token into a parser token.
+:param tokens: The list of lexer tokens, which might be used during parsing of this token depending on its
+type.
+:return: A parser token</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="words.token_types.lexer_token.LexerToken">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">words.token_types.lexer_token.</span></span><span class="sig-name descname"><span class="pre">LexerToken</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">word</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../lexer/lexer.html#words.lexer.lex_util.Word" title="words.lexer.lex_util.Word"><span class="pre">Word</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#words.token_types.lexer_token.LexerToken" title="Permalink to this definition"></a></dt>
+<dd><p>Abstract lexer token.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="words.token_types.lexer_token.LexerToken.Types">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Types</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#words.token_types.lexer_token.LexerToken.Types" title="Permalink to this definition"></a></dt>
+<dd><p>Fallback for undefined token types.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="words.token_types.lexer_token.LexerToken.assert_kind_of">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">assert_kind_of</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">token</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#words.token_types.lexer_token.LexerToken" title="words.token_types.lexer_token.LexerToken"><span class="pre">LexerToken</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">kind</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Type</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#words.token_types.lexer_token.LexerToken" title="words.token_types.lexer_token.LexerToken"><span class="pre">LexerToken</span></a><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#words.token_types.lexer_token.LexerToken.assert_kind_of" title="Permalink to this definition"></a></dt>
+<dd><p>Asserts that the provided token is of the provided kind. This method is used for recognizing syntax errors.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>token</strong> – The token to run the assertion on.</p></li>
+<li><p><strong>kind</strong> – The asserted kind.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="words.token_types.lexer_token.LexerToken.assert_type">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">assert_type</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">token</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#words.token_types.lexer_token.LexerToken" title="words.token_types.lexer_token.LexerToken"><span class="pre">LexerToken</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">type_</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">TokenTypeEnum</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#words.token_types.lexer_token.LexerToken.assert_type" title="Permalink to this definition"></a></dt>
+<dd><p>Asserts that the provided token is of the provided type. This method is used for recognizing syntax errors.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>token</strong> – The token to run the assertion on.</p></li>
+<li><p><strong>type</strong> – The asserted type.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="words.token_types.lexer_token.LexerToken.debug_str">
+<span class="sig-name descname"><span class="pre">debug_str</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#words.token_types.lexer_token.LexerToken.debug_str" title="Permalink to this definition"></a></dt>
+<dd><p>A debug string is used for providing better error messages during both parsing and at runtime.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="words.token_types.lexer_token.LexerToken.parse">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">parse</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tokens</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Iterator</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#words.token_types.lexer_token.LexerToken" title="words.token_types.lexer_token.LexerToken"><span class="pre">LexerToken</span></a><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#words.token_types.parser_token.ParserToken" title="words.token_types.parser_token.ParserToken"><span class="pre">ParserToken</span></a></span></span><a class="headerlink" href="#words.token_types.lexer_token.LexerToken.parse" title="Permalink to this definition"></a></dt>
+<dd><p>Parse the lexer token into a parser token.
+:param tokens: The list of lexer tokens, which might be used during parsing of this token depending on it’s
+type.
+:return: A parser token</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="words.token_types.lexer_token.LexerToken.try_get_return_value">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">try_get_return_value</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">token</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#words.token_types.lexer_token.LexerToken" title="words.token_types.lexer_token.LexerToken"><span class="pre">LexerToken</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">int</span></span></span><a class="headerlink" href="#words.token_types.lexer_token.LexerToken.try_get_return_value" title="Permalink to this definition"></a></dt>
+<dd><p>Try to get a return value after a return statement.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>token</strong> – The literal (number) token that should provide the amount of return values</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The amount of return values as an integer (1, 2 or 3).</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="words.token_types.lexer_token.LiteralLexerToken">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">words.token_types.lexer_token.</span></span><span class="sig-name descname"><span class="pre">LiteralLexerToken</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">token_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">word</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../lexer/lexer.html#words.lexer.lex_util.Word" title="words.lexer.lex_util.Word"><span class="pre">Word</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#words.token_types.lexer_token.LiteralLexerToken" title="Permalink to this definition"></a></dt>
+<dd><p>A literal token holds a literal value that does not get changed during lexing or parsing.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="words.token_types.lexer_token.LiteralLexerToken.Types">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Types</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#words.token_types.lexer_token.LiteralLexerToken.Types" title="Permalink to this definition"></a></dt>
+<dd><p>An enumeration.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="words.token_types.lexer_token.LiteralLexerToken.debug_str">
+<span class="sig-name descname"><span class="pre">debug_str</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#words.token_types.lexer_token.LiteralLexerToken.debug_str" title="Permalink to this definition"></a></dt>
+<dd><p>A debug string is used for providing better error messages during both parsing and at runtime.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="words.token_types.lexer_token.LiteralLexerToken.parse">
+<span class="sig-name descname"><span class="pre">parse</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tokens</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Iterator</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#words.token_types.lexer_token.LexerToken" title="words.token_types.lexer_token.LexerToken"><span class="pre">LexerToken</span></a><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#words.token_types.parser_token.NumberParserToken" title="words.token_types.parser_token.NumberParserToken"><span class="pre">NumberParserToken</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#words.token_types.parser_token.BooleanParserToken" title="words.token_types.parser_token.BooleanParserToken"><span class="pre">BooleanParserToken</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#words.token_types.lexer_token.LiteralLexerToken.parse" title="Permalink to this definition"></a></dt>
+<dd><p>Parse the lexer token into a parser token.
+:param tokens: The list of lexer tokens, which might be used during parsing of this token depending on it’s
+type.
+:return: Either a number parser token or a boolean parser token based on the type of lexer token.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="words.token_types.lexer_token.MacroLexerToken">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">words.token_types.lexer_token.</span></span><span class="sig-name descname"><span class="pre">MacroLexerToken</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">word</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../lexer/lexer.html#words.lexer.lex_util.Word" title="words.lexer.lex_util.Word"><span class="pre">Word</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#words.token_types.lexer_token.MacroLexerToken" title="Permalink to this definition"></a></dt>
+<dd><dl class="py class">
+<dt class="sig sig-object py" id="words.token_types.lexer_token.MacroLexerToken.Types">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Types</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#words.token_types.lexer_token.MacroLexerToken.Types" title="Permalink to this definition"></a></dt>
+<dd><p>An enumeration.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="words.token_types.lexer_token.MacroLexerToken.parse">
+<span class="sig-name descname"><span class="pre">parse</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tokens</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Iterator</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#words.token_types.lexer_token.LexerToken" title="words.token_types.lexer_token.LexerToken"><span class="pre">LexerToken</span></a><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#words.token_types.lexer_token.MacroLexerToken.parse" title="Permalink to this definition"></a></dt>
+<dd><p>Parse the lexer token into a parser token.
+:param tokens: The list of lexer tokens, which might be used during parsing of this token depending on its
+type.
+:return: A Macro parser token.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="words.token_types.lexer_token.OpLexerToken">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">words.token_types.lexer_token.</span></span><span class="sig-name descname"><span class="pre">OpLexerToken</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">word</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../lexer/lexer.html#words.lexer.lex_util.Word" title="words.lexer.lex_util.Word"><span class="pre">Word</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#words.token_types.lexer_token.OpLexerToken" title="Permalink to this definition"></a></dt>
+<dd><p>An operator token holds a Keyword that is used as an operator on literals or identifiers</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="words.token_types.lexer_token.OpLexerToken.Types">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Types</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#words.token_types.lexer_token.OpLexerToken.Types" title="Permalink to this definition"></a></dt>
+<dd><p>An enumeration.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="words.token_types.lexer_token.OpLexerToken.parse">
+<span class="sig-name descname"><span class="pre">parse</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tokens</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Iterator</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#words.token_types.lexer_token.LexerToken" title="words.token_types.lexer_token.LexerToken"><span class="pre">LexerToken</span></a><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#words.token_types.parser_token.ArithmeticOperatorParserToken" title="words.token_types.parser_token.ArithmeticOperatorParserToken"><span class="pre">ArithmeticOperatorParserToken</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#words.token_types.parser_token.BooleanOperatorParserToken" title="words.token_types.parser_token.BooleanOperatorParserToken"><span class="pre">BooleanOperatorParserToken</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#words.token_types.parser_token.DictionaryOperatorParserToken" title="words.token_types.parser_token.DictionaryOperatorParserToken"><span class="pre">DictionaryOperatorParserToken</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#words.token_types.lexer_token.OpLexerToken.parse" title="Permalink to this definition"></a></dt>
+<dd><p>Parse the lexer token into a parser token.
+:param tokens: The list of lexer tokens, which might be used during parsing of this token depending on it’s
+type.
+:return: One of the three operator parser token types:
+ArithmeticOperatorParserToken, BooleanOperatorParserToken or DictionaryOperatorParserToken,
+based on the type of lexer token.</p>
+</dd></dl>
+
+</dd></dl>
+
+<span class="target" id="module-words.token_types.parser_token"></span><dl class="py class">
+<dt class="sig sig-object py" id="words.token_types.parser_token.ArithmeticOperatorParserToken">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">words.token_types.parser_token.</span></span><span class="sig-name descname"><span class="pre">ArithmeticOperatorParserToken</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">debug_data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../lexer/lexer.html#words.lexer.lex_util.DebugData" title="words.lexer.lex_util.DebugData"><span class="pre">DebugData</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#words.token_types.parser_token.ArithmeticOperatorParserToken" title="Permalink to this definition"></a></dt>
+<dd><p>An arithmetic operator parser token represents an arithmetic operation. For example the addition operation. It holds
+both the type of operation, as well as the values it will operate on.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="words.token_types.parser_token.ArithmeticOperatorParserToken.execute">
+<span class="sig-name descname"><span class="pre">execute</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">stack</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dictionary</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">list</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dict</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#words.token_types.parser_token.ArithmeticOperatorParserToken.execute" title="Permalink to this definition"></a></dt>
+<dd><p>Execute the arithmetic operation.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>stack</strong> – The stack to use for executing the token.</p></li>
+<li><p><strong>dictionary</strong> – The dictionary to use for executing the token.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The stack and dictionary after executing the token.</p>
+</dd>
+<dt class="field-odd">Raises</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>StackSizeException</strong> – An arithmetic operator always needs two values to run.</p></li>
+<li><p><strong>NotImplementedError</strong> – If an undefined operator is specified it cannot run.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="words.token_types.parser_token.BooleanOperatorParserToken">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">words.token_types.parser_token.</span></span><span class="sig-name descname"><span class="pre">BooleanOperatorParserToken</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">debug_data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../lexer/lexer.html#words.lexer.lex_util.DebugData" title="words.lexer.lex_util.DebugData"><span class="pre">DebugData</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#words.token_types.parser_token.BooleanOperatorParserToken" title="Permalink to this definition"></a></dt>
+<dd><p>An boolean operator parser token represents a boolean operation. For example the equality operation. It holds
+both the type of operation, as well as the values it will operate on.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="words.token_types.parser_token.BooleanOperatorParserToken.execute">
+<span class="sig-name descname"><span class="pre">execute</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">stack</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dictionary</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">list</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dict</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#words.token_types.parser_token.BooleanOperatorParserToken.execute" title="Permalink to this definition"></a></dt>
+<dd><p>Execute the boolean operation.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>stack</strong> – The stack to use for executing the token.</p></li>
+<li><p><strong>dictionary</strong> – The dictionary to use for executing the token.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The stack and dictionary after executing the token.</p>
+</dd>
+<dt class="field-odd">Raises</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>StackSizeException</strong> – A boolean operation always needs two values to run.</p></li>
+<li><p><strong>NotImplementedError</strong> – If an undefined operator is specified it cannot run.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="words.token_types.parser_token.BooleanParserToken">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">words.token_types.parser_token.</span></span><span class="sig-name descname"><span class="pre">BooleanParserToken</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">debug_data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../lexer/lexer.html#words.lexer.lex_util.DebugData" title="words.lexer.lex_util.DebugData"><span class="pre">DebugData</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#words.token_types.parser_token.BooleanParserToken" title="Permalink to this definition"></a></dt>
+<dd><p>The boolean token represents a boolean.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="words.token_types.parser_token.BooleanParserToken.execute">
+<span class="sig-name descname"><span class="pre">execute</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">stack</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dictionary</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">list</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dict</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#words.token_types.parser_token.BooleanParserToken.execute" title="Permalink to this definition"></a></dt>
+<dd><p>Executing a boolean parser token places its value on the stack.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>stack</strong> – The stack to use for executing the token.</p></li>
+<li><p><strong>dictionary</strong> – The dictionary to use for executing the token.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The stack and dictionary after executing the token.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="words.token_types.parser_token.CopyParserToken">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">words.token_types.parser_token.</span></span><span class="sig-name descname"><span class="pre">CopyParserToken</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">debug_data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../lexer/lexer.html#words.lexer.lex_util.DebugData" title="words.lexer.lex_util.DebugData"><span class="pre">DebugData</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#words.token_types.parser_token.CopyParserToken" title="Permalink to this definition"></a></dt>
+<dd><p>A Copy Parser Token represents a COPY keyword.
+The COPY keyword duplicates the topmost value on the stack.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="words.token_types.parser_token.CopyParserToken.execute">
+<span class="sig-name descname"><span class="pre">execute</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">stack</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dictionary</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">list</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dict</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#words.token_types.parser_token.CopyParserToken.execute" title="Permalink to this definition"></a></dt>
+<dd><p>Execute the token to get the result.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>stack</strong> – The stack to use for executing the token.</p></li>
+<li><p><strong>dictionary</strong> – The dictionary to use for executing the token.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The stack and dictionary after executing the token.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="words.token_types.parser_token.DictionaryOperatorParserToken">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">words.token_types.parser_token.</span></span><span class="sig-name descname"><span class="pre">DictionaryOperatorParserToken</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">debug_data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../lexer/lexer.html#words.lexer.lex_util.DebugData" title="words.lexer.lex_util.DebugData"><span class="pre">DebugData</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">variable_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#words.token_types.parser_token.DictionaryOperatorParserToken" title="Permalink to this definition"></a></dt>
+<dd><p>A dictionary operator parser token represents a dictionary operation. Dictionary operators are used for interacting
+with the dictionary. For example the assign operator assigns the top value from the stack to the provided
+identifier in the dictionary.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="words.token_types.parser_token.DictionaryOperatorParserToken.execute">
+<span class="sig-name descname"><span class="pre">execute</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">stack</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dictionary</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">list</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dict</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#words.token_types.parser_token.DictionaryOperatorParserToken.execute" title="Permalink to this definition"></a></dt>
+<dd><p>Execute the dictionary operation.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>stack</strong> – The stack to use for executing the token.</p></li>
+<li><p><strong>dictionary</strong> – The dictionary to use for executing the token.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The stack and dictionary after executing the token.</p>
+</dd>
+<dt class="field-odd">Raises</dt>
+<dd class="field-odd"><p><strong>NotImplementedError</strong> – If an undefined operator is specified it cannot run.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="words.token_types.parser_token.DictionaryToken">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">words.token_types.parser_token.</span></span><span class="sig-name descname"><span class="pre">DictionaryToken</span></span><a class="headerlink" href="#words.token_types.parser_token.DictionaryToken" title="Permalink to this definition"></a></dt>
+<dd><p>A visitable token that is stored in the dictionary.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="words.token_types.parser_token.DictionaryToken.RemovedDictionaryToken">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">RemovedDictionaryToken</span></span><a class="headerlink" href="#words.token_types.parser_token.DictionaryToken.RemovedDictionaryToken" title="Permalink to this definition"></a></dt>
+<dd><p>Placeholder for tokens that are removed from the dictionary.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="words.token_types.parser_token.DictionaryToken.visit">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">visit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">stack</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dictionary</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">list</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dict</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#words.token_types.parser_token.DictionaryToken.visit" title="Permalink to this definition"></a></dt>
+<dd><p>The visit method is used for tokens that might have some other use after the initial execute. For example the
+function parser token is placed in the dictionary during execution, and run during visiting.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>stack</strong> – The stack used for visiting this token.</p></li>
+<li><p><strong>dictionary</strong> – The dictionary used for visiting this token.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The stack and dictionary after this token has been visited..</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="words.token_types.parser_token.FunctionParserToken">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">words.token_types.parser_token.</span></span><span class="sig-name descname"><span class="pre">FunctionParserToken</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">debug_data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../lexer/lexer.html#words.lexer.lex_util.DebugData" title="words.lexer.lex_util.DebugData"><span class="pre">DebugData</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">parameters</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#words.token_types.parser_token.ParserToken" title="words.token_types.parser_token.ParserToken"><span class="pre">ParserToken</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">body</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#words.token_types.parser_token.ParserToken" title="words.token_types.parser_token.ParserToken"><span class="pre">ParserToken</span></a><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#words.token_types.parser_token.FunctionParserToken" title="Permalink to this definition"></a></dt>
+<dd><dl class="simple">
+<dt>A function parser token represents a function. It can be executed to place it in the dictionary and visited to run</dt><dd><p>the statements in the body of the function.</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="words.token_types.parser_token.FunctionParserToken.debug_str">
+<span class="sig-name descname"><span class="pre">debug_str</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#words.token_types.parser_token.FunctionParserToken.debug_str" title="Permalink to this definition"></a></dt>
+<dd><p>A debug string is used for providing better error messages during both parsing and at runtime.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="words.token_types.parser_token.FunctionParserToken.execute">
+<span class="sig-name descname"><span class="pre">execute</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">stack</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dictionary</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#words.token_types.parser_token.FunctionParserToken.execute" title="Permalink to this definition"></a></dt>
+<dd><p>Setup the function by placing it in the dictionary.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>stack</strong> – The stack to use for executing the token.</p></li>
+<li><p><strong>dictionary</strong> – The dictionary to use for executing the token.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The stack and dictionary after executing the token.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="words.token_types.parser_token.FunctionParserToken.visit">
+<span class="sig-name descname"><span class="pre">visit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">stack</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dictionary</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">list</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dict</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#words.token_types.parser_token.FunctionParserToken.visit" title="Permalink to this definition"></a></dt>
+<dd><p>Set up the parameters and execute the function body.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>stack</strong> – The stack to use for executing the token.</p></li>
+<li><p><strong>dictionary</strong> – The dictionary to use for executing the token.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The stack and dictionary after executing the token.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="words.token_types.parser_token.IdentParserToken">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">words.token_types.parser_token.</span></span><span class="sig-name descname"><span class="pre">IdentParserToken</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">debug_data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../lexer/lexer.html#words.lexer.lex_util.DebugData" title="words.lexer.lex_util.DebugData"><span class="pre">DebugData</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#words.token_types.parser_token.IdentParserToken" title="Permalink to this definition"></a></dt>
+<dd><p>The identifier parser token represents an identifier.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="words.token_types.parser_token.IdentParserToken.debug_str">
+<span class="sig-name descname"><span class="pre">debug_str</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#words.token_types.parser_token.IdentParserToken.debug_str" title="Permalink to this definition"></a></dt>
+<dd><p>A debug string is used for providing better error messages during both parsing and at runtime.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="words.token_types.parser_token.IdentParserToken.execute">
+<span class="sig-name descname"><span class="pre">execute</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">stack</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dictionary</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">list</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dict</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#words.token_types.parser_token.IdentParserToken.execute" title="Permalink to this definition"></a></dt>
+<dd><p>Execute the token to get the result.
+:param stack: The stack to use for executing the token.
+:param dictionary: The dictionary to use for executing the token.
+:return: The stack and dictionary after executing the token.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="words.token_types.parser_token.IfParserToken">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">words.token_types.parser_token.</span></span><span class="sig-name descname"><span class="pre">IfParserToken</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">debug_data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../lexer/lexer.html#words.lexer.lex_util.DebugData" title="words.lexer.lex_util.DebugData"><span class="pre">DebugData</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">if_body</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#words.token_types.parser_token.ParserToken" title="words.token_types.parser_token.ParserToken"><span class="pre">ParserToken</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">else_body</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#words.token_types.parser_token.ParserToken" title="words.token_types.parser_token.ParserToken"><span class="pre">ParserToken</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#words.token_types.parser_token.IfParserToken" title="Permalink to this definition"></a></dt>
+<dd><p>The if token represents an if statement, with an optional else statement.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="words.token_types.parser_token.IfParserToken.debug_str">
+<span class="sig-name descname"><span class="pre">debug_str</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#words.token_types.parser_token.IfParserToken.debug_str" title="Permalink to this definition"></a></dt>
+<dd><p>A debug string is used for providing better error messages during both parsing and at runtime.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="words.token_types.parser_token.IfParserToken.execute">
+<span class="sig-name descname"><span class="pre">execute</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">stack</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dictionary</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">list</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dict</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#words.token_types.parser_token.IfParserToken.execute" title="Permalink to this definition"></a></dt>
+<dd><p>Either run the if or else body, based on the predicate.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>stack</strong> – The stack to use for executing the token.</p></li>
+<li><p><strong>dictionary</strong> – The dictionary to use for executing the token.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The stack and dictionary after executing the token.</p>
+</dd>
+<dt class="field-odd">Raises</dt>
+<dd class="field-odd"><p><strong>InvalidPredicateException</strong> – If the predicate does not return a boolean value the if statement cannot know
+if it should run.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="words.token_types.parser_token.LambdaParserToken">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">words.token_types.parser_token.</span></span><span class="sig-name descname"><span class="pre">LambdaParserToken</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">debug_data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../lexer/lexer.html#words.lexer.lex_util.DebugData" title="words.lexer.lex_util.DebugData"><span class="pre">DebugData</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#words.token_types.parser_token.LambdaParserToken" title="Permalink to this definition"></a></dt>
+<dd><p>TODO: Lambdas.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="words.token_types.parser_token.LambdaParserToken.execute">
+<span class="sig-name descname"><span class="pre">execute</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">stack</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dictionary</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">list</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dict</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#words.token_types.parser_token.LambdaParserToken.execute" title="Permalink to this definition"></a></dt>
+<dd><p>Execute the token to get the result.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>stack</strong> – The stack to use for executing the token.</p></li>
+<li><p><strong>dictionary</strong> – The dictionary to use for executing the token.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The stack and dictionary after executing the token.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="words.token_types.parser_token.MacroParserToken">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">words.token_types.parser_token.</span></span><span class="sig-name descname"><span class="pre">MacroParserToken</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">debug_data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../lexer/lexer.html#words.lexer.lex_util.DebugData" title="words.lexer.lex_util.DebugData"><span class="pre">DebugData</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">function_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#words.token_types.parser_token.MacroParserToken" title="Permalink to this definition"></a></dt>
+<dd><p>The macro token represents a macro, for example __PRINT___.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="words.token_types.parser_token.MacroParserToken.debug_str">
+<span class="sig-name descname"><span class="pre">debug_str</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#words.token_types.parser_token.MacroParserToken.debug_str" title="Permalink to this definition"></a></dt>
+<dd><p>A debug string is used for providing better error messages during both parsing and at runtime.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="words.token_types.parser_token.MacroParserToken.execute">
+<span class="sig-name descname"><span class="pre">execute</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">stack</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dictionary</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">list</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dict</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#words.token_types.parser_token.MacroParserToken.execute" title="Permalink to this definition"></a></dt>
+<dd><p>Execute the macro.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>stack</strong> – The stack to use for executing the token.</p></li>
+<li><p><strong>dictionary</strong> – The dictionary to use for executing the token.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The stack and dictionary after executing the token.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="words.token_types.parser_token.NumberParserToken">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">words.token_types.parser_token.</span></span><span class="sig-name descname"><span class="pre">NumberParserToken</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">debug_data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../lexer/lexer.html#words.lexer.lex_util.DebugData" title="words.lexer.lex_util.DebugData"><span class="pre">DebugData</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#words.token_types.parser_token.NumberParserToken" title="Permalink to this definition"></a></dt>
+<dd><p>The number token represents an integer.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="words.token_types.parser_token.NumberParserToken.execute">
+<span class="sig-name descname"><span class="pre">execute</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">stack</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dictionary</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">list</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dict</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#words.token_types.parser_token.NumberParserToken.execute" title="Permalink to this definition"></a></dt>
+<dd><p>Executing a number parser token places its value on the stack.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>stack</strong> – The stack to use for executing the token.</p></li>
+<li><p><strong>dictionary</strong> – The dictionary to use for executing the token.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The stack and dictionary after executing the token.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="words.token_types.parser_token.ParserToken">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">words.token_types.parser_token.</span></span><span class="sig-name descname"><span class="pre">ParserToken</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">debug_data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../lexer/lexer.html#words.lexer.lex_util.DebugData" title="words.lexer.lex_util.DebugData"><span class="pre">DebugData</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#words.token_types.parser_token.ParserToken" title="Permalink to this definition"></a></dt>
+<dd><p>Base parser token.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="words.token_types.parser_token.ParserToken.debug_str">
+<span class="sig-name descname"><span class="pre">debug_str</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#words.token_types.parser_token.ParserToken.debug_str" title="Permalink to this definition"></a></dt>
+<dd><p>A debug string is used for providing better error messages during both parsing and at runtime.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="words.token_types.parser_token.ParserToken.execute">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">execute</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">stack</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dictionary</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">list</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dict</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#words.token_types.parser_token.ParserToken.execute" title="Permalink to this definition"></a></dt>
+<dd><p>Execute the token to get the result.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>stack</strong> – The stack to use for executing the token.</p></li>
+<li><p><strong>dictionary</strong> – The dictionary to use for executing the token.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The stack and dictionary after executing the token.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="words.token_types.parser_token.ReturnParserToken">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">words.token_types.parser_token.</span></span><span class="sig-name descname"><span class="pre">ReturnParserToken</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">debug_data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../lexer/lexer.html#words.lexer.lex_util.DebugData" title="words.lexer.lex_util.DebugData"><span class="pre">DebugData</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">count</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#words.token_types.parser_token.ReturnParserToken" title="Permalink to this definition"></a></dt>
+<dd><p>The Return parser token represents the RETURN keyword, which specifies how many values should be kept from the stack
+after returning.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="words.token_types.parser_token.ReturnParserToken.debug_str">
+<span class="sig-name descname"><span class="pre">debug_str</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#words.token_types.parser_token.ReturnParserToken.debug_str" title="Permalink to this definition"></a></dt>
+<dd><p>A debug string is used for providing better error messages during both parsing and at runtime.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="words.token_types.parser_token.ReturnParserToken.execute">
+<span class="sig-name descname"><span class="pre">execute</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">stack</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dictionary</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">list</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dict</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#words.token_types.parser_token.ReturnParserToken.execute" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>stack</strong> – </p></li>
+<li><p><strong>dictionary</strong> – </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="words.token_types.parser_token.ValueParserToken">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">words.token_types.parser_token.</span></span><span class="sig-name descname"><span class="pre">ValueParserToken</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">debug_data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../lexer/lexer.html#words.lexer.lex_util.DebugData" title="words.lexer.lex_util.DebugData"><span class="pre">DebugData</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#words.token_types.parser_token.ValueParserToken" title="Permalink to this definition"></a></dt>
+<dd><p>The value parser token represents a function parameter, which is called a value in Words.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="words.token_types.parser_token.ValueParserToken.execute">
+<span class="sig-name descname"><span class="pre">execute</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">stack</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dictionary</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">list</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dict</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#words.token_types.parser_token.ValueParserToken.execute" title="Permalink to this definition"></a></dt>
+<dd><p>Values cannot be executed, only added to the dictionary when instantiating a function.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>stack</strong> – The stack to use for executing the token.</p></li>
+<li><p><strong>dictionary</strong> – The dictionary to use for executing the token.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The stack and dictionary after executing the token.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="words.token_types.parser_token.VariableParserToken">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">words.token_types.parser_token.</span></span><span class="sig-name descname"><span class="pre">VariableParserToken</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">debug_data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../lexer/lexer.html#words.lexer.lex_util.DebugData" title="words.lexer.lex_util.DebugData"><span class="pre">DebugData</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#words.token_types.parser_token.VariableParserToken" title="Permalink to this definition"></a></dt>
+<dd><p>The variable token represents a variable. The variable token gets placed in the dictionary.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="words.token_types.parser_token.VariableParserToken.debug_str">
+<span class="sig-name descname"><span class="pre">debug_str</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#words.token_types.parser_token.VariableParserToken.debug_str" title="Permalink to this definition"></a></dt>
+<dd><p>A debug string is used for providing better error messages during both parsing and at runtime.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="words.token_types.parser_token.VariableParserToken.execute">
+<span class="sig-name descname"><span class="pre">execute</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">stack</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dictionary</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">list</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dict</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#words.token_types.parser_token.VariableParserToken.execute" title="Permalink to this definition"></a></dt>
+<dd><p>Execute the variable to place it in the dictionary, with Unassigned as its value.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>stack</strong> – The stack to use for executing the token.</p></li>
+<li><p><strong>dictionary</strong> – The dictionary to use for executing the token.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The stack and dictionary after executing the token.</p>
+</dd>
+<dt class="field-odd">Raises</dt>
+<dd class="field-odd"><p><strong>IdentifierPreviouslyDefinedException</strong> – Since shadowing is not allowed, a variable cannot be defined
+twice.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="words.token_types.parser_token.VariableParserToken.visit">
+<span class="sig-name descname"><span class="pre">visit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">stack</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dictionary</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">list</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dict</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#words.token_types.parser_token.VariableParserToken.visit" title="Permalink to this definition"></a></dt>
+<dd><p>Visiting a variable retrieves its assigned value and places it on the stack.
+:param stack:
+:param dictionary:
+:return:</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="words.token_types.parser_token.WhileParserToken">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">words.token_types.parser_token.</span></span><span class="sig-name descname"><span class="pre">WhileParserToken</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">debug_data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../lexer/lexer.html#words.lexer.lex_util.DebugData" title="words.lexer.lex_util.DebugData"><span class="pre">DebugData</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">predicate</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#words.token_types.parser_token.ParserToken" title="words.token_types.parser_token.ParserToken"><span class="pre">ParserToken</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">statements</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#words.token_types.parser_token.ParserToken" title="words.token_types.parser_token.ParserToken"><span class="pre">ParserToken</span></a><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#words.token_types.parser_token.WhileParserToken" title="Permalink to this definition"></a></dt>
+<dd><dl class="simple">
+<dt>The while token represents a while loop. It holds a predicate that is checked every loop and the statements that</dt><dd><p>should be executed as long as the predicate holds true.</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="words.token_types.parser_token.WhileParserToken.debug_str">
+<span class="sig-name descname"><span class="pre">debug_str</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#words.token_types.parser_token.WhileParserToken.debug_str" title="Permalink to this definition"></a></dt>
+<dd><p>A debug string is used for providing better error messages during both parsing and at runtime.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="words.token_types.parser_token.WhileParserToken.execute">
+<span class="sig-name descname"><span class="pre">execute</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">stack</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dictionary</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">list</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dict</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#words.token_types.parser_token.WhileParserToken.execute" title="Permalink to this definition"></a></dt>
+<dd><p>Run the while loop as long as the predicate holds true.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>stack</strong> – The stack to use for executing the token.</p></li>
+<li><p><strong>dictionary</strong> – The dictionary to use for executing the token.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The stack and dictionary after executing the token.</p>
+</dd>
+<dt class="field-odd">Raises</dt>
+<dd class="field-odd"><p><strong>InvalidPredicateException</strong> – If the predicate does not return a boolean value the while loop cannot know
+if it should run.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="../parser/parser.html" class="btn btn-neutral float-left" title="Parser" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2021, D. Strootman.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
